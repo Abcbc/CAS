@@ -1,4 +1,8 @@
 from utils.Logger import *
+from SelectionRules import *
+from Builder import *
+from Rules import *
+from utility import *
 log = get_logger(__name__, __file__) # For Main
 
 import networkx as nx
@@ -8,7 +12,7 @@ def main():
     print("First Commit")
     log.debug("First Commit")
     
-    graph = nx.complete_graph(2)
+    graph = nx.complete_graph(3)
     
     #plt.figure()
     #nx.draw(graph,with_labels=True)
@@ -16,6 +20,7 @@ def main():
     
     graph.node[0]['xname'] = 'Peter'
     graph.node[1]['xname'] = 'Karl'
+    graph.node[2]['xname'] = 'Alice'
     
 #     print(graph.node)
 #     
@@ -25,6 +30,7 @@ def main():
 #         print('"'+key+'": '+graph.node[0][key])
     
     graph.edges[0,1]['concatname'] = "PeterKarl"
+    graph.remove_edge(0,2)
     
     #print(graph.edges[0,1]['nodes'])
     
@@ -41,7 +47,12 @@ def main():
         oldNode = graph.node[nodeId]
         newGraph.add_node(nodeId)
         newNode = newGraph.node[nodeId]
-        newNode['xname'] = oldNode['xname']+str(0)
+        numberOfNeighbors = len(list(graph.neighbors(nodeId)))
+        appendix = ''
+        for neighborId in list(graph.neighbors(nodeId)):
+            neighbor = graph.node[neighborId]
+            appendix = appendix + neighbor['xname'][0]
+        newNode['xname'] = oldNode['xname']+str(numberOfNeighbors)+appendix
         
     # update edges
 
@@ -67,4 +78,18 @@ def main():
             print('"'+key+'": '+newGraph.node[nodeId][key])
 
 if __name__ == "__main__":
-    main()
+    g = buildGraph()
+    
+    print('Original graph')
+    printGraph(g)
+    
+    aur = AttributesUpdateRule()
+    #g = aur.apply(g)
+    aur.apply(g)
+    
+    print('')
+    print('')
+    print('')
+    print('Graph with attributes')
+    printGraph(g)
+    
