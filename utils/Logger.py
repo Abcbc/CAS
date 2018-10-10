@@ -3,7 +3,9 @@ from logging import *
 
 import sys
 
+
 log_file = ""
+#Configs : Format, Log-Level and store path
 format = Formatter('%(asctime)s:%(module)s -> %(levelname)s:%(message)s')
 cmd_level = DEBUG
 file_level = DEBUG
