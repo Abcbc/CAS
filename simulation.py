@@ -3,6 +3,7 @@ from SelectionRules import *
 from Builder import *
 from Rules import *
 from utility import *
+from Updater import Updater
 log = get_logger(__name__, __file__) # For Main
 
 import networkx as nx
@@ -83,9 +84,8 @@ if __name__ == "__main__":
     print('Original graph')
     printGraph(g)
     
-    aur = AttributesUpdateRule()
-    #g = aur.apply(g)
-    aur.apply(g)
+    updater = Updater()
+    updater.setGraph(g)
     
     print('')
     print('')
@@ -93,8 +93,7 @@ if __name__ == "__main__":
     print('Graph with attributes')
     printGraph(g)
     
-    ocr = OrientationConfirmationRule()
-    ocr.apply(g)
+    updater.update()
     
     print('')
     print('')

@@ -1,15 +1,23 @@
+from Rules import *
+import random
+
 class Updater:
-    rules = []
-    
     def __init__(self):
-        pass#rules.append()
+        self.attributesUpdateRule = AttributesUpdateRule()
+        self.rules = []
+        self.rules.append(OrientationConfirmationRule())
+        
     
     def setGraph(self, graph):
         self.graph = graph
+        self.attributesUpdateRule.apply(self.graph)
     
-#     def addRule(self, rule):
-#         self.rules.append(rule)
+    def addRule(self, rule):
+         self.rules.append(rule)
     
     def update(self):
-        for rule in self.rules:
-            print(rule)        
+         rule = random.choice(self.rules)
+         
+         rule.apply(self.graph)
+         
+         self.attributesUpdateRule.apply(self.graph)
