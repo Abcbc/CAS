@@ -1,4 +1,8 @@
 import networkx as nx
+import random
+
+def getRandomOpinion():
+    return random.randint(-1,1)
 
 def buildGraph():
     g = nx.complete_graph(3)
@@ -6,7 +10,7 @@ def buildGraph():
         #print(nodeId)
         g.nodes()[nodeId]['id']=nodeId
         g.nodes()[nodeId]['graph']=g
-        g.nodes()[nodeId]['opinions']=[0,0,0]
+        g.nodes()[nodeId]['opinions']=[getRandomOpinion(),getRandomOpinion(),getRandomOpinion()]
         g.nodes()[nodeId]['spectrum']=0
     
     for edgeId in g.edges():
