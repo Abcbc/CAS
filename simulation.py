@@ -93,3 +93,12 @@ if __name__ == "__main__":
     print('Graph with attributes')
     printGraph(g)
     
+    ocr = OrientationConfirmationRule()
+    ocr.apply(g)
+    
+    print('')
+    print('')
+    print('')
+    print('Graph with attributes')
+    printGraph(g)
+    

@@ -1,5 +1,6 @@
 from SelectionRules import *
 import networkx as nx
+import random
 
 KEY_SPECTRUM = 'spectrum'
 KEY_OPINIONS = 'opinions'
@@ -34,6 +35,10 @@ def getEdgesFromIndices(graph, ids):
         edges.append(graph.edges[id])
     return edges
 
+def doOpinionsDiffer(opinionA, opinionB):
+    # differ if both != 0 and not equal
+    return opinionA*opinionB == -1
+
 class AttributesUpdateRule:
 #     graph = nx.Graph()
 #     selectionRule = selectNodeFromGraph(graph)
@@ -52,3 +57,27 @@ class AttributesUpdateRule:
             node[KEY_V] = calcV(edges)
             
         return graph
+    
+class OrientationConfirmationRule:
+    def calcProbability(self):
+        return 0.5
+        
+    def apply(self, graph):
+        # how many times?
+        # apply to all opinions or select one "opinion-pair"?
+        edgeId = selectEdgeFromGraph(graph)
+        edge = graph.edges[edgeId]
+        nodeA = graph.nodes[edgeId[0]]
+        nodeB = graph.nodes[edgeId[1]]
+        opinionsA = nodeA[KEY_OPINIONS]
+        opinionsB = nodeB[KEY_OPINIONS]
+        
+        #print('nodes: ' + str(edgeId))
+        for i in range(len(nodeA[KEY_OPINIONS])):
+            if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
+                #print('opinions['+str(i)+'] differ')
+                if random.random() > self.calcProbability():
+                    #print('one opinion is going to fall back to neutral')
+                    opToChange = random.choice([opinionsA, opinionsB])
+                    opToChange[i] = 0
+        
