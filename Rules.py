@@ -39,6 +39,10 @@ def doOpinionsDiffer(opinionA, opinionB):
     # differ if both != 0 and not equal
     return opinionA*opinionB == -1
 
+def areOppositeOpinions(opinionA, opinionB):
+    # dif one is 1 and one is -1
+    return opinionA*opinionB == -1
+
 class AttributesUpdateRule:
 #     graph = nx.Graph()
 #     selectionRule = selectNodeFromGraph(graph)
@@ -77,7 +81,25 @@ class OrientationConfirmationRule:
             if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
                 #print('opinions['+str(i)+'] differ')
                 if random.random() > self.calcProbability():
-                    #print('one opinion is going to fall back to neutral')
+                    print('one opinion is going to fall back to neutral')
                     opToChange = random.choice([opinionsA, opinionsB])
                     opToChange[i] = 0
+                    
+class AdaptationRule:
+    def selectionPredicate(self, pair):
+        opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
+        opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
+        return areOppositeOpinions(opA, opB)
         
+    def apply(self, graph):
+        # why is 'SelectionRules-' needed here???
+        #opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self.selectionPredicate)
+        # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
+        opinionPair =  selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self.selectionPredicate)
+        
+        # ToDo real behavior
+        nodeA = opinionPair['edge']['nodeA']
+        nodeB = opinionPair['edge']['nodeB']
+        nodeA[KEY_OPINIONS][opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][opinionPair['opinionIndex']]
+        
+        print('Changed node ' + str(nodeA['id']))

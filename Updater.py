@@ -5,7 +5,8 @@ class Updater:
     def __init__(self):
         self.attributesUpdateRule = AttributesUpdateRule()
         self.rules = []
-        self.rules.append(OrientationConfirmationRule())
+        #self.rules.append(OrientationConfirmationRule())
+        self.rules.append(AdaptationRule())
         
     
     def setGraph(self, graph):
