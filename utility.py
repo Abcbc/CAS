@@ -25,4 +25,4 @@ def printGraph(graph):
     for nodeId in graph.nodes:
         printNode(graph.nodes[nodeId])
         for neighborId in graph.neighbors(nodeId):
-            print('NeighId ' + str(neighborId))
+            print('NeighId ' + str(neighborId) + ': orientation ' + str(graph.edges[nodeId,neighborId][KEY_ORIENTATION]))
