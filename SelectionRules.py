@@ -1,4 +1,5 @@
 import random
+from Rules import KEY_OPINIONS
 
 # Anforderung an node: ID muss enthalten sein
 KEY_NODE_ID = 'id'
@@ -47,3 +48,15 @@ If no suitable edge could be found after maxChoiceTries, the function raises an 
 '''
 def selectEdgeFromGraph(graph, weight_getter=lambda edge:1, predicate=lambda edge: True, maxChoiceTries=100):
     return selectItemFromSet(list(graph.edges()), weight_getter, predicate, maxChoiceTries)
+
+#def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=lambda opA,opB:1, predicate=lambda edge,opA,opB:True, maxChoiceTries=100):
+def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=None, predicate=lambda pair:True, maxChoiceTries=100):
+    if weight_getter_opinion is not None:    
+        raise NotImplementedError("weight getter for opinions is not supported yet")
+     
+    pairs = []
+    for edgeId in graph.edges:
+        for idx in range(len(graph.nodes[edgeId[0]][KEY_OPINIONS])):
+            pairs.append({'edge':graph.edges[edgeId], 'opinionIndex':idx})
+    
+    return selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate, maxChoiceTries=maxChoiceTries)
