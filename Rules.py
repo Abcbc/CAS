@@ -92,14 +92,12 @@ class AdaptationRule:
         return areOppositeOpinions(opA, opB)
         
     def apply(self, graph):
-        # why is 'SelectionRules-' needed here???
-        #opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self.selectionPredicate)
         # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
+        #opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self.selectionPredicate)
+        # this works
         opinionPair =  selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self.selectionPredicate)
         
-        # ToDo real behavior
+        # ToDo real behavior, this is only dummy and always changes nodeA
         nodeA = opinionPair['edge']['nodeA']
         nodeB = opinionPair['edge']['nodeB']
         nodeA[KEY_OPINIONS][opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][opinionPair['opinionIndex']]
-        
-        print('Changed node ' + str(nodeA['id']))
