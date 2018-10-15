@@ -18,5 +18,7 @@ def buildGraph():
         g.edges()[edgeId]['id']=edgeId
         g.edges()[edgeId]['graph']=g
         g.edges()[edgeId]['orientation']=0
+        g.edges()[edgeId]['nodeA']=g.nodes[edgeId[0]]
+        g.edges()[edgeId]['nodeB']=g.nodes[edgeId[1]]
         
     return g
