@@ -1,9 +1,9 @@
 from Rules import *
+from Graph import calculateAttributes
 import random
 
 class Updater:
     def __init__(self):
-        self.attributesUpdateRule = AttributesUpdateRule()
         self.rules = []
         #self.rules.append(OrientationConfirmationRule())
         self.rules.append(AdaptationRule())
@@ -11,7 +11,7 @@ class Updater:
     
     def setGraph(self, graph):
         self.graph = graph
-        self.attributesUpdateRule.apply(self.graph)
+        self.graph = calculateAttributes(self.graph)
     
     def addRule(self, rule):
          self.rules.append(rule)
@@ -21,4 +21,4 @@ class Updater:
          
          rule.apply(self.graph)
          
-         self.attributesUpdateRule.apply(self.graph)
+         self.graph = calculateAttributes(self.graph)

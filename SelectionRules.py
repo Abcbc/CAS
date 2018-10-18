@@ -1,8 +1,5 @@
 import random
-from Rules import KEY_OPINIONS
-
-# Anforderung an node: ID muss enthalten sein
-KEY_NODE_ID = 'id'
+from Graph import KEY_OPINIONS
 
 def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
     weights = []

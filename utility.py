@@ -6,11 +6,7 @@
 #     nx.draw(graph)
 #     plt.show()
 import networkx as nx
-
-KEY_NODE_ID = 'id'
-KEY_SPECTRUM = 'spectrum'
-KEY_OPINIONS = 'opinions'
-KEY_ORIENTATION = 'orientation'
+from Graph import KEY_NODE_ID, KEY_OPINIONS, KEY_SPECTRUM, KEY_ORIENTATION
 
 def printNode(node):
     print(

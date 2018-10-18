@@ -1,66 +1,6 @@
-from SelectionRules import *
-import networkx as nx
 import random
-
-KEY_SPECTRUM = 'spectrum'
-KEY_OPINIONS = 'opinions'
-KEY_ORIENTATION = 'orientation'
-KEY_V = 'V'
-
-def calcSpectrum(opinions):
-    spectrum = 0
-    for op in opinions:
-        spectrum += op*op
-    
-    return spectrum
-        
-def calcOrientation(nodeA, nodeB):
-    orientation = 0
-    for opA, opB in zip(nodeA[KEY_OPINIONS], nodeB[KEY_OPINIONS]):
-        orientation += opA*opB
-    orientation /= len(nodeA[KEY_OPINIONS])
-    
-    return orientation
-
-def calcV(edges): # "anerkanntes Vermoegen"
-    V = 0
-    for edge in edges:
-        V += edge[KEY_ORIENTATION] * edge[KEY_ORIENTATION]
-    
-    return V
-
-def getEdgesFromIndices(graph, ids):
-    edges = []
-    for id in ids:
-        edges.append(graph.edges[id])
-    return edges
-
-def doOpinionsDiffer(opinionA, opinionB):
-    # differ if both != 0 and not equal
-    return opinionA*opinionB == -1
-
-def areOppositeOpinions(opinionA, opinionB):
-    # dif one is 1 and one is -1
-    return opinionA*opinionB == -1
-
-class AttributesUpdateRule:
-#     graph = nx.Graph()
-#     selectionRule = selectNodeFromGraph(graph)
-    def apply(self, graph): # TODO: not the rule should have the apply method?
-        for edgeId in graph.edges:
-            edge = graph.edges[edgeId]
-            neighborA = graph.nodes[edgeId[0]]
-            neighborB = graph.nodes[edgeId[1]]
-            edge[KEY_ORIENTATION] = calcOrientation(neighborA, neighborB)
-            
-        for nodeId in graph.nodes:
-            node = graph.nodes[nodeId]
-            node[KEY_SPECTRUM] = calcSpectrum(node[KEY_OPINIONS])
-            
-            edges = getEdgesFromIndices(graph, graph.edges(nodeId))
-            node[KEY_V] = calcV(edges)
-            
-        return graph
+from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
+from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
     
 class OrientationConfirmationRule:
     def calcProbability(self):
@@ -93,9 +33,10 @@ class AdaptationRule:
         
     def apply(self, graph):
         # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
-        #opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self.selectionPredicate)
+#         opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self.selectionPredicate)
         # this works
-        opinionPair =  selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self.selectionPredicate)
+        selectOpinionPairFromGraph(graph)
+        opinionPair = selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self.selectionPredicate)
         
         # ToDo real behavior, this is only dummy and always changes nodeA
         nodeA = opinionPair['edge']['nodeA']
