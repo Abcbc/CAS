@@ -24,6 +24,10 @@ class OrientationConfirmationRule:
                     print('one opinion is going to fall back to neutral')
                     opToChange = random.choice([opinionsA, opinionsB])
                     opToChange[i] = 0
+
+    @staticmethod
+    def getName():
+        return 'OrientationConfirmationRule'
                     
 class AdaptationRule:
     def selectionPredicate(self, pair):
@@ -42,3 +46,7 @@ class AdaptationRule:
         nodeA = opinionPair['edge']['nodeA']
         nodeB = opinionPair['edge']['nodeB']
         nodeA[KEY_OPINIONS][opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][opinionPair['opinionIndex']]
+
+    @staticmethod
+    def getName():
+        return 'AdaptationRule'
