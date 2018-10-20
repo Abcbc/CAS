@@ -15,7 +15,7 @@ class GraphLogJsonFormatter:
         if isinstance(entry, GraphLogSnapshotEntry):
             jsonStr = json.dumps({
                 'type':'GraphLogSnapshotEntry',
-                'graph':'TODOTODOTODO'
+                'graph':nx.to_dict_of_dicts(removeConvenienceAttributes(entry.graph.copy()))
                 })
             return jsonStr
 
