@@ -25,6 +25,8 @@ class OrientationConfirmationRule:
                     opToChange = random.choice([opinionsA, opinionsB])
                     opToChange[i] = 0
 
+        return graph
+
     @staticmethod
     def getName():
         return 'OrientationConfirmationRule'
@@ -46,6 +48,8 @@ class AdaptationRule:
         nodeA = opinionPair['edge']['nodeA']
         nodeB = opinionPair['edge']['nodeB']
         nodeA[KEY_OPINIONS][opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][opinionPair['opinionIndex']]
+
+        return graph
 
     @staticmethod
     def getName():
