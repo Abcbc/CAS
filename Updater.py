@@ -5,7 +5,7 @@ import random
 class Updater:
     def __init__(self):
         self.rules = {}
-        #self.rules[OrientationConfirmationRule.getName()] = OrientationConfirmationRule()
+        self.rules[OrientationConfirmationRule.getName()] = OrientationConfirmationRule()
         self.rules[AdaptationRule.getName()] = AdaptationRule()
 
 
@@ -27,5 +27,6 @@ class Updater:
 
         # TODO: get rule's requirements and choose items
         # for the rule to operate on
-        self.graph = self.rules[ruleName].apply()
+        operands = self.rules[ruleName].getOperands(self.graph)
+        self.graph = self.rules[ruleName].apply(self.graph, operands)
         # TODO: log rule application
