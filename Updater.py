@@ -1,6 +1,10 @@
 from Rules import *
 from Graph import calculateAttributes
 import random
+from GraphLogger import GraphLogger
+from GraphLogWriters import GraphLoggerJson
+
+graphLogger = None
 
 class Updater:
     def __init__(self):
@@ -8,10 +12,12 @@ class Updater:
         self.rules[OrientationConfirmationRule.getName()] = OrientationConfirmationRule()
         self.rules[AdaptationRule.getName()] = AdaptationRule()
 
-
     def setGraph(self, graph):
         self.graph = graph
         self.graph = calculateAttributes(self.graph)
+
+        global graphLogger
+        graphLogger = GraphLogger(self.graph, GraphLoggerJson(filename='log.txt'))
 
     def addRule(self, rule):
         self.rules[rule.getName()] = rule
@@ -29,4 +35,5 @@ class Updater:
         # for the rule to operate on
         operands = self.rules[ruleName].getOperands(self.graph)
         self.graph = self.rules[ruleName].apply(self.graph, operands)
-        # TODO: log rule application
+
+        graphLogger.logRule(self.rules[ruleName], operands)

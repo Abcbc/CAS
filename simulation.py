@@ -81,23 +81,7 @@ def main():
 if __name__ == "__main__":
     g = buildGraph()
     
-    print('Original graph')
-    printGraph(g)
-    
     updater = Updater()
     updater.setGraph(g)
     
-    print('')
-    print('')
-    print('')
-    print('Graph with attributes')
-    printGraph(g)
-    
     updater.update()
-    
-    print('')
-    print('')
-    print('')
-    print('Graph with attributes')
-    printGraph(g)
-    
