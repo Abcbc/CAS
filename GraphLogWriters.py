@@ -1,6 +1,8 @@
 import json
 from GraphLogEntries import GraphLogRuleEntry, GraphLogSnapshotEntry
+from Graph import toJsonStr, fromJsonStr
 
+# TODO: write to and parse from JSON in the classes themselves
 class GraphLogJsonFormatter:
     @staticmethod
     def formatEntry(entry):
@@ -15,9 +17,17 @@ class GraphLogJsonFormatter:
         if isinstance(entry, GraphLogSnapshotEntry):
             jsonStr = json.dumps({
                 'type':'GraphLogSnapshotEntry',
-                'graph':nx.to_dict_of_dicts(removeConvenienceAttributes(entry.graph.copy()))
+                'graph':toJsonStr(entry.graph)
                 })
             return jsonStr
+
+    @staticmethod
+    def parseEntry(jsonStr):
+        json = json.loads(jsonStr)
+        if json['type'] == 'GraphLogRuleEntry':
+            return GraphLogRuleEntry(json['rulename'], json['parameters'], json['operands'])
+        elif json['type'] == 'GraphLogSnapshotEntry':
+            return GraphLogSnapshotEntry(fromJsonStr(json['graph']))
 
 class GraphLoggerJson:
     def __init__(self, doPrint=False, filename=None):

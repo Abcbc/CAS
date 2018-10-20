@@ -1,3 +1,6 @@
+import networkx as nx
+import json
+
 KEY_NODE_ID = 'id'
 KEY_EDGE_ID = 'id'
 KEY_SPECTRUM = 'spectrum'
@@ -89,3 +92,15 @@ def addConvenienceAttributes(graph):
         edge['nodeB'] = graph.nodes[edgeId[1]]
 
     return graph
+
+def toJsonStr(graph):
+    return nx.jit_data(removeConvenienceAttributes(graph.copy()))
+
+def fromJsonStr(jsonStr):
+    return addConvenienceAttributes(nx.jit_graph(json.loads(jsonStr)))
+
+def toPickle(graph, filename):
+    nx.write_gpickle(removeConvenienceAttributes(graph.copy()),filename)
+
+def fromPickle(filename):
+    return addConvenienceAttributes(nx.read_gpickle(filename))
