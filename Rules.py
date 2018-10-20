@@ -96,8 +96,8 @@ class AdaptationRule(Rule):
     def apply(self, graph, opinionPair):
         print('Apply AdaptationRule')
         # ToDo real behavior, this is only dummy and always changes nodeA
-        nodeA = opinionPair['edge']['nodeA']
-        nodeB = opinionPair['edge']['nodeB']
+        nodeA = graph.edges[opinionPair['edgeId']] ['nodeA']
+        nodeB = graph.edges[opinionPair['edgeId']] ['nodeB']
         nodeA[KEY_OPINIONS][opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][opinionPair['opinionIndex']]
 
         return graph

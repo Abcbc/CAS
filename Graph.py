@@ -1,4 +1,5 @@
 KEY_NODE_ID = 'id'
+KEY_EDGE_ID = 'id'
 KEY_SPECTRUM = 'spectrum'
 KEY_OPINIONS = 'opinions'
 KEY_ORIENTATION = 'orientation'

@@ -1,5 +1,5 @@
 import random
-from Graph import KEY_OPINIONS
+from Graph import KEY_OPINIONS, KEY_EDGE_ID
 
 def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
     weights = []
@@ -63,7 +63,7 @@ The predicate can be specified to ensure the chosen edge fulfills some requireme
 function is specified, all edges can be chosen.
 Returns a dictionary with 'edge' (the edge dictionary) and 'opinionIndex' (the index of the chosen
 opinion pair.
-If no suitable edge could be found after maxChoiceTries, the function raises an error. 
+If no suitable edge could be found after maxChoiceTries, the function raises an error.
 '''
 #def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=lambda opA,opB:1, predicate=lambda edge,opA,opB:True, maxChoiceTries=100):
 def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=None, predicate=lambda pair:True, maxChoiceTries=100):
@@ -74,5 +74,6 @@ def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_g
     for edgeId in graph.edges:
         for idx in range(len(graph.nodes[edgeId[0]][KEY_OPINIONS])):
             pairs.append({'edge':graph.edges[edgeId], 'opinionIndex':idx})
-    
-    return selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate, maxChoiceTries=maxChoiceTries)
+
+    pairWithEdgeObjects = selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate, maxChoiceTries=maxChoiceTries)
+    return {'edgeId':pairWithEdgeObjects['edge'][KEY_EDGE_ID], 'opinionIndex':pairWithEdgeObjects['opinionIndex']}
