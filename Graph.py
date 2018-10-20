@@ -59,3 +59,33 @@ def doOpinionsDiffer(opinionA, opinionB):
 def areOppositeOpinions(opinionA, opinionB):
     # dif one is 1 and one is -1
     return opinionA*opinionB == -1
+
+def removeConvenienceAttributes(graph):
+    for nodeId in graph.nodes:
+        node = graph.nodes[nodeId]
+        del node['graph']
+        del node[KEY_NODE_ID]
+
+    for edgeId in graph.edges:
+        edge = graph.edges[edgeId]
+        del edge['graph']
+        del edge[KEY_EDGE_ID]
+        del edge['nodeA']
+        del edge['nodeB']
+
+    return graph
+
+def addConvenienceAttributes(graph):
+    for nodeId in graph.nodes:
+        node = graph.nodes[nodeId]
+        node['graph'] = graph
+        node[KEY_NODE_ID] = nodeId
+
+    for edgeId in graph.edges:
+        edge = graph.edges[edgeId]
+        edge['graph'] = graph
+        edge[KEY_EDGE_ID] = edgeId
+        edge['nodeA'] = graph.nodes[edgeId[0]]
+        edge['nodeB'] = graph.nodes[edgeId[1]]
+
+    return graph
