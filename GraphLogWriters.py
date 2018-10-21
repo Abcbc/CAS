@@ -23,11 +23,11 @@ class GraphLogJsonFormatter:
 
     @staticmethod
     def parseEntry(jsonStr):
-        json = json.loads(jsonStr)
-        if json['type'] == 'GraphLogRuleEntry':
-            return GraphLogRuleEntry(json['rulename'], json['parameters'], json['operands'])
-        elif json['type'] == 'GraphLogSnapshotEntry':
-            return GraphLogSnapshotEntry(fromJsonStr(json['graph']))
+        jsonDict = json.loads(jsonStr)
+        if jsonDict['type'] == 'GraphLogRuleEntry':
+            return GraphLogRuleEntry(jsonDict['rulename'], jsonDict['parameters'], jsonDict['operands'])
+        elif jsonDict['type'] == 'GraphLogSnapshotEntry':
+            return GraphLogSnapshotEntry(fromJsonStr(jsonDict['graph']))
 
 class GraphLoggerJson:
     def __init__(self, doPrint=False, filename=None):
