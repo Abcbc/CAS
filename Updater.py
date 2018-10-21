@@ -24,8 +24,6 @@ class Updater:
     def update(self, ruleName = None):
         self.applyRule(ruleName)
 
-        self.graph = calculateAttributes(self.graph)
-
     def applyRule(self, ruleName=None):
         if ruleName is None:
             ruleName = random.choice(list(self.rules))
@@ -35,4 +33,7 @@ class Updater:
         operands = self.rules[ruleName].getOperands(self.graph)
         self.graph = self.rules[ruleName].apply(self.graph, operands)
 
+        self.graph = calculateAttributes(self.graph)
+
         graphLogger.logRule(self.rules[ruleName], operands)
+        self.rules[ruleName].clearParameters()

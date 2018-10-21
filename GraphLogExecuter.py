@@ -1,6 +1,7 @@
 from Rules import getRuleset
 from GraphLogger import GraphLogger
 from GraphLogWriters import GraphLoggerJson
+from Graph import calculateAttributes
 
 class GraphLogExecuter:
     def __init__(self, graphLogReader):
@@ -30,6 +31,7 @@ class GraphLogExecuter:
             log = self.graphLogReader.getRuleEntry()
             self.rules[log.rulename].setParameters(log.parameters)
             self.graph = self.rules[log.rulename].apply(self.graph,log.operands)
+            self.graph = calculateAttributes(self.graph)
 
             self.graphLogger.logRule(self.rules[log.rulename], log.operands)
 
