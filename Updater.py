@@ -16,6 +16,7 @@ class Updater:
 
         global graphLogger
         graphLogger = GraphLogger(self.graph, GraphLoggerJson(filename='log.txt'))
+        graphLogger.setGraphGetter(lambda : self.graph)
 
     def addRule(self, rule):
         self.rules[rule.getName()] = rule
