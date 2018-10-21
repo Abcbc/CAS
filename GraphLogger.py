@@ -33,3 +33,6 @@ class GraphLogger:
             self.log.append((self._getLogEntryId(),GraphLogSnapshotEntry(self.graphGetter())))
             self.graphLogWriter.writeEntry(self.log[-1][1])
             self.ruleCnt = 0
+
+    def close(self):
+        self.graphLogWriter.close()

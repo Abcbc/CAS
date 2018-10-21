@@ -37,3 +37,7 @@ class Updater:
 
         graphLogger.logRule(self.rules[ruleName], operands)
         self.rules[ruleName].clearParameters()
+
+    def close(self):
+        global graphLogger
+        graphLogger.close()

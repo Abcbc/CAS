@@ -42,3 +42,7 @@ class GraphLoggerJson:
             print(strEntry)
         if self.file is not None:
             self.file.write(strEntry + '\n')
+
+    def close(self):
+        self.file.flush()
+        self.file.close()
