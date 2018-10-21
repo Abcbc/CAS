@@ -6,6 +6,8 @@ from utility import *
 from Updater import Updater
 from GraphLogEntries import GraphLogSnapshotEntry
 from Graph import toJsonStr, fromJsonStr, toPickle, fromPickle
+from GraphLogExecuter import GraphLogExecuter
+from GraphLogReaders import GraphLogReaderJson
 log = get_logger(__name__, __file__) # For Main
 
 import networkx as nx
@@ -102,10 +104,11 @@ def testGraphLogWriteRead():
 
 if __name__ == "__main__":
 #     g = buildGraph()
-#     
+#
 #     updater = Updater()
 #     updater.setGraph(g)
-#     
+#
 #     updater.update()
+    gExe = GraphLogExecuter(GraphLogReaderJson('log.txt'))
+    gExe.performSteps(12)
 
-    print(testGraphLogWriteRead())
