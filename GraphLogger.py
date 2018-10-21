@@ -29,6 +29,7 @@ class GraphLogger:
 
         self.graphLogWriter.writeEntry(self.log[-1][1])
 
-        if self.graphGetter is not None and self.ruleCnt > self.snapshotDistance:
+        if self.graphGetter is not None and self.ruleCnt >= self.snapshotDistance:
             self.log.append((self._getLogEntryId(),GraphLogSnapshotEntry(self.graphGetter())))
             self.graphLogWriter.writeEntry(self.log[-1][1])
+            self.ruleCnt = 0
