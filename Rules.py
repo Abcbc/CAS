@@ -2,6 +2,12 @@ import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
 from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
 
+def getRuleset():
+    return {
+        OrientationConfirmationRule.getName():OrientationConfirmationRule(),
+        AdaptationRule.getName():AdaptationRule()
+        }
+
 class Rule:
     '''
     Returns the human-readable and unique name for this rule

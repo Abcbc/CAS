@@ -8,9 +8,7 @@ graphLogger = None
 
 class Updater:
     def __init__(self):
-        self.rules = {}
-        self.rules[OrientationConfirmationRule.getName()] = OrientationConfirmationRule()
-        self.rules[AdaptationRule.getName()] = AdaptationRule()
+        self.rules = getRuleset()
 
     def setGraph(self, graph):
         self.graph = graph
