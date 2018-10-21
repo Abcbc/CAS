@@ -29,6 +29,12 @@ class Rule:
         raise NotImplementedError('setParameters not implemented for this rule class')
 
     '''
+    Clears internal parameters so that they will be generated new
+    '''
+    def clearParameters(self):
+        raise NotImplementedError('clearParameters not implemented for this rule class')
+
+    '''
     Returns the operands to be passed to apply()
     '''
     def getOperands(self, graph):
@@ -47,10 +53,15 @@ Parameters: None
 '''
 class OrientationConfirmationRule(Rule):
     def getParameters(self):
-        return dict()
+        return self.parameters
 
     def setParameters(self, parameters):
-        pass
+        for paramKey in self.parameters:
+            self.parameters[paramKey] = parameters[paramKey]
+
+    def clearParameters(self):
+        self.parameters = {'fallbackDecision': [],
+                           'fallbackSelection': []}
 
     def getOperands(self, graph):
         print('Selecting operands for OrientationConfirmationRule')
@@ -59,6 +70,10 @@ class OrientationConfirmationRule(Rule):
     def _calcProbability(self):
         return 0.5
 
+    def __init__(self):
+        self.clearParameters()
+
+    # TODO this could look a lot prettier
     def apply(self, graph, edgeId):
         print('Apply OrientationConfirmationRule')
         # how many times?
@@ -67,15 +82,24 @@ class OrientationConfirmationRule(Rule):
         nodeB = graph.nodes[edgeId[1]]
         opinionsA = nodeA[KEY_OPINIONS]
         opinionsB = nodeB[KEY_OPINIONS]
-        
-        #print('nodes: ' + str(edgeId))
+
         for i in range(len(nodeA[KEY_OPINIONS])):
-            if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
-                #print('opinions['+str(i)+'] differ')
+            if len(self.parameters['fallbackDecision']) <= i: # if this opinion no decision yet
                 if random.random() > self._calcProbability():
-                    print('one opinion is going to fall back to neutral')
-                    opToChange = random.choice([opinionsA, opinionsB])
+                    self.parameters['fallbackDecision'].append(True)
+                else:
+                    self.parameters['fallbackDecision'].append(False)
+            if len(self.parameters['fallbackSelection']) <= i:
+                self.parameters['fallbackSelection'].append(random.choice([0,1]))
+
+            if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
+                if self.parameters['fallbackDecision'][i]:
+                    if self.parameters['fallbackSelection'][i] == 0:
+                        opToChange = opinionsA
+                    else:
+                        opToChange = opinionsB
                     opToChange[i] = 0
+                    #print('Change opinionpair ' + str(i) + ' in node ' + str(self.parameters['fallbackSelection'][i]) + ' of nodes ' + str(edgeId))
 
         return graph
 
@@ -91,6 +115,9 @@ class AdaptationRule(Rule):
         return dict()
 
     def setParameters(self, parameters):
+        pass
+
+    def clearParameters(self):
         pass
 
     def getOperands(self, graph):
