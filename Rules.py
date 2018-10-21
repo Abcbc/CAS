@@ -49,6 +49,9 @@ class OrientationConfirmationRule(Rule):
     def getParameters(self):
         return dict()
 
+    def setParameters(self, parameters):
+        pass
+
     def getOperands(self, graph):
         print('Selecting operands for OrientationConfirmationRule')
         return selectEdgeFromGraph(graph)
@@ -86,6 +89,9 @@ Parameters: None
 class AdaptationRule(Rule):
     def getParameters(self):
         return dict()
+
+    def setParameters(self, parameters):
+        pass
 
     def getOperands(self, graph):
         print('Selecting operands for AdaptationRule')
