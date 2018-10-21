@@ -103,12 +103,15 @@ def testGraphLogWriteRead():
     return True
 
 if __name__ == "__main__":
-#     g = buildGraph()
-#
-#     updater = Updater()
-#     updater.setGraph(g)
-#
-#     updater.update()
-    gExe = GraphLogExecuter(GraphLogReaderJson('log.txt'))
-    gExe.performSteps(12)
+    g = buildGraph()
 
+    updater = Updater()
+    updater.setGraph(g)
+
+    for i in range(20):
+        updater.update()
+
+    updater.close()
+
+    gExe = GraphLogExecuter(GraphLogReaderJson('log.txt'))
+    gExe.performSteps(20)
