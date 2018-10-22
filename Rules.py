@@ -125,7 +125,7 @@ class AdaptationRule(Rule):
         # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
 #         opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self._selectionPredicate)
         # this works
-        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate)
+        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
 
     def _selectionPredicate(self, pair):
         opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
