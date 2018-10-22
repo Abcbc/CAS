@@ -17,13 +17,13 @@ class Rule:
         raise NotImplementedError('getName not implemented for this rule class')
 
     '''
-    Returns a dictionary with internal parameters which are used in this rule
+    Returns a dictionary with parameters which are used in this rule
     '''
     def getParameters(self):
         raise NotImplementedError('getParameters not implemented for this rule class')
 
     '''
-    Sets internal parameters from the dictionary (can be retrieved with getParameters)
+    Sets parameters from the dictionary (can be retrieved with getParameters)
     '''
     def setParameters(self, parameters):
         raise NotImplementedError('setParameters not implemented for this rule class')
@@ -36,23 +36,31 @@ class Rule:
 
     '''
     Applies this rule to the operands of the graph.
-    Operands have to be parts of the graph and have the structure as returned by getOperands().
+    Parameters must be a dictionary according to the rule's needs. If the argument
+    is not given, parameters given with setParameters are used. Parameters given by
+    this argument are used only for the particular call and are not stored.
+    Internals must be a dictionary according to the rule's needs. The stored information
+    will typically include the objects to operade on and decisions which are needed for
+    rule application. If it is not given, the data will be generated and be available
+    with getInternals.
     Returns the graph, which can be a new object.
     '''
-    def apply(self, graph, operands=None, internals=None):
+    def apply(self, graph, operands=None, parameters=None, internals=None):
         raise NotImplementedError('apply not implemented for this rule class')
 
 '''
 Parameters: None
 '''
 class OrientationConfirmationRule(Rule):
+    defaultParameters = dict() # accessed by get/setParameters, used as fallback by apply
+    parameters = dict() # actual parameters used during application.
+
     def getParameters(self):
-        return dict()
+        return self.defaultParameters
 
     def setParameters(self, parameters):
-        # for paramKey in self.parameters:
-        #     self.parameters[paramKey] = parameters[paramKey]
-        pass
+        for paramKey in self.defaultParameters:
+            self.defaultParameters[paramKey] = parameters[paramKey]
 
     def _createInternals(self, graph):
         self.internals = {'fallbackDecision': [],
@@ -75,11 +83,12 @@ class OrientationConfirmationRule(Rule):
         return 0.5
 
     # TODO this could look a lot prettier
-    def apply(self, graph, _internals=None):
+    def apply(self, graph, _parameters=None, _internals=None):
         if _internals == None:
             self._createInternals(graph)
         else:
             self.internals = _internals
+        self.parameters = _parameters if _parameters is not None else self.getParameters()
 
         nodeA = graph.nodes[self.internals['edgeId'][0]]
         nodeB = graph.nodes[self.internals['edgeId'][1]]
@@ -106,11 +115,15 @@ class OrientationConfirmationRule(Rule):
 Parameters: None
 '''
 class AdaptationRule(Rule):
+    defaultParameters = dict() # accessed by get/setParameters, used as fallback by apply
+    parameters = dict() # actual parameters used during application.
+
     def getParameters(self):
-        return dict()
+        return self.defaultParameters
 
     def setParameters(self, parameters):
-        pass
+        for paramKey in self.defaultParameters:
+            self.defaultParameters[paramKey] = parameters[paramKey]
 
     def _createInternals(self, graph):
         self.internals = {'opinionPair': self._findOperands(graph)
@@ -130,11 +143,12 @@ class AdaptationRule(Rule):
         opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
         return areOppositeOpinions(opA, opB)
 
-    def apply(self, graph, _internals=None):
+    def apply(self, graph, _parameters=None, _internals=None):
         if _internals == None:
             self._createInternals(graph)
         else:
             self.internals = _internals
+        self.parameters = _parameters if _parameters is not None else self.getParameters()
 
         # ToDo real behavior, this is only dummy and always changes nodeA
         nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']

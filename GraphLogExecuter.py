@@ -30,8 +30,7 @@ class GraphLogExecuter:
             if not self.graphLogReader.hasRuleEntry():
                 raise RuntimeError('Unknown entry. Entry, but not snapshotentry should be ruleentry, but isnt')
             log = self.graphLogReader.getRuleEntry()
-            self.rules[log.rulename].setParameters(log.parameters)
-            self.graph = self.rules[log.rulename].apply(self.graph,log.internals)
+            self.graph = self.rules[log.rulename].apply(self.graph,log.parameters,log.internals)
             self.graph = calculateAttributes(self.graph)
 
             self.graphLogger.logRule(self.rules[log.rulename])
