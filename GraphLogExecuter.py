@@ -33,7 +33,7 @@ class GraphLogExecuter:
             self.graph = self.rules[log.rulename].apply(self.graph,log.operands)
             self.graph = calculateAttributes(self.graph)
 
-            self.graphLogger.logRule(self.rules[log.rulename], log.operands)
+            self.graphLogger.logRule(self.rules[log.rulename])
 
     def performStep(self):
         self.performSteps(1)

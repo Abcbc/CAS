@@ -23,8 +23,8 @@ class GraphLogger:
         self.graphGetter = graphGetter
 
     # arguments are subject to change, just written to get a first impression
-    def logRule(self, rule, operands):
-        self.log.append((self._getLogEntryId(),GraphLogRuleEntry(rule.getName(), rule.getParameters(), operands)))
+    def logRule(self, rule):
+        self.log.append((self._getLogEntryId(),GraphLogRuleEntry(rule.getName(), rule.getParameters(), rule.getOperands())))
         self.ruleCnt += 1
 
         self.graphLogWriter.writeEntry(self.log[-1][1])

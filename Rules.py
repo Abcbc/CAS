@@ -37,7 +37,7 @@ class Rule:
     '''
     Returns the operands to be passed to apply()
     '''
-    def getOperands(self, graph):
+    def getOperands(self):
         raise NotImplementedError('getOperands not implemented for this rule class')
 
     '''
@@ -45,7 +45,7 @@ class Rule:
     Operands have to be parts of the graph and have the structure as returned by getOperands().
     Returns the graph, which can be a new object.
     '''
-    def apply(self, graph, operands):
+    def apply(self, graph, operands=None):
         raise NotImplementedError('apply not implemented for this rule class')
 
 '''
@@ -63,9 +63,11 @@ class OrientationConfirmationRule(Rule):
         self.parameters = {'fallbackDecision': [],
                            'fallbackSelection': []}
 
-    def getOperands(self, graph):
-        print('Selecting operands for OrientationConfirmationRule')
-        return selectEdgeFromGraph(graph)
+    def _findOperands(self, graph):
+        self.edgeId = selectEdgeFromGraph(graph)
+
+    def getOperands(self):
+        return self.edgeId
 
     def _calcProbability(self):
         return 0.5
@@ -74,12 +76,17 @@ class OrientationConfirmationRule(Rule):
         self.clearParameters()
 
     # TODO this could look a lot prettier
-    def apply(self, graph, edgeId):
+    def apply(self, graph, _edgeId=None):
         print('Apply OrientationConfirmationRule')
         # how many times?
         # apply to all opinions or select one "opinion-pair"?
-        nodeA = graph.nodes[edgeId[0]]
-        nodeB = graph.nodes[edgeId[1]]
+        if _edgeId == None:
+            self._findOperands(graph)
+        else:
+            self.edgeId = _edgeId
+
+        nodeA = graph.nodes[self.edgeId[0]]
+        nodeB = graph.nodes[self.edgeId[1]]
         opinionsA = nodeA[KEY_OPINIONS]
         opinionsB = nodeB[KEY_OPINIONS]
 
@@ -120,24 +127,32 @@ class AdaptationRule(Rule):
     def clearParameters(self):
         pass
 
-    def getOperands(self, graph):
-        print('Selecting operands for AdaptationRule')
+    def _findOperands(self, graph):
         # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
 #         opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self._selectionPredicate)
         # this works
-        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
+        self.opinionPair = selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
+
+    def getOperands(self):
+        return self.opinionPair
 
     def _selectionPredicate(self, pair):
         opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
         opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
         return areOppositeOpinions(opA, opB)
 
-    def apply(self, graph, opinionPair):
+    def apply(self, graph, _opinionPair=None):
         print('Apply AdaptationRule')
+
+        if _opinionPair == None:
+            self._findOperands(graph)
+        else:
+            self.opinionPair = _opinionPair
+
         # ToDo real behavior, this is only dummy and always changes nodeA
-        nodeA = graph.edges[opinionPair['edgeId']] ['nodeA']
-        nodeB = graph.edges[opinionPair['edgeId']] ['nodeB']
-        nodeA[KEY_OPINIONS][opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][opinionPair['opinionIndex']]
+        nodeA = graph.edges[self.opinionPair['edgeId']] ['nodeA']
+        nodeB = graph.edges[self.opinionPair['edgeId']] ['nodeB']
+        nodeA[KEY_OPINIONS][self.opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][self.opinionPair['opinionIndex']]
 
         return graph
 

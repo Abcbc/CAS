@@ -31,12 +31,11 @@ class Updater:
         # TODO: get rule's requirements and choose items
         # for the rule to operate on
         try:
-            operands = self.rules[ruleName].getOperands(self.graph)
-            self.graph = self.rules[ruleName].apply(self.graph, operands)
+            self.graph = self.rules[ruleName].apply(self.graph)
 
             self.graph = calculateAttributes(self.graph)
 
-            graphLogger.logRule(self.rules[ruleName], operands)
+            graphLogger.logRule(self.rules[ruleName])
             self.rules[ruleName].clearParameters()
         except TimeoutError:
             pass
