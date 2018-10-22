@@ -39,7 +39,7 @@ def get_logger(name=None, filepath=None):
     cmd_handler.setLevel(cmd_level)
 
     print(log_file)
-    file_handler = FileHandler("".join([log_dir, log_file]),mode='w')
+    file_handler = FileHandler("".join([log_dir, log_file]))
     file_handler.setFormatter(format)
     file_handler.setLevel(file_level)
 
@@ -71,7 +71,7 @@ def get_graph_logger(name=None, filepath=None, doPrint=False):
     cmd_handler.setFormatter(graphLogFormat)
     cmd_handler.setLevel(INFO)
 
-    file_handler = FileHandler("".join([log_dir, log_file]))
+    file_handler = FileHandler("".join([log_dir, log_file]),mode='w')
     file_handler.setFormatter(graphLogFormat)
     file_handler.setLevel(INFO)
 
