@@ -3,8 +3,7 @@ from Graph import calculateAttributes
 import random
 from GraphLogger import GraphLogger
 from GraphLogWriters import GraphLoggerJson
-
-graphLogger = None
+from utils.Logger import get_graph_logger
 
 class Updater:
     def __init__(self):
@@ -14,9 +13,8 @@ class Updater:
         self.graph = graph
         self.graph = calculateAttributes(self.graph)
 
-        global graphLogger
-        graphLogger = GraphLogger(self.graph, GraphLoggerJson(filename='log.txt'))
-        graphLogger.setGraphGetter(lambda : self.graph)
+        self.graphLogger = GraphLogger(self.graph, GraphLoggerJson(get_graph_logger('GraphLogger','graph.log')))
+        self.graphLogger.setGraphGetter(lambda : self.graph)
 
     def addRule(self, rule):
         self.rules[rule.getName()] = rule
@@ -35,10 +33,9 @@ class Updater:
 
             self.graph = calculateAttributes(self.graph)
 
-            graphLogger.logRule(self.rules[ruleName])
+            self.graphLogger.logRule(self.rules[ruleName])
         except TimeoutError:
             pass
 
     def close(self):
-        global graphLogger
-        graphLogger.close()
+        self.graphLogger.close()

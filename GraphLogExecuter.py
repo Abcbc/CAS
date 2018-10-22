@@ -2,6 +2,7 @@ from Rules import getRuleset
 from GraphLogger import GraphLogger
 from GraphLogWriters import GraphLoggerJson
 from Graph import calculateAttributes
+from utils.Logger import get_graph_logger
 
 class GraphLogExecuter:
     def __init__(self, graphLogReader):
@@ -12,7 +13,7 @@ class GraphLogExecuter:
         self.graph = self.graphLogReader.getSnapshotEntry().graph
         self.rules = getRuleset()
 
-        self.graphLogger = GraphLogger(self.graph, GraphLoggerJson(filename='reproduced_log.txt'))
+        self.graphLogger = GraphLogger(self.graph, GraphLoggerJson(get_graph_logger('GraphLogger','graphReproduced.log')))
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
     def getGraph(self):

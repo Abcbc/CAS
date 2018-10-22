@@ -76,9 +76,6 @@ class OrientationConfirmationRule(Rule):
 
     # TODO this could look a lot prettier
     def apply(self, graph, _internals=None):
-        print('Apply OrientationConfirmationRule')
-        # how many times?
-        # apply to all opinions or select one "opinion-pair"?
         if _internals == None:
             self._createInternals(graph)
         else:
@@ -134,8 +131,6 @@ class AdaptationRule(Rule):
         return areOppositeOpinions(opA, opB)
 
     def apply(self, graph, _internals=None):
-        print('Apply AdaptationRule')
-
         if _internals == None:
             self._createInternals(graph)
         else:

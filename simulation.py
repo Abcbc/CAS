@@ -113,5 +113,5 @@ if __name__ == "__main__":
 
     updater.close()
 
-    gExe = GraphLogExecuter(GraphLogReaderJson('log.txt'))
+    gExe = GraphLogExecuter(GraphLogReaderJson('logs/graph.log'))
     gExe.performSteps(20)

@@ -30,19 +30,12 @@ class GraphLogJsonFormatter:
             return GraphLogSnapshotEntry(fromJsonStr(jsonDict['graph']))
 
 class GraphLoggerJson:
-    def __init__(self, doPrint=False, filename=None):
-        self.doPrint = doPrint
-        self.file = None
-        if filename is not None:
-            self.file = open(filename,'w')
+    def __init__(self, logger):
+        self.logger = logger
 
     def writeEntry(self, entry):
         strEntry = GraphLogJsonFormatter.formatEntry(entry)
-        if self.doPrint:
-            print(strEntry)
-        if self.file is not None:
-            self.file.write(strEntry + '\n')
+        self.logger.info(strEntry)
 
     def close(self):
-        self.file.flush()
-        self.file.close()
+        pass #TODO flush logger
