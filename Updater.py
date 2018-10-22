@@ -36,7 +36,6 @@ class Updater:
             self.graph = calculateAttributes(self.graph)
 
             graphLogger.logRule(self.rules[ruleName])
-            self.rules[ruleName].clearParameters()
         except TimeoutError:
             pass
 

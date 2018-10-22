@@ -29,23 +29,17 @@ class Rule:
         raise NotImplementedError('setParameters not implemented for this rule class')
 
     '''
-    Clears internal parameters so that they will be generated new
+    Returns the internal data generated during application of the rule
     '''
-    def clearParameters(self):
-        raise NotImplementedError('clearParameters not implemented for this rule class')
-
-    '''
-    Returns the operands to be passed to apply()
-    '''
-    def getOperands(self):
-        raise NotImplementedError('getOperands not implemented for this rule class')
+    def getInternals(self):
+        raise NotImplementedError('getInternals not implemented for this rule class')
 
     '''
     Applies this rule to the operands of the graph.
     Operands have to be parts of the graph and have the structure as returned by getOperands().
     Returns the graph, which can be a new object.
     '''
-    def apply(self, graph, operands=None):
+    def apply(self, graph, operands=None, internals=None):
         raise NotImplementedError('apply not implemented for this rule class')
 
 '''
@@ -53,55 +47,52 @@ Parameters: None
 '''
 class OrientationConfirmationRule(Rule):
     def getParameters(self):
-        return self.parameters
+        return dict()
 
     def setParameters(self, parameters):
-        for paramKey in self.parameters:
-            self.parameters[paramKey] = parameters[paramKey]
+        # for paramKey in self.parameters:
+        #     self.parameters[paramKey] = parameters[paramKey]
+        pass
 
-    def clearParameters(self):
-        self.parameters = {'fallbackDecision': [],
-                           'fallbackSelection': []}
+    def _createInternals(self, graph):
+        self.internals = {'fallbackDecision': [],
+                           'fallbackSelection': [],
+                           'edgeId': self._findOperands(graph)
+                          }
+        nodeA = graph.nodes[self.internals['edgeId'][0]]
+        for i in range(len(nodeA[KEY_OPINIONS])):
+            self.internals['fallbackDecision'].append( random.random() > self._calcProbability() )
+            self.internals['fallbackSelection'].append( random.choice([0,1]) )
+
 
     def _findOperands(self, graph):
-        self.edgeId = selectEdgeFromGraph(graph)
+        return selectEdgeFromGraph(graph)
 
-    def getOperands(self):
-        return self.edgeId
+    def getInternals(self):
+        return self.internals
 
     def _calcProbability(self):
         return 0.5
 
-    def __init__(self):
-        self.clearParameters()
-
     # TODO this could look a lot prettier
-    def apply(self, graph, _edgeId=None):
+    def apply(self, graph, _internals=None):
         print('Apply OrientationConfirmationRule')
         # how many times?
         # apply to all opinions or select one "opinion-pair"?
-        if _edgeId == None:
-            self._findOperands(graph)
+        if _internals == None:
+            self._createInternals(graph)
         else:
-            self.edgeId = _edgeId
+            self.internals = _internals
 
-        nodeA = graph.nodes[self.edgeId[0]]
-        nodeB = graph.nodes[self.edgeId[1]]
+        nodeA = graph.nodes[self.internals['edgeId'][0]]
+        nodeB = graph.nodes[self.internals['edgeId'][1]]
         opinionsA = nodeA[KEY_OPINIONS]
         opinionsB = nodeB[KEY_OPINIONS]
 
         for i in range(len(nodeA[KEY_OPINIONS])):
-            if len(self.parameters['fallbackDecision']) <= i: # if this opinion no decision yet
-                if random.random() > self._calcProbability():
-                    self.parameters['fallbackDecision'].append(True)
-                else:
-                    self.parameters['fallbackDecision'].append(False)
-            if len(self.parameters['fallbackSelection']) <= i:
-                self.parameters['fallbackSelection'].append(random.choice([0,1]))
-
             if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
-                if self.parameters['fallbackDecision'][i]:
-                    if self.parameters['fallbackSelection'][i] == 0:
+                if self.internals['fallbackDecision'][i]:
+                    if self.internals['fallbackSelection'][i] == 0:
                         opToChange = opinionsA
                     else:
                         opToChange = opinionsB
@@ -124,35 +115,36 @@ class AdaptationRule(Rule):
     def setParameters(self, parameters):
         pass
 
-    def clearParameters(self):
-        pass
+    def _createInternals(self, graph):
+        self.internals = {'opinionPair': self._findOperands(graph)
+                          }
 
     def _findOperands(self, graph):
         # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
 #         opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self._selectionPredicate)
         # this works
-        self.opinionPair = selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
+        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
 
-    def getOperands(self):
-        return self.opinionPair
+    def getInternals(self):
+        return self.internals
 
     def _selectionPredicate(self, pair):
         opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
         opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
         return areOppositeOpinions(opA, opB)
 
-    def apply(self, graph, _opinionPair=None):
+    def apply(self, graph, _internals=None):
         print('Apply AdaptationRule')
 
-        if _opinionPair == None:
-            self._findOperands(graph)
+        if _internals == None:
+            self._createInternals(graph)
         else:
-            self.opinionPair = _opinionPair
+            self.internals = _internals
 
         # ToDo real behavior, this is only dummy and always changes nodeA
-        nodeA = graph.edges[self.opinionPair['edgeId']] ['nodeA']
-        nodeB = graph.edges[self.opinionPair['edgeId']] ['nodeB']
-        nodeA[KEY_OPINIONS][self.opinionPair['opinionIndex']] += nodeB[KEY_OPINIONS][self.opinionPair['opinionIndex']]
+        nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+        nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+        nodeA[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']] += nodeB[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']]
 
         return graph
 

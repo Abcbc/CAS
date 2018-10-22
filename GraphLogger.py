@@ -24,7 +24,7 @@ class GraphLogger:
 
     # arguments are subject to change, just written to get a first impression
     def logRule(self, rule):
-        self.log.append((self._getLogEntryId(),GraphLogRuleEntry(rule.getName(), rule.getParameters(), rule.getOperands())))
+        self.log.append((self._getLogEntryId(),GraphLogRuleEntry(rule.getName(), rule.getParameters(), rule.getInternals())))
         self.ruleCnt += 1
 
         self.graphLogWriter.writeEntry(self.log[-1][1])

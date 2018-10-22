@@ -11,7 +11,7 @@ class GraphLogJsonFormatter:
                 'type':'GraphLogRuleEntry',
                 'rulename':entry.rulename,
                 'parameters':entry.parameters,
-                'operands':entry.operands
+                'internals':entry.internals
                 })
             return jsonStr
         if isinstance(entry, GraphLogSnapshotEntry):
@@ -25,7 +25,7 @@ class GraphLogJsonFormatter:
     def parseEntry(jsonStr):
         jsonDict = json.loads(jsonStr)
         if jsonDict['type'] == 'GraphLogRuleEntry':
-            return GraphLogRuleEntry(jsonDict['rulename'], jsonDict['parameters'], jsonDict['operands'])
+            return GraphLogRuleEntry(jsonDict['rulename'], jsonDict['parameters'], jsonDict['internals'])
         elif jsonDict['type'] == 'GraphLogSnapshotEntry':
             return GraphLogSnapshotEntry(fromJsonStr(jsonDict['graph']))
 
