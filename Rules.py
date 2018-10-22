@@ -76,9 +76,13 @@ class Rule:
         raise NotImplementedError('apply not implemented for this rule class')
 
 '''
-Parameters: None
+Parameters:
+  fallbackProbability: probability for each of the differing opinion pairs to
+    fall to neutral on one side. Range: 0 to 1
 '''
 class OrientationConfirmationRule(Rule):
+    defaultParameters = {'fallbackProbability': 0.5}
+
     def _createInternals(self, graph):
         self.internals = {'fallbackDecision': [],
                            'fallbackSelection': [],
@@ -95,9 +99,8 @@ class OrientationConfirmationRule(Rule):
         return selectEdgeFromGraph(graph)
 
     def _calcProbability(self):
-        return 0.5
+        return self.parameters['fallbackProbability']
 
-    # TODO this could look a lot prettier
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
 
