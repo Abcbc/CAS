@@ -1,0 +1,20 @@
+Ich will sichern können, wie ein Graph sich über die Zeit verändert, um
+- eine Simulation, die interessante Effekte zeigt, speichern und wieder vorführen zu können
+- eine Simulation von einem beliebigen Zeitpunkt aus (neu) weiterlaufen lassen zu können
+- d.h. den Endzustand als init für einen neuen Lauf nehmen
+- Analysen über die Auswahl meiner Aktionen machen zu können, z.B. ob die relativen Häufigkeiten der Anwendung meiner Regeln ungefähr passt
+
+d.h. ich muss verfügbar haben:
+- Zustände des Graphen nach jedem Änderungsschritt
+  - Komplettes Graph-Objekt: Knoten+Kanten mit allen Attributen
+- Informationen über den Änderungsschritt (Was wurde worauf angewendet)
+  - Regel + Änderungen (betroffenes Element, Änderung)
+- Konfiguration des Programms
+
+Implementierung:
+- Zustände oder Veränderungen speichern? Veränderungen müssen eh mit 
+gespeichert werden, können aber zu längeren Rechenzeiten beim nachbauen 
+führen => Alle x Schritte einen snapshot mit speichern?
+- Klasse mit noch zu suchendem Namen
+- Benutzt python logger, um die Ausgabe flexibel zu halten
+- Umfangreiche Ausgabe, die auch in Datei geschrieben werden muss => Performance beachten
