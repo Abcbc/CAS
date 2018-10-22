@@ -1,13 +1,28 @@
 simulation_settings:
-  1:
-    name: "some Simulationname"
-    number_of_actors: 100
-    actor_seed: 1237402
-    actor_generation_method: "YES"
-  2:
-    name: " another name"
-
-  defaults:
-    number_of_actors: 100
-    actor_seed: 1237402
-    actor_generation_method: "NO"
+    group1:
+        sim1:
+            name: "some Simulationname"
+            number_of_actors: 100
+            actor_seed: 1237402
+            actor_generation_method: "YES"
+        sim2:
+            name: " another name"
+    
+        defaults:
+            number_of_actors: 100
+            actor_seed: 1237402
+            actor_generation_method: "NO"
+    group2:
+        sim3:
+            name: "some Simulationname"
+            number_of_actors: 100
+            actor_seed: 1237402
+            actor_generation_method: "YES"
+        sim4:
+            name: " another name"
+    
+        defaults:
+            number_of_actors: 100
+            actor_seed: 1237402
+            actor_generation_method: "NO"
+      
