@@ -1,6 +1,9 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
 from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
+from utils.Logger import get_logger
+
+log = get_logger("Rule")
 
 def getRuleset():
     return {
@@ -103,6 +106,9 @@ class OrientationConfirmationRule(Rule):
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
+        log.debug('applying OrientationConfirmationRule with parameters ' +
+                  str(self.parameters) + ' and internals ' + ('(given) ' if _parameters is not None else '') +
+                  str(self.internals) + (' (given)' if _internals is not None else ''))
 
         nodeA = graph.nodes[self.internals['edgeId'][0]]
         nodeB = graph.nodes[self.internals['edgeId'][1]]
@@ -117,7 +123,6 @@ class OrientationConfirmationRule(Rule):
                     else:
                         opToChange = opinionsB
                     opToChange[i] = 0
-                    #print('Change opinionpair ' + str(i) + ' in node ' + str(self.parameters['fallbackSelection'][i]) + ' of nodes ' + str(edgeId))
 
         return graph
 
@@ -147,6 +152,9 @@ class AdaptationRule(Rule):
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
+        log.debug('applying AdaptationRule with parameters ' +
+                  str(self.parameters) + ' and internals ' + ('(given) ' if _parameters is not None else '') +
+                  str(self.internals) + (' (given)' if _internals is not None else ''))
 
         # ToDo real behavior, this is only dummy and always changes nodeA
         nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
