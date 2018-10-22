@@ -9,6 +9,18 @@ def getRuleset():
         }
 
 class Rule:
+    """
+    Default parameters. Can be changed by setParameters() and retrieved by
+    getParameters(). Used to initialize parameters if none are given in apply()
+    If a rule has parameters, it has to initialize them here,
+    """
+    defaultParameters = dict()
+    '''
+    Actual parameters used during application. Set from the given parameters
+    or the defaults.
+    '''
+    parameters = dict()
+
     '''
     Returns the human-readable and unique name for this rule
     '''
@@ -20,19 +32,34 @@ class Rule:
     Returns a dictionary with parameters which are used in this rule
     '''
     def getParameters(self):
-        raise NotImplementedError('getParameters not implemented for this rule class')
+        return self.defaultParameters
 
     '''
     Sets parameters from the dictionary (can be retrieved with getParameters)
     '''
     def setParameters(self, parameters):
-        raise NotImplementedError('setParameters not implemented for this rule class')
+        for paramKey in self.defaultParameters:
+            self.defaultParameters[paramKey] = parameters[paramKey]
 
     '''
     Returns the internal data generated during application of the rule
     '''
     def getInternals(self):
-        raise NotImplementedError('getInternals not implemented for this rule class')
+        return self.internals
+
+    '''
+    Creates and returns the internal data
+    '''
+    def _createInternals(self, graph):
+        raise NotImplementedError('_createInternals not implemented for this rule class')
+
+    '''
+    Internal method. Common for all rule classes. Initializes operands,
+    parameters and internals.
+    '''
+    def _prepareApply(self, graph, _parameters, _internals):
+        self.parameters = _parameters if _parameters is not None else self.getParameters()
+        self.internals = _internals if _internals is not None else  self._createInternals(graph)
 
     '''
     Applies this rule to the operands of the graph.
@@ -52,16 +79,6 @@ class Rule:
 Parameters: None
 '''
 class OrientationConfirmationRule(Rule):
-    defaultParameters = dict() # accessed by get/setParameters, used as fallback by apply
-    parameters = dict() # actual parameters used during application.
-
-    def getParameters(self):
-        return self.defaultParameters
-
-    def setParameters(self, parameters):
-        for paramKey in self.defaultParameters:
-            self.defaultParameters[paramKey] = parameters[paramKey]
-
     def _createInternals(self, graph):
         self.internals = {'fallbackDecision': [],
                            'fallbackSelection': [],
@@ -72,23 +89,17 @@ class OrientationConfirmationRule(Rule):
             self.internals['fallbackDecision'].append( random.random() > self._calcProbability() )
             self.internals['fallbackSelection'].append( random.choice([0,1]) )
 
+        return self.internals
 
     def _findOperands(self, graph):
         return selectEdgeFromGraph(graph)
-
-    def getInternals(self):
-        return self.internals
 
     def _calcProbability(self):
         return 0.5
 
     # TODO this could look a lot prettier
     def apply(self, graph, _parameters=None, _internals=None):
-        if _internals == None:
-            self._createInternals(graph)
-        else:
-            self.internals = _internals
-        self.parameters = _parameters if _parameters is not None else self.getParameters()
+        self._prepareApply(graph, _parameters, _internals)
 
         nodeA = graph.nodes[self.internals['edgeId'][0]]
         nodeB = graph.nodes[self.internals['edgeId'][1]]
@@ -115,19 +126,10 @@ class OrientationConfirmationRule(Rule):
 Parameters: None
 '''
 class AdaptationRule(Rule):
-    defaultParameters = dict() # accessed by get/setParameters, used as fallback by apply
-    parameters = dict() # actual parameters used during application.
-
-    def getParameters(self):
-        return self.defaultParameters
-
-    def setParameters(self, parameters):
-        for paramKey in self.defaultParameters:
-            self.defaultParameters[paramKey] = parameters[paramKey]
-
     def _createInternals(self, graph):
         self.internals = {'opinionPair': self._findOperands(graph)
                           }
+        return self.internals
 
     def _findOperands(self, graph):
         # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
@@ -135,20 +137,13 @@ class AdaptationRule(Rule):
         # this works
         return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
 
-    def getInternals(self):
-        return self.internals
-
     def _selectionPredicate(self, pair):
         opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
         opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
         return areOppositeOpinions(opA, opB)
 
     def apply(self, graph, _parameters=None, _internals=None):
-        if _internals == None:
-            self._createInternals(graph)
-        else:
-            self.internals = _internals
-        self.parameters = _parameters if _parameters is not None else self.getParameters()
+        self._prepareApply(graph, _parameters, _internals)
 
         # ToDo real behavior, this is only dummy and always changes nodeA
         nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
