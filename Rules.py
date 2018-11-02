@@ -8,7 +8,8 @@ log = get_logger("Rule")
 def getRuleset():
     return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
-        AdaptationRule.getName():AdaptationRule()
+        AdaptationRule.getName():AdaptationRule(),
+        NewNodeRule.getName():NewNodeRule()
         }
 
 class Rule:
@@ -175,3 +176,37 @@ class AdaptationRule(Rule):
     @staticmethod
     def getName():
         return 'AdaptationRule'
+
+class NewNodeRule(Rule):
+    """
+    Parameters: None
+    """
+
+    def _createInternals(self, graph):
+        pass
+
+    def _findOperands(self, graph):
+        # ToDo Find a strongly connected subset of nodes with a high orientation
+        pass
+
+    def _calcOpinions(self, graph, nodeSet):
+        # ToDo for each opinion find common value in set or use 0 if no common value
+        pass
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+
+        nodeSet = self.internals['nodeSet']
+        newNodeId = 0 # ToDo get next available node id from graph
+        graph.add_node(newNodeId)
+        # ToDo add convenience attributes
+        graph.nodes[newNodeId][KEY_OPINIONS] = self._calcOpinions(graph, nodeSet)
+
+        # ToDo  for nodeId in nodeSet:
+        # ToDo      graph.add_edge(nodeId, newNodeId)
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'NewNodeRule'
