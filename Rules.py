@@ -13,77 +13,83 @@ def getRuleset():
 
 class Rule:
     """
-    Default parameters. Can be changed by setParameters() and retrieved by
-    getParameters(). Used to initialize parameters if none are given in apply()
-    If a rule has parameters, it has to initialize them here,
+    Base class for implementing rules
+
+    Defines methods common to all classes and defines rule-specific methods with
+    a NotImplementedError.
+
+    Member variable: defaultParameters (dict):
+        Default parameters. Can be changed by setParameters() and retrieved by
+        getParameters(). Used to initialize parameters if none are given in apply()
+        If a rule has parameters, it has to initialize them here,
+    Member variable: parameters (dict):
+        Actual parameters used during application. Set from the given parameters
+        or the defaults.
     """
+
     defaultParameters = dict()
-    '''
-    Actual parameters used during application. Set from the given parameters
-    or the defaults.
-    '''
+
     parameters = dict()
 
-    '''
-    Returns the human-readable and unique name for this rule
-    '''
     @staticmethod
     def getName():
+        """
+        Returns the human-readable and unique name for this rule
+        """
         raise NotImplementedError('getName not implemented for this rule class')
 
-    '''
-    Returns a dictionary with parameters which are used in this rule
-    '''
     def getParameters(self):
+        """
+        Returns a dictionary with parameters which are used in this rule
+        """
         return self.defaultParameters
 
-    '''
-    Sets parameters from the dictionary (can be retrieved with getParameters)
-    '''
     def setParameters(self, parameters):
+        """
+        Sets parameters from the dictionary (can be retrieved with getParameters)
+        """
         for paramKey in self.defaultParameters:
             self.defaultParameters[paramKey] = parameters[paramKey]
 
-    '''
-    Returns the internal data generated during application of the rule
-    '''
     def getInternals(self):
+        """
+        Returns the internal data generated during application of the rule
+        """
         return self.internals
 
-    '''
-    Creates and returns the internal data
-    '''
     def _createInternals(self, graph):
+        """
+        Creates and returns the internal data
+        """
         raise NotImplementedError('_createInternals not implemented for this rule class')
 
-    '''
-    Internal method. Common for all rule classes. Initializes operands,
-    parameters and internals.
-    '''
     def _prepareApply(self, graph, _parameters, _internals):
+        """
+        Internal method. Common for all rule classes. Initializes operands, parameters and internals.
+        """
         self.parameters = _parameters if _parameters is not None else self.getParameters()
         self.internals = _internals if _internals is not None else  self._createInternals(graph)
 
-    '''
-    Applies this rule to the operands of the graph.
-    Parameters must be a dictionary according to the rule's needs. If the argument
-    is not given, parameters given with setParameters are used. Parameters given by
-    this argument are used only for the particular call and are not stored.
-    Internals must be a dictionary according to the rule's needs. The stored information
-    will typically include the objects to operade on and decisions which are needed for
-    rule application. If it is not given, the data will be generated and be available
-    with getInternals.
-    Returns the graph, which can be a new object.
-    '''
     def apply(self, graph, operands=None, parameters=None, internals=None):
+        """
+        Applies this rule to the operands of the graph.
+        Parameters must be a dictionary according to the rule's needs. If the argument
+        is not given, parameters given with setParameters are used. Parameters given by
+        this argument are used only for the particular call and are not stored.
+        Internals must be a dictionary according to the rule's needs. The stored information
+        will typically include the objects to operade on and decisions which are needed for
+        rule application. If it is not given, the data will be generated and be available
+        with getInternals.
+        Returns the graph, which can be a new object.
+        """
         raise NotImplementedError('apply not implemented for this rule class')
 
-'''
-Parameters:
-  fallbackProbability: probability for each of the differing opinion pairs to
-    fall to neutral on one side. Range: 0 to 1. Default: 0.5.
-'''
 class OrientationConfirmationRule(Rule):
+    """
+    fallbackProbability: probability for each of the differing opinion pairs to
+    fall to neutral on one side. Range: 0 to 1. Default: 0.5.
+    """
+
     defaultParameters = {'fallbackProbability': 0.5}
 
     def _createInternals(self, graph):
