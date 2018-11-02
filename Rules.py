@@ -70,7 +70,7 @@ class Rule:
         self.parameters = _parameters if _parameters is not None else self.getParameters()
         self.internals = _internals if _internals is not None else  self._createInternals(graph)
 
-    def apply(self, graph, operands=None, parameters=None, internals=None):
+    def apply(self, graph, parameters=None, internals=None):
         """
         Applies this rule to the operands of the graph.
         Parameters must be a dictionary according to the rule's needs. If the argument
