@@ -160,7 +160,9 @@ class AdaptationRule(Rule):
     def _calcAdaptionProbability(self, graph):
         nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
         nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
-        return nodeB[KEY_V] / (nodeA[KEY_V]+nodeB[KEY_V])
+        nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
+        nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
+        return nodeToAdaptFrom[KEY_V] / (nodeToAdapt[KEY_V]+nodeToAdaptFrom[KEY_V])
 
     def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
         opInd = self.internals['opinionPair']['opinionIndex']
