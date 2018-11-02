@@ -1,6 +1,6 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, KEY_ORIENTATION, doOpinionsDiffer, areOppositeOpinions
+from Graph import KEY_OPINIONS, KEY_ORIENTATION, KEY_V, doOpinionsDiffer, areOppositeOpinions
 from utils.Logger import get_logger
 
 log = get_logger("Rule")
@@ -143,7 +143,9 @@ Parameters: None
 '''
 class AdaptationRule(Rule):
     def _createInternals(self, graph):
-        self.internals = {'opinionPair': self._findOperands(graph)
+        self.internals = {'opinionPair': self._findOperands(graph),
+                          'adaptionDecision': random.random() < self._calcAdaptionProbability(graph),
+                          'nodePosToAdapt': random.choice([0,1])
                           }
         return self.internals
 
@@ -155,6 +157,15 @@ class AdaptationRule(Rule):
         opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
         return areOppositeOpinions(opA, opB)
 
+    def _calcAdaptionProbability(self, graph):
+        nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+        nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+        return nodeB[KEY_V] / (nodeA[KEY_V]+nodeB[KEY_V])
+
+    def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
+        opInd = self.internals['opinionPair']['opinionIndex']
+        toAdapt[KEY_OPINIONS][opInd] += toAdaptFrom[KEY_OPINIONS][opInd]
+
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
         log.debug('applying AdaptationRule with parameters ' +
@@ -162,10 +173,12 @@ class AdaptationRule(Rule):
                   str(self.internals) + (' (given)' if _internals is not None else ''))
 
         if self.internals['opinionPair'] is not None:
-            # ToDo real behavior, this is only dummy and always changes nodeA
-            nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
-            nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
-            nodeA[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']] += nodeB[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']]
+            if self.internals['adaptionDecision']:
+                nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+                nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+                nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
+                nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
+                self._adaptNodeToNode(nodeToAdapt, nodeToAdaptFrom)
 
         return graph
 
