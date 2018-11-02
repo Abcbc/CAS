@@ -1,0 +1,80 @@
+\documentclass[11pt, a4paper]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern}
+
+\usepackage[backend=biber,style=authoryear-icomp]{biblatex}
+\usepackage[hidelinks=true]{hyperref}
+
+\bibliography{../literatur}
+
+
+%Beschreiben Sie in einem kurzen Text, welche konkrete Forschungsfrage Sie an Ihr Simulationsmodell stellen wollen! Also: Was wollen Sie untersuchen?
+%Beschreiben Sie, welche Erwartung Sie in Bezug auf den Ausgang des Experiments haben.
+%Erläutern Sie, welche Auswirkungen Ihre Frage auf den Versuchsaufbau, d.h. auf Details Ohres Modells hat!
+%Beschreiben Sie, welche Messungen Sie vornehmen wollen und wie Sie an die Daten kommen!
+%Wie sichern Sie sich dagegen ab, dass Sie vielleicht nur einen Zufallsbefund haben?
+
+\begin{document}
+\section{Forschungsfrage}
+
+Basierend auf dem Modell von \autocite{Koehler-Bussmeier2018} sollen Aspekte der Stabilität von Clustern untersucht werden.
+
+Es wird vermutet, dass das Modell zu Clusterbildung führt, weil Knoten mit ähnlichen Interessen ihre Verbindung stärken und Knoten mit gegensätzlichen Interessen diese ändern sowie ihre Verbindung schwächen.
+
+Wir wollen untersuchen, ob existente Cluster stabil sind und ein konvergierter Zustand des Systems erreicht sein kann, oder ob Cluster durch innere Dynamiken zerfallen und sich neu bilden. Möglicherweise hängt die Stabilität von der Interessensstruktur innerhalb der Cluster ab, die von sehr ähnlichen Interessen geprägt sein kann, aber auch eine Art "`Sammelbecken"' mit geringerem inneren Zusammenhalt. Außerdem wollen wir gezielt zwischen Clustern Verbindungen einführen und herausfinden, inwiefern dies die Struktur des Systems beeinflusst.
+
+In der vorsichtigen Anwendung des Modells auf menschliche Sozialstrukturen steckt dahinter die Frage, ob Meinungsblasen dauerhafte oder doch eher kurzzeitige, sich permanent entwickelnde Phänomene sind. Wenn Menschen aus verschiedenen Meinungsblasen zusammenkommen und sich vernetzen (mögliche Beispiele dafür wären gemeinsame Teilinteressen wie Hobbys oder auch rein zufällig gemeinsam erlebte Ereignisse wie ein liegengebliebener Zug), besteht die Möglichkeit, dass die neuen Kontakte zur zumindest kurzzeitigen Auflösung oder Auflockerung der Meinungsblasen führt.
+
+Fallen Cluster auch wieder auseinander? In wie viele Teile? Welchen Einfluss hat die Clustergröße, die Art des Clusters ("`Sekte"', "`Sammelbecken"')?
+
+\section{Aufbau des Experiments}
+\subsection{Ausgangssituation}
+Die initiale Konfiguration des Graphen muss Cluster beinhalten. Zunächst seien die Clustergrößen nach $\mathcal{N}\left(\mu_{Cl},\sigma_{Cl}\right)$ verteilt, wobei $\sigma_{Cl}$ klein ist und $\mu_{Cl}$ variiert werden kann. Weitere Parameter sind die Anzahl der Cluster, die Anzahl und Verteilung von Verbindungen zwischen Clustern.
+
+Eine wichtige Rolle spielt die Verteilung der Interessen und Verbindungen in einem Cluster. Knoten eines Clusters können sich in allen Interessen ähneln, oder nur in einer Teilmenge der Interessen, während die Interessen der Restmenge zufällig verteilt sind. Cluster mit stark hierarchischer Ausprägung, mit einem sehr vermögenden Kern und schwächerer Peripherie können sich von gleichmäßig aufgebauten Clustern unterscheiden.
+
+\subsection{Messungen am Graph}
+Anzahl der Cluster
+
+Anzahl der Abgänge/Neuzugänge von Knoten zu den Clustern
+
+Anzahl der Verbindungen zwischen Clustern
+
+\printbibliography
+
+\appendix
+\section{Sammlung an Parametern, Fragen etc.}
+\subsection{Initiale Graphen}
+\begin{itemize}
+\item Parameter\begin{itemize}
+	\item Anzahl Knoten
+	\item (Durchschnittliche) Anzahl Kanten pro Knoten
+\end{itemize}
+\item Lokalität der Kanten => wie messbar/erreichbar?
+\item Regelmäßige Struktur?
+\item Verbundenheit?
+\item Initialisierung der Interessen\begin{itemize}
+	\item Gleichmäßig zufällig
+	\item Zufällig, aber mit unterschiedlichen Wkeiten für "`0"' und "`1 oder -1"'
+	\item Zufällig, aber Bevorzugung lokaler Übereinstimmungen => führen diese zur Ausprägung von Clustern? Wie stark muss die Abweichung von Gleichverteilung sein?
+	\item Zufällig, aber Bevorzugung lokaler Uneinigkeiten
+\end{itemize}
+\item Cluster, wie groß, wie viele, wie starke Verbindungen zwischen den Clustern?
+\item Skaleninvariant?
+\end{itemize}
+
+\subsection{Untersuchungen}
+\begin{itemize}
+\item bilden sich Cluster?
+\item wie viele, wie groß?
+\item gibt es im Cluster vorherrschende Meinungen?
+\item Empfindlichkeit auf kleiner Änderungen der Initialisierung?
+\end{itemize}
+
+\subsection{Sonstiges}
+\begin{itemize}
+\item \url{https://en.wikipedia.org/wiki/Barab%C3%A1si%E2%80%93Albert_model}
+\end{itemize}
+\end{document}
