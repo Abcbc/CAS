@@ -81,7 +81,7 @@ class Rule:
 '''
 Parameters:
   fallbackProbability: probability for each of the differing opinion pairs to
-    fall to neutral on one side. Range: 0 to 1
+    fall to neutral on one side. Range: 0 to 1. Default: 0.5.
 '''
 class OrientationConfirmationRule(Rule):
     defaultParameters = {'fallbackProbability': 0.5}
