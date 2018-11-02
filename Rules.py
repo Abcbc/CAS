@@ -138,10 +138,17 @@ class OrientationConfirmationRule(Rule):
     def getName():
         return 'OrientationConfirmationRule'
 
-'''
-Parameters: None
-'''
 class AdaptationRule(Rule):
+    """
+    Implementation of Adaptation Rule 2.1.2
+
+    Parameters: None
+
+    Chooses one pair of opinions -1 and 1 of nodes A and B. For this rule, the order of
+    nodes in the edge is chosen randomly, as if the graph were directed.
+    With probability V(B)/(V(A)+V(B)) the opinion of node A is moved towards the opinion
+    of B, i.e. is set to 0 at the moment (possible opinion values are -1,-0-1).
+    """
     def _createInternals(self, graph):
         self.internals = {'opinionPair': self._findOperands(graph),
                           'nodePosToAdapt': random.choice([0,1])
