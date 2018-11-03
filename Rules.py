@@ -2,6 +2,7 @@ import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
 from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
 from utils.Logger import get_logger
+import community
 
 log = get_logger("Rule")
 
@@ -185,9 +186,29 @@ class NewNodeRule(Rule):
     def _createInternals(self, graph):
         pass
 
+    def _getCommunities(self, graph):
+        """
+        Calculates the communities using the python-louvain package.
+        Returns a list of lists. One list of node ids for every community.
+        Nodes outside all communities are not included.
+        """
+        bp = community.best_partition(graph)
+        comms = []
+        if np.all(bp == 0):
+            log.debug('found no communities')
+        else:
+            for nodeId in bp:
+                if bp[nodeId] >= len(comms):
+                    comms.append([nodeId])
+                else:
+                    comms[bp[nodeId]].append(nodeId)
+
+        return comms
+
     def _findOperands(self, graph):
         # ToDo Find a strongly connected subset of nodes with a high orientation
-        pass
+        communities = self._getCommunities(graph)
+        # ToDo check connectivity and orientation
 
     def _calcOpinions(self, graph, nodeSet):
         # ToDo for each opinion find common value in set or use 0 if no common value
