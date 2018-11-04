@@ -195,12 +195,15 @@ class NewNodeRule(Rule):
                           'opMeanThreshold' : 0.8 }
 
     def _createInternals(self, graph):
+        log.debug('NewNodeRule create internals')
         communities = self._findOperands(graph)
         self.internals = { 'nodesToAdd' : [] }
         for comm in communities:
             opinions = self._calcOpinions(graph, comm)
             neighbors = comm
             self.internals['nodesToAdd'].append((opinions,neighbors))
+            log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
+                      + ' to community ' + str(comm))
 
         return self.internals
 
@@ -232,6 +235,9 @@ class NewNodeRule(Rule):
             hasHighOrientation = np.mean([graph.edges[eid][KEY_ORIENTATION] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
             if isDense and hasHighOrientation:
                 connectedCommunities.append(comm)
+            else:
+                log.debug('Community ' + str(comm) + ' was not selected. isDense: ' + str(isDense)
+                          + ', hasHighOrientation: ' + str(hasHighOrientation))
 
         return connectedCommunities
 
@@ -250,9 +256,11 @@ class NewNodeRule(Rule):
             node = createNewNodeSkeleton(graph)
             node[KEY_OPINIONS] = opinions
             graph.add_nodes_from([(node[KEY_NODE_ID],node)])
+            log.debug('Added node ' + str(graph.nodes[node[KEY_NODE_ID]]))
             for neighbour in nodeToAdd[1]:
                 edge = createNewEdgeSkeleton(graph, node, graph.nodes[neighbour])
                 graph.add_edges_from([(node[KEY_NODE_ID], neighbour,edge)])
+                log.debug('Added edge ' + str(graph.edges[edge[KEY_EDGE_ID]]))
 
         return graph
 
