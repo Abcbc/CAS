@@ -195,7 +195,14 @@ class NewNodeRule(Rule):
                           'opMeanThreshold' : 0.8 }
 
     def _createInternals(self, graph):
-        pass
+        communities = self._findOperands(graph)
+        self.internals = { 'nodesToAdd' : [] }
+        for comm in communities:
+            opinions = self._calcOpinions(graph, comm)
+            neighbors = comm
+            self.internals['nodesToAdd'].append((opinions,neighbors))
+
+        return self.internals
 
     def _getCommunities(self, graph):
         """
@@ -233,7 +240,7 @@ class NewNodeRule(Rule):
         opinionMeans = np.mean(opinionMat,0) # mean op_i of all nodes
         newNodeOpinions = np.sign(opinionMeans)*np.greater(np.abs(opinionMeans),self.parameters['opMeanThreshold'])
 
-        return newNodeOpinions
+        return list(newNodeOpinions)
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
