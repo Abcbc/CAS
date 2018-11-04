@@ -105,6 +105,10 @@ def getNextNodeId(graph):
 def createNewNodeSkeleton(graph):
     return { 'graph' : graph, KEY_NODE_ID : getNextNodeId(graph)}
 
+def createNewEdgeSkeleton(graph, nodeA, nodeB):
+    return { 'graph' : graph, KEY_EDGE_ID : (nodeA[KEY_NODE_ID],nodeB[KEY_NODE_ID]),
+             'nodeA' : nodeA, 'nodeB': nodeB }
+
 def toJsonStr(graph):
     return nx.jit_data(removeConvenienceAttributes(graph.copy()))
 
