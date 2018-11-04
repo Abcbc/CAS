@@ -99,6 +99,9 @@ def getMaxNodeId(graph):
         maxNodeId = max(maxNodeId, id)
     return maxNodeId
 
+def getNextNodeId(graph):
+    return getMaxNodeId(graph) + 1
+
 def toJsonStr(graph):
     return nx.jit_data(removeConvenienceAttributes(graph.copy()))
 
