@@ -93,6 +93,12 @@ def addConvenienceAttributes(graph):
 
     return graph
 
+def getMaxNodeId(graph):
+    maxNodeId = 0
+    for id in graph.nodes:
+        maxNodeId = max(maxNodeId, id)
+    return maxNodeId
+
 def toJsonStr(graph):
     return nx.jit_data(removeConvenienceAttributes(graph.copy()))
 
