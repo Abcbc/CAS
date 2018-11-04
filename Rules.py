@@ -212,9 +212,16 @@ class NewNodeRule(Rule):
         return comms
 
     def _findOperands(self, graph):
-        # ToDo Find a strongly connected subset of nodes with a high orientation
         communities = self._getCommunities(graph)
-        # ToDo check connectivity and orientation
+        connectedCommunities = []
+        for comm in communities:
+            commGraph = graph.subgraph(comm)
+            isDense = nx.density(commGraph) >= self.parameters['densityThreshold']
+            hasHighOrientation = np.mean([graph.edges[eid] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
+            if isDense and hasHighOrientation:
+                connectedCommunities.append(comm)
+
+        return connectedCommunities
 
     def _calcOpinions(self, graph, nodeSet):
         # ToDo for each opinion find common value in set or use 0 if no common value
