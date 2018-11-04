@@ -180,8 +180,14 @@ class AdaptationRule(Rule):
 
 class NewNodeRule(Rule):
     """
-    Parameters: None
+    densityThreshold: minimum required n_edges/max possible n_edges
+      for a community. Range: 0 to 1. Default: 0.8
+    meanOrientationThreshold: minimum required mean of orientation in
+      a community. Range: -1 to 1. Default: 0.8
     """
+
+    defaultParameters = { 'densityThreshold' : 0.8,
+                          'meanOrientationThreshold' : 0.8}
 
     def _createInternals(self, graph):
         pass
