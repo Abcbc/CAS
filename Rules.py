@@ -222,15 +222,18 @@ class NewNodeRule(Rule):
         for comm in communities:
             commGraph = graph.subgraph(comm)
             isDense = nx.density(commGraph) >= self.parameters['densityThreshold']
-            hasHighOrientation = np.mean([graph.edges[eid] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
+            hasHighOrientation = np.mean([graph.edges[eid][KEY_ORIENTATION] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
             if isDense and hasHighOrientation:
                 connectedCommunities.append(comm)
 
         return connectedCommunities
 
     def _calcOpinions(self, graph, nodeSet):
-        # ToDo for each opinion find common value in set or use 0 if no common value
-        pass
+        opinionMat = np.array([graph.nodes[nid][KEY_OPINIONS] for nid in nodeSet])
+        opinionMeans = np.mean(opinionMat,0) # mean op_i of all nodes
+        newNodeOpinions = np.sign(opinionMeans)*np.greater(np.abs(opinionMeans),self.parameters['opMeanThreshold'])
+
+        return newNodeOpinions
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
