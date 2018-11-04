@@ -1,8 +1,10 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
+from Graph import KEY_OPINIONS, KEY_ORIENTATION, doOpinionsDiffer, areOppositeOpinions
 from utils.Logger import get_logger
 import community
+import networkx as nx
+import numpy as np
 
 log = get_logger("Rule")
 
