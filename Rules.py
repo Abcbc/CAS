@@ -186,10 +186,13 @@ class NewNodeRule(Rule):
       for a community. Range: 0 to 1. Default: 0.8
     meanOrientationThreshold: minimum required mean of orientation in
       a community. Range: -1 to 1. Default: 0.8
+    opMeanThreshold: minimum required mean of |orientation| in a community
+      to give the new node an opinion. Range: 0 to 1. Default: 0.8
     """
 
     defaultParameters = { 'densityThreshold' : 0.8,
-                          'meanOrientationThreshold' : 0.8}
+                          'meanOrientationThreshold' : 0.8,
+                          'opMeanThreshold' : 0.8 }
 
     def _createInternals(self, graph):
         pass
