@@ -102,6 +102,9 @@ def getMaxNodeId(graph):
 def getNextNodeId(graph):
     return getMaxNodeId(graph) + 1
 
+def createNewNodeSkeleton(graph):
+    return { 'graph' : graph, KEY_NODE_ID : getNextNodeId(graph)}
+
 def toJsonStr(graph):
     return nx.jit_data(removeConvenienceAttributes(graph.copy()))
 
