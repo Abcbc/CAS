@@ -1,6 +1,6 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_NODE_ID, KEY_OPINIONS, KEY_ORIENTATION, doOpinionsDiffer, areOppositeOpinions, createNewNodeSkeleton, createNewEdgeSkeleton
+from Graph import KEY_NODE_ID, KEY_EDGE_ID, KEY_OPINIONS, KEY_ORIENTATION, doOpinionsDiffer, areOppositeOpinions, createNewNodeSkeleton, createNewEdgeSkeleton
 from utils.Logger import get_logger
 import community
 import networkx as nx
@@ -245,14 +245,14 @@ class NewNodeRule(Rule):
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
 
-        nodeSet = self.internals['nodeSet']
-        newNodeId = 0 # ToDo get next available node id from graph
-        graph.add_node(newNodeId)
-        # ToDo add convenience attributes
-        graph.nodes[newNodeId][KEY_OPINIONS] = self._calcOpinions(graph, nodeSet)
-
-        # ToDo  for nodeId in nodeSet:
-        # ToDo      graph.add_edge(nodeId, newNodeId)
+        for nodeToAdd in self.internals['nodesToAdd']:
+            opinions = nodeToAdd[0]
+            node = createNewNodeSkeleton(graph)
+            node[KEY_OPINIONS] = opinions
+            graph.add_nodes_from([(node[KEY_NODE_ID],node)])
+            for neighbour in nodeToAdd[1]:
+                edge = createNewEdgeSkeleton(graph, node, graph.nodes[neighbour])
+                graph.add_edges_from([(node[KEY_NODE_ID], neighbour,edge)])
 
         return graph
 
