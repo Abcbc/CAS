@@ -62,7 +62,19 @@ random\_graphs.barabasi\_albert\_graph}\footnote{\url{https://networkx.github.io
 duplication.duplication\_divergence\_graph}\footnote{\url{https://networkx.github.io/documentation/stable/reference/generated/networkx.generators.duplication.duplication_divergence_graph.html}}) und Watts-Strogatz-Graphen \autocite{Watts1998}, \autocite{Newman1999} (\nx{networkx.generators.%
 random\_graphs.watts\_strogatz\_graph}\footnote{\url{https://networkx.github.io/documentation/latest/reference/generated/networkx.generators.random_graphs.watts_strogatz_graph.html}}).
 
-\subsection{\ToDo{Messungen am Graph}}
+\subsection{Durchführung}
+Ausgehend von einer initialen Graphenkonfiguration werden so lange Simulationsschritte durchgeführt, bis Konvergenzen beobachtet oder Divergenzen ausreichend sicher erkannt werden können.
+
+Um aussagekräftige Ergebnisse zu erhalten, werden Simulationsläufe wiederholt durchgeführt. Wiederholte Durchläufe auf dem selben Anfangsgraphen senken den Einfluss einzelner Entscheidungen während der Regelanwendung. Wiederholte Durchläufe mit neuen Anfangsgraphen senken den Einfluss des konkreten Graphen auf das Ergebnis.
+
+Drei Arten von Simulationsläufen können unterschieden werden:
+\begin{enumerate}
+\item Keine äußere Einflussnahme auf den Graphen nach der Initialisierung
+\item Zufällige Erzeugung neuer Verbindungen zwischen Clustern
+\item {}[Optional] Zufällige Erzeugung von irregulären Knoten bei der Initialisierung und/oder während der Simulation
+\end{enumerate}
+
+\subsection{Messungen am Graph}
 Am Graphen sollen mindestens folgende Messungen vorgenommen werden:
 \begin{itemize}
 	\item Anzahl der Cluster
