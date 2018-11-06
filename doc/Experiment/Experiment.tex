@@ -4,6 +4,7 @@
 \usepackage[ngerman]{babel}
 \usepackage{lmodern}
 
+\usepackage{paralist}
 \usepackage[backend=biber,style=authoryear-icomp]{biblatex}
 \usepackage[hidelinks=true]{hyperref}
 
@@ -66,6 +67,22 @@ random\_graphs.barabasi\_albert\_graph}\footnote{\url{https://networkx.github.io
 duplication.duplication\_divergence\_graph}\footnote{\url{https://networkx.github.io/documentation/stable/reference/generated/networkx.generators.duplication.duplication_divergence_graph.html}}), \ToDo{tbc}
 
 \subsection{\ToDo{Messungen am Graph}}
+Am Graphen sollen mindestens folgende Messungen vorgenommen werden:
+\begin{itemize}
+	\item Anzahl der Cluster
+	\item Verteilung der Clustergrößen
+	\item Rate der Zu- und Abgänge von Knoten aus Clustern (Drei Fälle: \begin{inparaenum}[(I)] \item Wechsel von Cluster in ungeclusterte Menge \item Wechsel aus ungeclusterter Menge in Cluster \item direkter Wechsel zwischen zwei Clustern\end{inparaenum})
+	\item Verteilung der Anzahl der Verbindungen zwischen Clustern
+	\item Anzahl von Interessen, bei denen mehrere Cluster überwiegend den gleichen Wert aufweisen
+\end{itemize}
+Innerhalb der Cluster soll gemessen werden:
+\begin{itemize}
+	\item Dichte
+	\item Vorhandensein/Größe eines Kerns
+	\item Anzahl der Meinungen, zu denen im Cluster Konsens herrscht
+	\item Verteilung Grad der Übereinstimmung der Interessen
+\end{itemize}
+
 Anzahl der Cluster
 
 Anzahl der Abgänge/Neuzugänge von Knoten zu den Clustern
