@@ -16,6 +16,7 @@
 \definecolor{ToDoColor}{named}{red}
 \newcommand*{\ToDo}[1]{{\color{ToDoColor}\textbf{TODO:} #1}}
 
+\setlength{\parindent}{0pt}
 
 %Beschreiben Sie in einem kurzen Text, welche konkrete Forschungsfrage Sie an Ihr Simulationsmodell stellen wollen! Also: Was wollen Sie untersuchen?
 %Beschreiben Sie, welche Erwartung Sie in Bezug auf den Ausgang des Experiments haben.
@@ -27,18 +28,18 @@
 \section{Forschungsfrage}
 
 Basierend auf dem Modell von \autocite{Koehler-Bussmeier2018} sollen Aspekte der Stabilität von Clustern untersucht werden.
-\\
+
 Es wird vermutet, dass das Modell zu Clusterbildung führt, weil Knoten mit ähnlichen Interessen ihre Verbindung stärken und Knoten mit gegensätzlichen Interessen diese ändern sowie ihre Verbindung schwächen.
-\\
+
 Wir wollen untersuchen, ob existente Cluster stabil sind und ein konvergierter Zustand des Systems erreicht sein kann, oder ob Cluster durch innere Dynamiken zerfallen und sich neu bilden. Möglicherweise hängt die Stabilität von der Interessensstruktur innerhalb der Cluster ab, die von sehr ähnlichen Interessen geprägt sein kann, aber auch eine Art "`Sammelbecken"' mit geringerem inneren Zusammenhalt. Außerdem wollen wir gezielt zwischen Clustern Verbindungen einführen und herausfinden, inwiefern dies die Struktur des Systems beeinflusst.
-\\
+
 %neu
 Damit soll Kommunikation zwischen ansonsten disjunkten Interessengemeinschaften modelliert werden, daher solchen, die nicht in direktem sozialen Kontakt stehen. Die Kanten könnten etwa den Austausch über Repräsentanten auf Konferenzen,  das Teilen von Links oder das sich ausrichten an scheinbaren Mehrheitsmeinungen in Sozialen Medien, oder auch die Teilname an politisch motivierten Veranstaltungen repräsentieren.
-\\
+
 %ende
 %todo: setup gleiche/Diverse Interessen
 In der vorsichtigen Anwendung des Modells auf menschliche Sozialstrukturen steckt dahinter die Frage, ob Meinungsblasen dauerhafte oder doch eher kurzzeitige, sich permanent entwickelnde Phänomene sind. Wenn Menschen aus verschiedenen Meinungsblasen zusammen kommen und sich vernetzen (mögliche Beispiele dafür wären gemeinsame Teilinteressen wie Hobbys oder auch rein zufällig gemeinsam erlebte Ereignisse wie ein liegengebliebener Zug), besteht die Möglichkeit, dass die neuen Kontakte zur zumindest kurzzeitigen Auflösung oder Auflockerung der Meinungsblasen führt. 
-\\
+
 %neu
 Es gilt also zu betrachten, wie nachhaltig ein Perspektivwechsel eines Mitglieds einer Interessengruppe sein kann. Wird es die nun abweichende Meinung zwangsläufig verworfen, oder kann es gar die Bildung einer Clique bewirken. Wie realistisch ist die Annahme, dass sich diese Clique sogar isoliert?
 \\
@@ -56,9 +57,9 @@ Welchen Einfluss hat die anfängliche Homogenität/Inhomogenität bezüglich der
 \section{Aufbau des Experiments}
 \subsection{Ausgangssituation}
 Die initiale Konfiguration des Graphen muss Cluster beinhalten, deren Anzahl und Größenverteilung festgelegt werden muss. Weitere Parameter sind die Anzahl der Cluster, die Anzahl und Verteilung von Verbindungen zwischen Clustern.
-\\
+
 Eine wichtige Rolle spielt die Verteilung der Interessen und Verbindungen in einem Cluster. Knoten eines Clusters können sich in allen Interessen ähneln, oder nur in einer Teilmenge der Interessen, während die Interessen der Restmenge anders (z.B. zufällig) verteilt sind. Cluster mit stark hierarchischer Ausprägung mit einem sehr vermögenden Kern und schwächerer Peripherie können sich von gleichmäßig aufgebauten Clustern unterscheiden. Cluster mit starkem inneren Zusammenhalt, möglicherweise hierarchischem Aufbau und großen Interessensüberschneidungen bilden "`Sekten"', schwach vernetzte Cluster mit geringeren Interessensüberschneidungen "`Sammelbecken"'.
-\\
+
 Zur Erzeugung der Graphen können Funktionen der Graphenbibliothek \autocite{networkx} herangezogen werden. Allgemein sind zufällige Graphen anzustreben, um durch Wiederholungen der Experimente den Einfluss der einzelnen Instanziierungen gegenüber dem Einfluss definierter Metriken zu minimieren.
 % => dorogovtsev_goltsev_mendes_graph fällt weg. Sieht zwar auch schön aus, ist aber deterministisch (https://arxiv.org/pdf/cond-mat/0112143.pdf)
 Unterstützte Graphen, die untersucht werden könnten, sind \autocite{Holme2002} (\nx{%networkx.generators.
