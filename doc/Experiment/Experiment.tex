@@ -1,0 +1,149 @@
+\documentclass[11pt, a4paper]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern}
+
+\usepackage{paralist}
+\usepackage[backend=biber,style=authoryear-icomp]{biblatex}
+\usepackage[hidelinks=true]{hyperref}
+
+\bibliography{../literatur}
+
+\newcommand{\nx}[1]{\texttt{#1}}
+
+\usepackage{xcolor}
+\definecolor{ToDoColor}{named}{red}
+\newcommand*{\ToDo}[1]{{\color{ToDoColor}\textbf{TODO:} #1}}
+
+\setlength{\parindent}{0pt}
+
+%Beschreiben Sie in einem kurzen Text, welche konkrete Forschungsfrage Sie an Ihr Simulationsmodell stellen wollen! Also: Was wollen Sie untersuchen?
+%Beschreiben Sie, welche Erwartung Sie in Bezug auf den Ausgang des Experiments haben.
+%Erläutern Sie, welche Auswirkungen Ihre Frage auf den Versuchsaufbau, d.h. auf Details Ohres Modells hat!
+%Beschreiben Sie, welche Messungen Sie vornehmen wollen und wie Sie an die Daten kommen!
+%Wie sichern Sie sich dagegen ab, dass Sie vielleicht nur einen Zufallsbefund haben?
+
+\begin{document}
+\section{Forschungsfrage}
+
+Basierend auf dem Modell von \autocite{Koehler-Bussmeier2018} sollen Aspekte der Stabilität von Clustern untersucht werden.
+
+Es wird vermutet, dass das Modell zu Clusterbildung führt, weil Knoten mit ähnlichen Interessen ihre Verbindung stärken und Knoten mit gegensätzlichen Interessen diese ändern sowie ihre Verbindung schwächen.
+
+Wir wollen untersuchen, ob existente Cluster stabil sind und ein konvergierter Zustand des Systems erreicht sein kann, oder ob Cluster durch innere Dynamiken zerfallen, sich vereinigen oder neu bilden. Möglicherweise hängt die Stabilität von der Interessensstruktur innerhalb der Cluster ab, die von sehr ähnlichen Interessen geprägt sein kann, aber auch eine Art "`Sammelbecken"' mit geringerem inneren Zusammenhalt. Außerdem wollen wir gezielt zwischen Clustern Verbindungen einführen und herausfinden, inwiefern dies die Struktur des Systems beeinflusst.
+
+%todo: setup gleiche/Diverse Interessen
+In der vorsichtigen Anwendung des Modells auf menschliche Sozialstrukturen steckt dahinter die Frage, ob disjunkte Interessensgemeinschaften, die nicht/wenig in Kontakt stehen ("`Meinungsblasen"') dauerhafte oder doch eher kurzzeitige, sich permanent entwickelnde Phänomene sind. Wenn Menschen aus verschiedenen Meinungsblasen zusammen kommen und sich vernetzen (mögliche Beispiele dafür wären gemeinsame Teilinteressen wie Hobbys, Messen/Konferenzen etc. oder auch rein zufällig gemeinsam erlebte Ereignisse wie ein liegengebliebener Zug), besteht die Möglichkeit, dass die neuen Kontakte zur zumindest kurzzeitigen Auflösung oder Auflockerung der Meinungsblasen führt.
+
+Es gilt also zu betrachten, wie nachhaltig ein Perspektivwechsel eines Mitglieds einer Interessengruppe sein kann. Wird es die nun abweichende Meinung zwangsläufig verworfen, oder kann es gar die Bildung eines Clusters bewirken? Wie realistisch ist die Annahme, dass sich dieses Cluster sogar isoliert?
+
+Fallen Cluster spontan wieder auseinander? In wie viele Teile? Welchen Einfluss hat die Clustergröße, die Art des Clusters ("`Sekte"', "`Sammelbecken"')?
+
+\subsection{Erweiterung}
+Vor dem Hintergrund der Annahme, die Aktivität von Trollen und/oder das Teilen von nicht belegten falschen Nachrichten beeinflussten in erheblicher Weise die öffentliche Meinung dahin gehend, dass sich neue Gruppen von  extremer Ausrichtung herausbilden, wollen wir versuchen, ihre Wirksamkeit zu simulieren.
+
+Hierbei handelt es sich um Urheber, die als reguläres Mitglied einer Gemeinschaft  wahrgenommen werden, jedoch nicht implizit angenommenen Regeln gehorchen. Sie sind insbesondere dadurch charakterisiert, dass ihr Standpunkt zu einem Thema unveränderlich ist, ohne das tatsächlich ein Konsens innerhalb der Gruppe ursächlich ist. Zur Modellierung sollen als Sonderfall irregulär agierende Knoten eingeführt werden, die gleichermaßen die betreffende Regel ignorieren. Das Modell kann dafür um Knoten erweitert werden, die ein niedriges Spektrum aufweisen, da ihre Vermögenswerte überwiegend neutral sind. Sie ändern nicht ihre Bewertungen nach Regeln 2.1.1 und 2.1.2.
+
+Es kann untersucht werden, ob solche irregulären Knoten zu Isolationen von Clustern führen oder eigene Cluster ausbilden. Wie groß ist ihr Einfluss auf das Meinungsbild der Cluster, abhängig von der Art des Clusters ("`Sekte"', "`Sammelbecken"')?
+
+
+\section{Aufbau des Experiments}
+\subsection{Ausgangssituation}
+Die initiale Konfiguration des Graphen muss Cluster beinhalten, deren Anzahl und Größenverteilung festgelegt werden muss. Weitere Parameter sind die Anzahl der Cluster, die Anzahl und Verteilung von Verbindungen zwischen Clustern.
+
+Eine wichtige Rolle spielt die Verteilung der Interessen und Verbindungen in einem Cluster. Knoten eines Clusters können sich in allen Interessen ähneln, oder nur in einer Teilmenge der Interessen, während die Interessen der Restmenge anders (z.B. zufällig) verteilt sind. Cluster mit stark hierarchischer Ausprägung mit einem sehr vermögenden Kern und schwächerer Peripherie können sich von gleichmäßig aufgebauten Clustern unterscheiden. Cluster mit starkem inneren Zusammenhalt, möglicherweise hierarchischem Aufbau und großen Interessensüberschneidungen bilden "`Sekten"', schwach vernetzte Cluster mit geringeren Interessensüberschneidungen "`Sammelbecken"'.
+
+Zur Erzeugung der Graphen können Funktionen der Graphenbibliothek \autocite{networkx} herangezogen werden. Allgemein sind zufällige Graphen anzustreben, um durch Wiederholungen der Experimente den Einfluss der einzelnen Instanziierungen gegenüber dem Einfluss definierter Metriken zu minimieren.
+% => dorogovtsev_goltsev_mendes_graph fällt weg. Sieht zwar auch schön aus, ist aber deterministisch (https://arxiv.org/pdf/cond-mat/0112143.pdf)
+Unterstützte Graphen, die untersucht werden könnten, sind \autocite{Holme2002} (\nx{%networkx.generators.
+random\_graphs.powerlaw\_cluster\_graph}\footnote{\url{https://networkx.github.io/documentation/stable/reference/generated/networkx.generators.random_graphs.powerlaw_cluster_graph.html}}), \autocite{Barabasi509} (\nx{%networkx.generators.
+random\_graphs.barabasi\_albert\_graph}\footnote{\url{https://networkx.github.io/documentation/stable/reference/generated/networkx.generators.random_graphs.barabasi_albert_graph.html}}), \autocite{Ispolatov2005} (\nx{%networkx.generators.
+duplication.duplication\_divergence\_graph}\footnote{\url{https://networkx.github.io/documentation/stable/reference/generated/networkx.generators.duplication.duplication_divergence_graph.html}}) und Watts-Strogatz-Graphen \autocite{Watts1998}, \autocite{Newman1999} \\(\nx{networkx.generators.%
+random\_graphs.watts\_strogatz\_graph}\footnote{\url{https://networkx.github.io/documentation/latest/reference/generated/networkx.generators.random_graphs.watts_strogatz_graph.html}}).
+
+\subsection{Durchführung}
+Ausgehend von einer initialen Graphenkonfiguration werden so lange Simulationsschritte durchgeführt, bis Konvergenzen beobachtet oder Divergenzen ausreichend sicher erkannt werden können.
+
+Um aussagekräftige Ergebnisse zu erhalten, werden Simulationsläufe wiederholt durchgeführt. Wiederholte Durchläufe auf dem selben Anfangsgraphen senken den Einfluss einzelner Entscheidungen während der Regelanwendung. Wiederholte Durchläufe mit neuen Anfangsgraphen senken den Einfluss des konkreten Graphen auf das Ergebnis.
+
+Drei Arten von Simulationsläufen können unterschieden werden:
+\begin{enumerate}
+\item Keine äußere Einflussnahme auf den Graphen nach der Initialisierung
+\item Zufällige Erzeugung neuer Verbindungen zwischen Clustern
+\item {}[Optional] Zufällige Erzeugung von irregulären Knoten bei der Initialisierung und/oder während der Simulation
+\end{enumerate}
+
+\subsection{Messungen am Graph}
+Am Graphen sollen mindestens folgende Messungen vorgenommen werden:
+\begin{itemize}
+	\item Anzahl der Cluster
+	\item Verteilung der Clustergrößen
+	\item Rate der Zu- und Abgänge von Knoten aus Clustern (Drei Fälle: \begin{inparaenum}[(I)] \item Wechsel von Cluster in ungeclusterte Menge \item Wechsel aus ungeclusterter Menge in Cluster \item direkter Wechsel zwischen zwei Clustern\end{inparaenum})
+	\item Verteilung der Anzahl der Verbindungen zwischen Clustern
+	\item Anzahl von Interessen, bei denen mehrere Cluster überwiegend den gleichen Wert aufweisen
+\end{itemize}
+Innerhalb der Cluster soll gemessen werden:
+\begin{itemize}
+	\item Dichte
+	\item Vorhandensein/Größe eines Kerns
+	\item Anzahl der Meinungen, zu denen im Cluster Konsens herrscht
+	\item Verteilung Grad der Übereinstimmung der Interessen
+\end{itemize}
+Im Falle des erweiterten Experiments mit irregulären Knoten soll betrachtet werden:
+\begin{itemize}
+	\item Gradzentralität
+	\item Zwischenzentralität 
+	\item Nähezentralität 
+\end{itemize}
+
+\subsection{Hypothese}
+
+Für den Fall eines Graphen mit starken, einigen Clustern und wenigen Verbindungen zwischen Clustern erwarten wir eine Auflösung dieser Verbindungen zwischen Clustern unterschiedlicher Vermögenswerte und eine Verstärkung der Verbindungen bis hin zur Verschmelzung der Cluster bei ähnlichen Vermögenswerten. Ein beide entwickelt sich ein konvergierter Endzustand. Für das Einfügen von Verbindungen während der Simulation erwarten wir eher geringe Auswirkungen auf diesen Endzustand.
+
+Sind die Cluster recht stark untereinander vernetzt und im Inneren nur in wenigen Vermögenswerten einig, erwarten wir eine große Empfindlichkeit bezogen auf die Vermögenswerte im Anfangszustand und ein größere Veränderungen. Während einige Cluster in Untercluster zerfallen, erodieren andere langsam und wieder andere verstärken ihre Einigkeit und wachsen. Hier können eingefügte Verbindungen großen Einfluss nehmen und eine Umordnung der Clusterstruktur bewirken.
+
+Im erweiterten Experiment erwarten wir aufzeigen zu können, dass ein irregulärer Knoten überdurchschnittlich viele Nachbarn 1. Ordnung gewinnt. Außerdem nehmen wir an, dass er nach endlichen Schritten eine zentrale Position im Cluster einnimmt, d.h. er wird im Mittel kurze Wege zu allen Knoten im  haben. Des Weiteren erwarten wir zu finden, dass besonders viele kürzeste Wege zwischen beliebigen Paaren von Knoten in seinem Cluster durch ihn hindurch verlaufen. 
+
+\printbibliography
+
+%\appendix
+%\section{Sammlung an Parametern, Fragen etc.}
+%\subsection{Initiale Graphen}
+%\begin{itemize}
+%\item Parameter\begin{itemize}
+%	\item Anzahl Knoten
+%	\item (Durchschnittliche) Anzahl Kanten pro Knoten
+%\end{itemize}
+%\item Lokalität der Kanten => wie messbar/erreichbar?
+%\item Regelmäßige Struktur?
+%\item Verbundenheit?
+%\item Initialisierung der Interessen\begin{itemize}
+%	\item Gleichmäßig zufällig
+%	\item Zufällig, aber mit unterschiedlichen Wkeiten für "`0"' und "`1 oder -1"'
+%	\item Zufällig, aber Bevorzugung lokaler Übereinstimmungen => führen diese zur Ausprägung von Clustern? Wie stark muss die Abweichung von Gleichverteilung sein?
+%	\item Zufällig, aber Bevorzugung lokaler Uneinigkeiten
+%\end{itemize}
+%\item Cluster, wie groß, wie viele, wie starke Verbindungen zwischen den Clustern?
+%\item Skaleninvariant?
+%\end{itemize}
+%
+%\subsection{Untersuchungen}
+%\begin{itemize}
+%\item bilden sich Cluster?
+%\item wie viele, wie groß?
+%\item gibt es im Cluster vorherrschende Meinungen?
+%\item Empfindlichkeit auf kleiner Änderungen der Initialisierung?
+%\end{itemize}
+%
+%\subsection{Sonstiges}
+%\begin{itemize}
+%\item \url{https://en.wikipedia.org/wiki/Barab%C3%A1si%E2%80%93Albert_model}
+%\item Survey zu Netzwerken: \url{https://arxiv.org/pdf/cond-mat/0106144.pdf}
+%\item Link zu \autocite{Holme2002}: \url{http://www.uvm.edu/pdodds/files/papers/others/2002/holme2002a.pdf}
+%\item Link zu \autocite{Barabasi509}: \url{https://arxiv.org/pdf/cond-mat/9910332.pdf}, \url{http://barabasi.com/f/67.pdf}
+%\item Link zu \autocite{Ispolatov2005}: \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2092385/}, \url{http://iopscience.iop.org/article/10.1088/1367-2630/7/1/145/pdf}
+%\item Link zu \autocite{Newman1999}: https://arxiv.org/pdf/cond-mat/9903357.pdf
+%\item Link zu \autocite{Watts1998}: https://www.nature.com/articles/30918.pdf
+%\end{itemize}
+\end{document}
