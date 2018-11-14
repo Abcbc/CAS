@@ -21,30 +21,28 @@
 \section{Bezug auf das Modell von Axelrod und Cohen}
 
 
-Unser Projekt soll die Dynamik sozialer Organisation aufgrund von Meinungen in Komplexen Adaptiven Systemen simulieren. Die Kategorisierung ist zutreffend, da zu erwarten ist, dass das betrachtete System in Anbetracht einer Menge wechselwirkender Agenten ein emergentes Verhalten zeigen wird. 
-
+Unser Projekt soll die Dynamik sozialer Organisation aufgrund von Meinungen in Komplexen Adaptiven Systemen simulieren. Die Kategorisierung ist zutreffend, da zu erwarten ist, dass das betrachtete System in Anbetracht einer Menge wechselwirkender Agenten ein emergentes Verhalten zeigen wird. \\
+\\
 Ein Agent ist in unserem System ein Knoten in einem Graphen, der Träger individueller Geschmacksurteile ist.
-
-Er besitzt für sich Entscheidungskriterien für bestimmte Verhalten, die im Regelfall zur Verfolgung des Zieles niedriges Vermögensgefälle und ggf. Hinwendung Richtung großem Orientierungswert  führt. Dies entspricht im Sinne eines „measure of success“ dem Wunsch nach einem Umfeld mit möglichst großem Konsens.
-
-Da die Strategie zu diesem Ziel nicht global vorgegeben ist, und von der Position im sozialen Graphen sowie den Eigenschaften seiner Nachbarn beeinflusst wird, kann von einem adaptiven Verhalten ausgegangen werden.
-
-Wir versuchen näherungsweise einen „coevolutionary process, daher Gleichzeitigkeit der Auswirkungen nachzubilden, indem wir in jedem Update-Zyklus eine eine Kopie unseres Graphen anfertigen (Generation) und die Nachbarn jedes Knotens auf Grundlage des Originals aktualisieren.
-
-Die Populationen, welche wir betrachten wollen, sind verbundene Teilgraphen, daher die Gesamtheit, Cluster und möglicherweise Cliquen.
-
-Die möglichen Aktionen eines Akteurs umfassen die Neuausrichtung bestimmter Vermögenswerte, das Knüpfen neuer Verbindungen zu Nachbarn 2. Ordnung, sowie das Abbrechen von Verbindungen.
-
-Eine Strategien zum Erzielen  eines Erfolgs wären demnach Adaption im Sinne von sich gleich einer Teilmenge zu verhalten und ein Gleichgewicht aus Änderung der Position im Netzwerk und Anpassung/Beeinflussung des Umfelds zu finden.
-Eine andere Strategie wäre gleich einem Troll zu versuchen, durch Unveränderlichkeit eine möglichst große Anzahl Nachbarn zu beeinflussen. Im Erfolgsfall entspräche dies einem „harnessing complexity“, daher einem Ausnutzen vom Vermutungen zum Verhalten des Sytems.
-
+Für sein Verhalten nutzt er unter Betrachtung seiner Wechselwirkung mit der Umgebung Entscheidungskriterien, die im Regelfall zur Verfolgung des Zieles niedriges Vermögensgefälle und ggf. Hinwendung Richtung großem Orientierungswert führen. Dies entspricht im Sinne eines „measure of success“ dem Wunsch nach einem Umfeld, in dem er möglichst großem Konsens erfährt.\\
+\\
+Da die Strategie zu diesem Ziel nicht global vorgegeben ist, sondern von der Position im sozialen Graphen sowie den Eigenschaften seiner Nachbarn beeinflusst wird, kann tatsächlich von einem adaptiven Verhalten ausgegangen werden.
+Die möglichen Aktionen eines Akteurs umfassen die Neuausrichtung bestimmter Vermögenswerte, das Knüpfen neuer Verbindungen zu Nachbarn 2. Ordnung, sowie das Abbrechen von Verbindungen.\\
+\\
+Eine mögliche Strategie zum Erzielen eines Erfolgs wären demnach Adaption im Sinne von sich gleich einer Teilmenge zu verhalten und ein Gleichgewicht aus Änderung der Position im Netzwerk und Anpassung/Beeinflussung des Umfelds zu finden. Eine andere Strategie wäre gleich einem Troll zu versuchen, durch Unveränderlichkeit eine möglichst große Anzahl Nachbarn verstärkt zu beeinflussen.
+Im Erfolgsfall entspräche dies einem „harnessing complexity“, daher einem Ausnutzen von Vermutungen zum Verhalten des Systems.\\
+\\
 Die ausschlaggebenden Regeln sind in unserer Implementierung tatsächlich ausgelagert und werden von einer Update-Methode zum Einsatz gebracht, die den individuellen Knoten aktualisiert.
-
+Wir versuchen einen „coevolutionary process, daher Gleichzeitigkeit der Auswirkungen näherungsweise  nachzubilden, indem wir in jedem Update-Zyklus eine eine Kopie unseres Graphen anfertigen (Generation) und die Nachbarn jedes Knotens auf Grundlage des Originals aktualisieren.\\
+\\
+Die Populationen, welche wir betrachten wollen, sind verbundene Teilgraphen, daher die Gesamtheit, Cluster und möglicherweise Cliquen.
+Unser Netzwerk ist nicht evolutionär, da keine Replikation von Akteuren stattfindet.
 Im Sinne von „emergent proberties“ und globaler Dynamik erwarten wir die Bildung bzw. Auflösung von Clustern zu beobachten, sowie eine starke Vernetzung Gleichgesinnter zu finden.
-Um diese zu beeinflussen beabsichtigen wir den sozialen Graphen mit unterschiedlicher Topologie sowie unterschiedlichen Graden der Homogenität in Clustern zu initialisieren.
-
-„Interventions“ im Sinne der Definition sind nicht vorgesehen, da wir keinen Belohnungs- / oder Bestrafungsmechanismus implementieren. Dennoch wollen wir versuchen irreguläre Akteure mit fremdbestimmter Strategie „Trolle“ einzusetzen.
-
-
+Um die Dynamik zu beeinflussen beabsichtigen wir den sozialen Graphen mit unterschiedlicher Topologie sowie unterschiedlichen Graden der Homogenität in Clustern zu initialisieren.\\
+\\
+Im Falle des Einfügens von Kanten in einem näherungsweise stabilen Zustands zur Laufzeit, wird möglichweise das Phänomen eines ''self-restoring patterns'' zu beobachten sein.\\
+ \\
+„Interventions“ im Sinne der Definition sind nicht vorgesehen, da wir keinen Belohnungs-/oder Bestrafungsmechanismus implementieren.\\
+Dennoch wollen wir versuchen irreguläre Akteure mit fremdbestimmter Strategie „Trolle“ einzusetzen.
 
 \end{document}
