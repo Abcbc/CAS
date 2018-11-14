@@ -19,8 +19,6 @@
 \setlength{\parindent}{0pt}
 \begin{document}
 \section{Bezug auf das Modell von Axelrod und Cohen}
-
-
 Unser Projekt soll die Dynamik sozialer Organisation aufgrund von Meinungen in Komplexen Adaptiven Systemen simulieren. Die Kategorisierung ist zutreffend, da zu erwarten ist, dass das betrachtete System in Anbetracht einer Menge wechselwirkender Agenten ein emergentes Verhalten zeigen wird. \\
 \\
 Ein Agent ist in unserem System ein Knoten in einem Graphen, der Träger individueller Geschmacksurteile ist.
@@ -36,13 +34,13 @@ Die ausschlaggebenden Regeln sind in unserer Implementierung tatsächlich ausgel
 Wir versuchen einen „coevolutionary process, daher Gleichzeitigkeit der Auswirkungen näherungsweise  nachzubilden, indem wir in jedem Update-Zyklus eine eine Kopie unseres Graphen anfertigen (Generation) und die Nachbarn jedes Knotens auf Grundlage des Originals aktualisieren.\\
 \\
 Die Populationen, welche wir betrachten wollen, sind verbundene Teilgraphen, daher die Gesamtheit, Cluster und möglicherweise Cliquen.
-Unser Netzwerk ist nicht evolutionär, da keine Replikation von Akteuren stattfindet.
-Im Sinne von „emergent proberties“ und globaler Dynamik erwarten wir die Bildung bzw. Auflösung von Clustern zu beobachten, sowie eine starke Vernetzung Gleichgesinnter zu finden.
-Um die Dynamik zu beeinflussen beabsichtigen wir den sozialen Graphen mit unterschiedlicher Topologie sowie unterschiedlichen Graden der Homogenität in Clustern zu initialisieren.\\
+Unser Netzwerk ist nicht evolutionär, da keine Replikation von Akteuren stattfindet.\\
 \\
+Im Sinne von „emergent proberties“ und globaler Dynamik erwarten wir die Bildung bzw. Auflösung von Clustern zu beobachten, sowie eine starke Vernetzung Gleichgesinnter zu finden.\\
+\\
+Um die Dynamik zu beeinflussen beabsichtigen wir den sozialen Graphen mit unterschiedlicher Topologie sowie unterschiedlichen Graden der Homogenität in Clustern zu initialisieren.
 Im Falle des Einfügens von Kanten in einem näherungsweise stabilen Zustands zur Laufzeit, wird möglichweise das Phänomen eines ''self-restoring patterns'' zu beobachten sein.\\
  \\
 „Interventions“ im Sinne der Definition sind nicht vorgesehen, da wir keinen Belohnungs-/oder Bestrafungsmechanismus implementieren.\\
-Dennoch wollen wir versuchen irreguläre Akteure mit fremdbestimmter Strategie „Trolle“ einzusetzen.
-
+Dennoch wollen wir versuchen irreguläre Akteure mit implizit von uns vorgegebener Strategie (Trolle) einzusetzen.
 \end{document}
