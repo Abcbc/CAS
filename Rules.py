@@ -1,10 +1,16 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
+<<<<<<< HEAD
 from Graph import KEY_NODE_ID, KEY_EDGE_ID, KEY_OPINIONS, KEY_ORIENTATION, KEY_V, doOpinionsDiffer, areOppositeOpinions, createNewNodeSkeleton, createNewEdgeSkeleton
 from utils.Logger import get_logger
 import community
 import networkx as nx
 import numpy as np
+=======
+from Graph import KEY_OPINIONS, KEY_ORIENTATION, doOpinionsDiffer, areOppositeOpinions
+from utils.Logger import get_logger
+import networkx as nx
+>>>>>>> NewEdgesRule implementation
 
 log = get_logger("Rule")
 
