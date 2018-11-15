@@ -1,7 +1,8 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
+from Graph import KEY_OPINIONS, KEY_ORIENTATION, doOpinionsDiffer, areOppositeOpinions
 from utils.Logger import get_logger
+import networkx as nx
 
 log = get_logger("Rule")
 
@@ -172,3 +173,67 @@ class AdaptationRule(Rule):
     @staticmethod
     def getName():
         return 'AdaptationRule'
+
+class NewEdgesRule(Rule):
+    """
+    Chooses an edge (probability weighed with orientation). Neighbours of one node can become
+    neighbours of the other node also.
+    createEdgeProbability: probability that an edge is created. Range: 0 to 1. Default: 0.1
+    """
+
+    defaultParameters = {'createEdgeProbability': 0.1}
+
+    def _getNeighbours(self, graph, node, degree):
+        neighbours = set()
+        if degree > 0:
+            for neighbour in self._getNeighbours(node, degree-1):
+                neighbours.update(nx.neighbors(graph, neighbour))
+
+    # Return all neighbours of minimal degree of nodesToCheck that are not already connected to nodeToConnect
+    # Minimal degree is the lowest degree for which at least one node is returned
+    def _addUnconnected(self, graph, nodeToConnect, neighboursOfNodeToConnect, nodesToCheck):
+        if len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1:
+            return set()
+        edgesToAdd = set()
+        checkedNeighbours = set()
+        neighboursOfNodeToConnect.add(nodeToConnect)
+        for nodeToCheck in nodesToCheck:
+            checkedNeighbours.update(nx.neighbors(graph,nodeToCheck))
+            edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in checkedNeighbours if not neighbour in neighboursOfNodeToConnect])
+        if len(edgesToAdd) == 0:
+            edgesToAdd = self._addUnconnected(graph, nodeToConnect, neighboursOfNodeToConnect, checkedNeighbours)
+
+        return edgesToAdd
+
+
+    def _createInternals(self, graph):
+        if self.internals['edgeId'] is None:
+            self.internals = {'edgeId': self._findOperands(graph)
+                              }
+        if self.internals['newEdges'] is None:
+            nodeToConnect = self.internals['edgeId'][0]
+            fixedNode = self.internals['edgeId'][1]
+            fixedNeighbours = set(nx.neighbors(graph, nodeToConnect))
+            edgeCandidates = self._addUnconnected(graph, nodeToConnect, fixedNeighbours, [fixedNode])
+            edgesToAdd = set()
+            for edgeCandidate in edgeCandidates:
+                if random.random() < self.parameters['createEdgeProbability']:
+                    edgesToAdd.add(edgeCandidate)
+            self.internals['newEdges'] = edgesToAdd
+
+        return self.internals
+
+    def _findOperands(self, graph):
+        return selectEdgeFromGraph(graph, weight_getter=lambda edge : graph.edges[edge][KEY_ORIENTATION])
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+        log.debug('NewEdgeRule add edges ' + str(self.internals['newEdges']))
+        for edgeToAdd in self.internals['newEdges']:
+            graph.add_edge(edgeToAdd[0],edgeToAdd[1])
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'NewEdgesRule'
