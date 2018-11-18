@@ -9,7 +9,8 @@ log = get_logger("Rule")
 def getRuleset():
     return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
-        AdaptationRule.getName():AdaptationRule()
+        AdaptationRule.getName():AdaptationRule(),
+        NewEdgesRule.getName():NewEdgesRule(),
         }
 
 class Rule:
