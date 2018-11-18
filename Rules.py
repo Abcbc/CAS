@@ -194,17 +194,16 @@ class NewEdgesRule(Rule):
 
     # Return all neighbours of minimal degree of nodesToCheck that are not already connected to nodeToConnect
     # Minimal degree is the lowest degree for which at least one node is returned
-    def _addUnconnected(self, graph, nodeToConnect, neighboursOfNodeToConnect, nodesToCheck):
+    def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
         if len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1:
             return set()
         edgesToAdd = set()
         checkedNeighbours = set()
-        neighboursOfNodeToConnect.add(nodeToConnect)
         for nodeToCheck in nodesToCheck:
             checkedNeighbours.update(nx.neighbors(graph,nodeToCheck))
-            edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in checkedNeighbours if not neighbour in neighboursOfNodeToConnect])
+            edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in checkedNeighbours if not (graph.has_edge(neighbour,nodeToConnect) or neighbour==nodeToConnect)])
         if len(edgesToAdd) == 0:
-            edgesToAdd = self._addUnconnected(graph, nodeToConnect, neighboursOfNodeToConnect, checkedNeighbours)
+            edgesToAdd = self._addUnconnected(graph, nodeToConnect, checkedNeighbours)
 
         return edgesToAdd
 
@@ -216,8 +215,7 @@ class NewEdgesRule(Rule):
         if self.internals['newEdges'] is None:
             nodeToConnect = self.internals['edgeId'][0]
             fixedNode = self.internals['edgeId'][1]
-            fixedNeighbours = set(nx.neighbors(graph, nodeToConnect))
-            edgeCandidates = self._addUnconnected(graph, nodeToConnect, fixedNeighbours, [fixedNode])
+            edgeCandidates = self._addUnconnected(graph, nodeToConnect, [fixedNode])
             edgesToAdd = set()
             for edgeCandidate in edgeCandidates:
                 if random.random() < self.parameters['createEdgeProbability']:
