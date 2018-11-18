@@ -192,8 +192,10 @@ class NewEdgesRule(Rule):
             for neighbour in self._getNeighbours(node, degree-1):
                 neighbours.update(nx.neighbors(graph, neighbour))
 
-    # Return all neighbours of minimal degree of nodesToCheck that are not already connected to nodeToConnect
-    # Minimal degree is the lowest degree for which at least one node is returned
+    # Search for nodes that are not connected to nodeToConnect. Starts with the nodesToCheck,
+    # then go on with their neighbours of increasing neighbourhood degree, until at least one
+    # node is returned.
+    # Return empty set if nodeToConnect is already connected with all other nodes.
     def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
         if len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1:
             return set()
