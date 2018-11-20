@@ -97,10 +97,11 @@ class OrientationConfirmationRule(Rule):
                            'fallbackSelection': [],
                            'edgeId': self._findOperands(graph)
                           }
-        nodeA = graph.nodes[self.internals['edgeId'][0]]
-        for i in range(len(nodeA[KEY_OPINIONS])):
-            self.internals['fallbackDecision'].append( random.random() > self._calcProbability() )
-            self.internals['fallbackSelection'].append( random.choice([0,1]) )
+        if self.internals['edgeId'] is not None:
+            nodeA = graph.nodes[self.internals['edgeId'][0]]
+            for i in range(len(nodeA[KEY_OPINIONS])):
+                self.internals['fallbackDecision'].append( random.random() > self._calcProbability() )
+                self.internals['fallbackSelection'].append( random.choice([0,1]) )
 
         return self.internals
 
@@ -116,19 +117,20 @@ class OrientationConfirmationRule(Rule):
                   str(self.parameters) + ' and internals ' + ('(given) ' if _parameters is not None else '') +
                   str(self.internals) + (' (given)' if _internals is not None else ''))
 
-        nodeA = graph.nodes[self.internals['edgeId'][0]]
-        nodeB = graph.nodes[self.internals['edgeId'][1]]
-        opinionsA = nodeA[KEY_OPINIONS]
-        opinionsB = nodeB[KEY_OPINIONS]
+        if self.internals['edgeId'] is not None:
+            nodeA = graph.nodes[self.internals['edgeId'][0]]
+            nodeB = graph.nodes[self.internals['edgeId'][1]]
+            opinionsA = nodeA[KEY_OPINIONS]
+            opinionsB = nodeB[KEY_OPINIONS]
 
-        for i in range(len(nodeA[KEY_OPINIONS])):
-            if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
-                if self.internals['fallbackDecision'][i]:
-                    if self.internals['fallbackSelection'][i] == 0:
-                        opToChange = opinionsA
-                    else:
-                        opToChange = opinionsB
-                    opToChange[i] = 0
+            for i in range(len(nodeA[KEY_OPINIONS])):
+                if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
+                    if self.internals['fallbackDecision'][i]:
+                        if self.internals['fallbackSelection'][i] == 0:
+                            opToChange = opinionsA
+                        else:
+                            opToChange = opinionsB
+                        opToChange[i] = 0
 
         return graph
 
