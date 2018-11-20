@@ -3,12 +3,12 @@ import utils.ConfigLoader as cnf
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
 from SelectionRules import *
-from Builder import buildGraph
+from Builder import buildGraph, buildTestGraphForTakeoverRule
 from Rules import *
 from utility import *
 from Updater import Updater
 from GraphLogEntries import GraphLogSnapshotEntry
-from Graph import toJsonStr, fromJsonStr, toPickle, fromPickle
+from Graph import toJsonStr, fromJsonStr, toPickle, fromPickle, calculateAttributes
 from GraphLogExecuter import GraphLogExecuter
 from GraphLogReaders import GraphLogReaderJson
 
@@ -113,15 +113,34 @@ def testGraphLogWriteRead():
     return True
 
 if __name__ == "__main__":
-    g = buildGraph()
+    g = buildTestGraphForTakeoverRule()
+    g = calculateAttributes(g)
 
-    updater = Updater()
-    updater.setGraph(g)
+    import matplotlib.pyplot as plt
+    plt.figure()
+    nx.draw_networkx(g,with_labels=True)
 
-    for i in range(20):
-        updater.update()
+    r = TakeoverRule()
 
-    updater.close()
+    for nid in g.nodes:
+        print(g.nodes[nid][KEY_V])
 
-    gExe = GraphLogExecuter(GraphLogReaderJson('logs/graph.log'))
-    gExe.performSteps(20)
+    g = r.apply(g,_parameters={'removalProbability': 1,'minDifference': 1})
+
+    plt.figure()
+    nx.draw_networkx(g,with_labels=True)
+
+    plt.show()
+
+    # g = buildGraph()
+    #
+    # updater = Updater()
+    # updater.setGraph(g)
+    #
+    # for i in range(20):
+    #     updater.update()
+    #
+    # updater.close()
+    #
+    # gExe = GraphLogExecuter(GraphLogReaderJson('logs/graph.log'))
+    # gExe.performSteps(20)
