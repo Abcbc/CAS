@@ -1,14 +1,16 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
+from Graph import KEY_OPINIONS, KEY_V, doOpinionsDiffer, areOppositeOpinions
 from utils.Logger import get_logger
+import networkx as nx
 
 log = get_logger("Rule")
 
 def getRuleset():
     return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
-        AdaptationRule.getName():AdaptationRule()
+        AdaptationRule.getName():AdaptationRule(),
+        TakeoverRule.getName():TakeoverRule(),
         }
 
 class Rule:
@@ -175,3 +177,47 @@ class AdaptationRule(Rule):
     @staticmethod
     def getName():
         return 'AdaptationRule'
+
+class TakeoverRule(Rule):
+    """
+    removalProbability: probability that a suitable edge is removed. Range: 0 to 1. Default: 0.5
+    minDifference: minimum difference in V of the two nodes that this rule can be applied to them.
+    """
+
+    defaultParameters = {'removalProbability': 0.5,
+                         'minDifference': 1,
+                         }
+
+    def _createInternals(self, graph):
+        self.internals = {'edgeId': self._findOperands(graph),
+                          'edgesToRemove': [],
+                          }
+
+        if self.internals['edgeId'] is not None:
+            commonNeighbours = [candidate for candidate in nx.neighbors(graph,self.internals['edgeId'][0]) if candidate in nx.neighbors(graph,self.internals['edgeId'][1])]
+            weakerNodeId = self.internals['edgeId'][0 if graph.nodes[self.internals['edgeId'][0]][KEY_V] < graph.nodes[self.internals['edgeId'][1]][KEY_V] else 1]
+
+            for commonNeighbour in commonNeighbours:
+                if self._calcVDiffMetrik(graph.nodes[self.internals['edgeId'][0]][KEY_V],graph.nodes[self.internals['edgeId'][1]][KEY_V]) >= self.parameters['minDifference'] and random.random() < self.parameters['removalProbability']:
+                    self.internals['edgesToRemove'].append((weakerNodeId, commonNeighbour))
+
+        return self.internals
+
+    def _calcVDiffMetrik(self, v1, v2):
+        return abs(v1-v2)
+
+    def _findOperands(self, graph):
+        return selectEdgeFromGraph(graph, weight_getter=lambda edgeId:self._calcVDiffMetrik(graph.nodes[edgeId[0]][KEY_V],graph.nodes[edgeId[1]][KEY_V]))
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph,_parameters, _internals)
+
+        if self.internals['edgeId'] is not None:
+            log.debug('Removing edges ' + str(self.internals['edgesToRemove']) + ' because one node of ' + str(self.internals['edgeId']) + ' is stronger')
+            graph.remove_edges_from(self.internals['edgesToRemove'])
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'TakeoverRule'
