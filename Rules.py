@@ -215,7 +215,7 @@ class NewEdgesRule(Rule):
         if self.internals['edgeId'] is None:
             self.internals = {'edgeId': self._findOperands(graph)
                               }
-        if self.internals['newEdges'] is None:
+        if self.internals['edgeId'] is not None and self.internals['newEdges'] is None:
             nodeToConnect = self.internals['edgeId'][0]
             fixedNode = self.internals['edgeId'][1]
             edgeCandidates = self._addUnconnected(graph, nodeToConnect, [fixedNode])
@@ -233,8 +233,9 @@ class NewEdgesRule(Rule):
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
         log.debug('NewEdgeRule add edges ' + str(self.internals['newEdges']))
-        for edgeToAdd in self.internals['newEdges']:
-            graph.add_edge(edgeToAdd[0],edgeToAdd[1])
+        if self.internals['newEdges'] is not None:
+            for edgeToAdd in self.internals['newEdges']:
+                graph.add_edge(edgeToAdd[0],edgeToAdd[1])
 
         return graph
 
