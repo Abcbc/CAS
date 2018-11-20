@@ -146,8 +146,7 @@ class AdaptationRule(Rule):
 
     Chooses one pair of opinions -1 and 1 of nodes A and B. For this rule, the order of
     nodes in the edge is chosen randomly, as if the graph were directed.
-    With probability V(B)/(V(A)+V(B)) the opinion of node A is moved towards the opinion
-    of B, i.e. is set to 0 at the moment (possible opinion values are -1,-0-1).
+    With probability V(B)/(V(A)+V(B)) the opinion of node A is set to the opinion at B.
     """
     def _createInternals(self, graph):
         self.internals = {'opinionPair': self._findOperands(graph),
@@ -173,7 +172,7 @@ class AdaptationRule(Rule):
 
     def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
         opInd = self.internals['opinionPair']['opinionIndex']
-        toAdapt[KEY_OPINIONS][opInd] += toAdaptFrom[KEY_OPINIONS][opInd]
+        toAdapt[KEY_OPINIONS][opInd] = toAdaptFrom[KEY_OPINIONS][opInd]
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
