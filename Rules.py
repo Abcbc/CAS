@@ -164,10 +164,11 @@ class AdaptationRule(Rule):
                   str(self.parameters) + ' and internals ' + ('(given) ' if _parameters is not None else '') +
                   str(self.internals) + (' (given)' if _internals is not None else ''))
 
-        # ToDo real behavior, this is only dummy and always changes nodeA
-        nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
-        nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
-        nodeA[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']] += nodeB[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']]
+        if self.internals['opinionPair'] is not None:
+            # ToDo real behavior, this is only dummy and always changes nodeA
+            nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+            nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+            nodeA[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']] += nodeB[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']]
 
         return graph
 
