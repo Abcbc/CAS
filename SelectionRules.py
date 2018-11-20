@@ -2,6 +2,9 @@ import random
 from Graph import KEY_OPINIONS, KEY_EDGE_ID
 
 def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
+    if len(set) == 0:
+        return None
+
     weights = []
     for item in set:
         weights.append(weight_getter(item))
@@ -76,4 +79,4 @@ def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_g
             pairs.append({'edge':graph.edges[edgeId], 'opinionIndex':idx})
 
     pairWithEdgeObjects = selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate, maxChoiceTries=maxChoiceTries)
-    return {'edgeId':pairWithEdgeObjects['edge'][KEY_EDGE_ID], 'opinionIndex':pairWithEdgeObjects['opinionIndex']}
+    return {'edgeId':pairWithEdgeObjects['edge'][KEY_EDGE_ID], 'opinionIndex':pairWithEdgeObjects['opinionIndex']} if pairWithEdgeObjects is not None else None
