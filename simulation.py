@@ -12,6 +12,7 @@ from Graph import toJsonStr, fromJsonStr, toPickle, fromPickle, calculateAttribu
 from GraphLogExecuter import GraphLogExecuter
 from GraphLogReaders import GraphLogReaderJson
 from Graph import calculateAttributes
+import GraphFactory as gf
 
 import networkx as nx
 #import matplotlib.pyplot as plt
@@ -114,32 +115,25 @@ def testGraphLogWriteRead():
     return True
 
 if __name__ == "__main__":
-    g = buildTestGraphForNewEdgeRule(3)
+    g = gf.Graph_factory.get_default_setup()
 
-    g = calculateAttributes(g)
+
     import matplotlib.pyplot as plt
+    plt.figure()
+    nx.draw_networkx(g, with_labels=True)
+
+    updater = Updater()
+    updater.setGraph(g)
+
+    for i in range(20):
+        updater.update()
+
+    updater.close()
 
     plt.figure()
-    nx.draw_networkx(g,with_labels=True)
-
-    r = NewEdgesRule()
-    r.internals = {'edgeId':(0,1),'newEdges':None}
-    params = {'createEdgeProbability':1}
-    r.apply(g,_parameters=params)
-    g = calculateAttributes(g)
-
-    plt.figure()
-    nx.draw_networkx(g,with_labels=True)
+    nx.draw_networkx(g, with_labels=True)
 
     plt.show()
 
-    # updater = Updater()
-    # updater.setGraph(g)
-    #
-    # for i in range(20):
-    #     updater.update()
-    #
-    # updater.close()
-    #
     # gExe = GraphLogExecuter(GraphLogReaderJson('logs/graph.log'))
     # gExe.performSteps(20)

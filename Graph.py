@@ -50,8 +50,8 @@ def calculateAttributes(graph):
         
         edges = getEdgesFromIndices(graph, graph.edges(nodeId))
         node[KEY_V] = calcV(edges)
-        
-    return graph
+
+    return addConvenienceAttributes(graph)
 
 
 
