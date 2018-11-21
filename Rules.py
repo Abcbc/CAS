@@ -1,6 +1,6 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, doOpinionsDiffer, areOppositeOpinions
+from Graph import KEY_OPINIONS, KEY_ORIENTATION, KEY_V, doOpinionsDiffer, areOppositeOpinions
 from utils.Logger import get_logger
 
 log = get_logger("Rule")
@@ -138,25 +138,41 @@ class OrientationConfirmationRule(Rule):
     def getName():
         return 'OrientationConfirmationRule'
 
-'''
-Parameters: None
-'''
 class AdaptationRule(Rule):
+    """
+    Implementation of Adaptation Rule 2.1.2
+
+    Parameters: None
+
+    Chooses one pair of opinions -1 and 1 of nodes A and B. For this rule, the order of
+    nodes in the edge is chosen randomly, as if the graph were directed.
+    With probability V(B)/(V(A)+V(B)) the opinion of node A is set to the opinion at B.
+    """
     def _createInternals(self, graph):
-        self.internals = {'opinionPair': self._findOperands(graph)
+        self.internals = {'opinionPair': self._findOperands(graph),
+                          'nodePosToAdapt': random.choice([0,1])
                           }
+        self.internals['adaptionDecision'] = random.random() < self._calcAdaptionProbability(graph)
         return self.internals
 
     def _findOperands(self, graph):
-        # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
-#         opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self._selectionPredicate)
-        # this works
-        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
+        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self._selectionPredicate, maxChoiceTries=1e6)
 
     def _selectionPredicate(self, pair):
         opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
         opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
         return areOppositeOpinions(opA, opB)
+
+    def _calcAdaptionProbability(self, graph):
+        nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+        nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+        nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
+        nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
+        return nodeToAdaptFrom[KEY_V] / (nodeToAdapt[KEY_V]+nodeToAdaptFrom[KEY_V])
+
+    def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
+        opInd = self.internals['opinionPair']['opinionIndex']
+        toAdapt[KEY_OPINIONS][opInd] = toAdaptFrom[KEY_OPINIONS][opInd]
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
@@ -165,10 +181,12 @@ class AdaptationRule(Rule):
                   str(self.internals) + (' (given)' if _internals is not None else ''))
 
         if self.internals['opinionPair'] is not None:
-            # ToDo real behavior, this is only dummy and always changes nodeA
-            nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
-            nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
-            nodeA[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']] += nodeB[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']]
+            if self.internals['adaptionDecision']:
+                nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+                nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+                nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
+                nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
+                self._adaptNodeToNode(nodeToAdapt, nodeToAdaptFrom)
 
         return graph
 
