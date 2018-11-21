@@ -14,6 +14,7 @@ def getRuleset():
         AdaptationRule.getName():AdaptationRule(),
         NewNodeRule.getName():NewNodeRule(),
         NewEdgesRule.getName():NewEdgesRule(),
+        RemoveEdgeRule.getName():RemoveEdgeRule(),
         }
 
 class Rule:
@@ -351,3 +352,37 @@ class NewEdgesRule(Rule):
     @staticmethod
     def getName():
         return 'NewEdgesRule'
+
+class RemoveEdgeRule(Rule):
+    """
+    Chooses an edge with low orientation and removes it.
+
+    absOrientationThreshold: maximum absolute orientation to perform edge removal. Range: 0 to 1. Default: 0.1
+    """
+    defaultParameters = {'absOrientationThreshold': 0.1}
+
+    def _createInternals(self, graph):
+        self.internals = {'edgeId': self._findOperands(graph)
+                          }
+
+        return self.internals
+
+    def _findOperands(self, graph):
+        try:
+            return selectEdgeFromGraph(graph,predicate=lambda edgeId: abs(graph.edges[edgeId][KEY_ORIENTATION]) < self.parameters['absOrientationThreshold'])
+        except(TimeoutError):
+            log.debug('Found no edge with low orientation')
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+
+        edgeId = self.internals['edgeId']
+        if edgeId is not None:
+            log.debug('Removing edge ' + str(edgeId) + ' with low orientation')
+            graph.remove_edges_from([edgeId])
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'RemoveEdgeRule'
