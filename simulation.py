@@ -3,7 +3,7 @@ import utils.ConfigLoader as cnf
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
 from SelectionRules import *
-from Builder import buildGraph
+from Builder import buildGraph, buildTestGraphForNewEdgeRule
 from Rules import *
 from utility import *
 from Updater import Updater
@@ -11,6 +11,7 @@ from GraphLogEntries import GraphLogSnapshotEntry
 from Graph import toJsonStr, fromJsonStr, toPickle, fromPickle
 from GraphLogExecuter import GraphLogExecuter
 from GraphLogReaders import GraphLogReaderJson
+from Graph import calculateAttributes
 
 import networkx as nx
 #import matplotlib.pyplot as plt
@@ -113,15 +114,32 @@ def testGraphLogWriteRead():
     return True
 
 if __name__ == "__main__":
-    g = buildGraph()
+    g = buildTestGraphForNewEdgeRule(3)
 
-    updater = Updater()
-    updater.setGraph(g)
+    g = calculateAttributes(g)
+    import matplotlib.pyplot as plt
 
-    for i in range(20):
-        updater.update()
+    plt.figure()
+    nx.draw_networkx(g,with_labels=True)
 
-    updater.close()
+    r = NewEdgesRule()
+    r.internals = {'edgeId':(0,1),'newEdges':None}
+    params = {'createEdgeProbability':1}
+    r.apply(g,_parameters=params)
+    g = calculateAttributes(g)
 
-    gExe = GraphLogExecuter(GraphLogReaderJson('logs/graph.log'))
-    gExe.performSteps(20)
+    plt.figure()
+    nx.draw_networkx(g,with_labels=True)
+
+    plt.show()
+
+    # updater = Updater()
+    # updater.setGraph(g)
+    #
+    # for i in range(20):
+    #     updater.update()
+    #
+    # updater.close()
+    #
+    # gExe = GraphLogExecuter(GraphLogReaderJson('logs/graph.log'))
+    # gExe.performSteps(20)

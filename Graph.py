@@ -93,6 +93,22 @@ def addConvenienceAttributes(graph):
 
     return graph
 
+def getMaxNodeId(graph):
+    maxNodeId = 0
+    for id in graph.nodes:
+        maxNodeId = max(maxNodeId, id)
+    return maxNodeId
+
+def getNextNodeId(graph):
+    return getMaxNodeId(graph) + 1
+
+def createNewNodeSkeleton(graph):
+    return { 'graph' : graph, KEY_NODE_ID : getNextNodeId(graph)}
+
+def createNewEdgeSkeleton(graph, nodeA, nodeB):
+    return { 'graph' : graph, KEY_EDGE_ID : (nodeA[KEY_NODE_ID],nodeB[KEY_NODE_ID]),
+             'nodeA' : nodeA, 'nodeB': nodeB }
+
 def toJsonStr(graph):
     return nx.jit_data(removeConvenienceAttributes(graph.copy()))
 
