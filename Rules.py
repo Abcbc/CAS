@@ -1,14 +1,18 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, KEY_ORIENTATION, KEY_V, doOpinionsDiffer, areOppositeOpinions
+from Graph import KEY_NODE_ID, KEY_EDGE_ID, KEY_OPINIONS, KEY_ORIENTATION, KEY_V, doOpinionsDiffer, areOppositeOpinions, createNewNodeSkeleton, createNewEdgeSkeleton
 from utils.Logger import get_logger
+import community
+import networkx as nx
+import numpy as np
 
 log = get_logger("Rule")
 
 def getRuleset():
     return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
-        AdaptationRule.getName():AdaptationRule()
+        AdaptationRule.getName():AdaptationRule(),
+        NewNodeRule.getName():NewNodeRule()
         }
 
 class Rule:
@@ -193,3 +197,91 @@ class AdaptationRule(Rule):
     @staticmethod
     def getName():
         return 'AdaptationRule'
+
+class NewNodeRule(Rule):
+    """
+    densityThreshold: minimum required n_edges/max possible n_edges
+      for a community. Range: 0 to 1. Default: 0.8
+    meanOrientationThreshold: minimum required mean of orientation in
+      a community. Range: -1 to 1. Default: 0.8
+    opMeanThreshold: minimum required mean of |orientation| in a community
+      to give the new node an opinion. Range: 0 to 1. Default: 0.8
+    """
+
+    defaultParameters = { 'densityThreshold' : 0.8,
+                          'meanOrientationThreshold' : 0.8,
+                          'opMeanThreshold' : 0.8 }
+
+    def _createInternals(self, graph):
+        log.debug('NewNodeRule create internals')
+        communities = self._findOperands(graph)
+        self.internals = { 'nodesToAdd' : [] }
+        for comm in communities:
+            opinions = self._calcOpinions(graph, comm)
+            neighbors = comm
+            self.internals['nodesToAdd'].append((opinions,neighbors))
+            log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
+                      + ' to community ' + str(comm))
+
+        return self.internals
+
+    def _getCommunities(self, graph):
+        """
+        Calculates the communities using the python-louvain package.
+        Returns a list of lists. One list of node ids for every community.
+        Nodes outside all communities are not included.
+        """
+        bp = community.best_partition(graph)
+        comms = []
+        if np.all(bp == 0):
+            log.debug('found no communities')
+        else:
+            for nodeId in bp:
+                if bp[nodeId] >= len(comms):
+                    comms.append([nodeId])
+                else:
+                    comms[bp[nodeId]].append(nodeId)
+
+        return comms
+
+    def _findOperands(self, graph):
+        communities = self._getCommunities(graph)
+        connectedCommunities = []
+        for comm in communities:
+            commGraph = graph.subgraph(comm)
+            isDense = nx.density(commGraph) >= self.parameters['densityThreshold']
+            hasHighOrientation = np.mean([graph.edges[eid][KEY_ORIENTATION] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
+            if isDense and hasHighOrientation:
+                connectedCommunities.append(comm)
+            else:
+                log.debug('Community ' + str(comm) + ' was not selected. isDense: ' + str(isDense)
+                          + ', hasHighOrientation: ' + str(hasHighOrientation))
+
+        return connectedCommunities
+
+    def _calcOpinions(self, graph, nodeSet):
+        opinionMat = np.array([graph.nodes[nid][KEY_OPINIONS] for nid in nodeSet])
+        opinionMeans = np.mean(opinionMat,0) # mean op_i of all nodes
+        newNodeOpinions = np.sign(opinionMeans)*np.greater(np.abs(opinionMeans),self.parameters['opMeanThreshold'])
+
+        return list(newNodeOpinions)
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+
+        for nodeToAdd in self.internals['nodesToAdd']:
+            opinions = nodeToAdd[0]
+            node = createNewNodeSkeleton(graph)
+            node[KEY_OPINIONS] = opinions
+            graph.add_nodes_from([(node[KEY_NODE_ID],node)])
+            log.debug('Added node ' + str(graph.nodes[node[KEY_NODE_ID]]))
+            for neighbour in nodeToAdd[1]:
+                edge = createNewEdgeSkeleton(graph, node, graph.nodes[neighbour])
+                graph.add_edges_from([(node[KEY_NODE_ID], neighbour,edge)])
+                log.debug('Added edge ' + str(graph.edges[edge[KEY_EDGE_ID]]))
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'NewNodeRule'
