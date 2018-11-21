@@ -322,10 +322,10 @@ class NewEdgesRule(Rule):
 
 
     def _createInternals(self, graph):
-        if self.internals['edgeId'] is None:
-            self.internals = {'edgeId': self._findOperands(graph)
+        self.internals = {'edgeId': self._findOperands(graph)
                               }
-        if self.internals['edgeId'] is not None and self.internals['newEdges'] is None:
+
+        if self.internals['edgeId'] is not None:
             nodeToConnect = self.internals['edgeId'][0]
             fixedNode = self.internals['edgeId'][1]
             edgeCandidates = self._addUnconnected(graph, nodeToConnect, [fixedNode])
