@@ -309,7 +309,7 @@ class NewEdgesRule(Rule):
     # Return empty set if nodeToConnect is already connected with all other nodes.
     def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
         if len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1:
-            return set()
+            return []
         edgesToAdd = set()
         checkedNeighbours = set()
         for nodeToCheck in nodesToCheck:
@@ -333,7 +333,7 @@ class NewEdgesRule(Rule):
             for edgeCandidate in edgeCandidates:
                 if random.random() < self.parameters['createEdgeProbability']:
                     edgesToAdd.add(edgeCandidate)
-            self.internals['newEdges'] = edgesToAdd
+            self.internals['newEdges'] = list(edgesToAdd)
 
         return self.internals
 
