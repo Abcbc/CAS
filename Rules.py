@@ -310,22 +310,20 @@ class NewEdgesRule(Rule):
     # Search for nodes that are not connected to nodeToConnect. Starts with the nodesToCheck,
     # then go on with their neighbours of increasing neighbourhood degree, until at least one
     # node is returned.
-    # Return empty set if nodeToConnect is already connected with all other nodes.
+    # Return empty list if no such edge can be added
     def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
-        fullyConnectedCriterion = len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1
-        nothingToCheckCriterion = len(nodesToCheck) == 0
-        if fullyConnectedCriterion or nothingToCheckCriterion:
+        nextToCheck = set()
+        nextToCheck.update([nx.neighbors(graph, n) for n in nodesToCheck])
+        if len(nodesToCheck) == len(nextToCheck):
             return []
+
         edgesToAdd = set()
-        checkedNeighbours = set()
-        for nodeToCheck in nodesToCheck:
-            checkedNeighbours.update(nx.neighbors(graph,nodeToCheck))
-            edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in checkedNeighbours if not (graph.has_edge(neighbour,nodeToConnect) or neighbour==nodeToConnect)])
+        edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in nodesToCheck if not (graph.has_edge(neighbour,nodeToConnect) or neighbour==nodeToConnect)])
+
         if len(edgesToAdd) == 0:
-            edgesToAdd = self._addUnconnected(graph, nodeToConnect, checkedNeighbours)
+            self._addUnconnected(graph, nodeToConnect, nextToCheck)
 
-        return edgesToAdd
-
+        return list(edgesToAdd)
 
     def _createInternals(self, graph):
         self.internals = {'edgeId': self._findOperands(graph)
