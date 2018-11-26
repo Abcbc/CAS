@@ -12,7 +12,7 @@ class Updater:
         self.graph = graph
         self.graph = Graph.calculateAttributes(self.graph)
 
-        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLoggerJson(get_graph_logger('GraphLogger','graph.log')))
+        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(get_graph_logger('GraphLogger', 'graph.log')))
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
     def addRule(self, rule):

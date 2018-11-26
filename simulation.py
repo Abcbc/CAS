@@ -17,6 +17,6 @@ if __name__ == "__main__":
 
     updater.close()
 
-    gExe = gl.GraphLogExecuter(gl.GraphLogReaderJson('logs/graph.log'))
-    gExe = gl.GraphLogExecuter(gl.GraphLogReaderJson('logs/graph.log'))
+    gExe = gl.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
+    gExe = gl.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
     gExe.performSteps(20)

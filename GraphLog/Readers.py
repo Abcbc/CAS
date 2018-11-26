@@ -1,7 +1,8 @@
 import GraphLog as gl
 
-class GraphLogReaderJson:
-    def __init__(self, filename):
+class GraphLogReader:
+    def __init__(self, filename, formatter=gl.GraphLogJsonFormatter):
+        self.formatter = formatter
         self.file = open(filename,'r')
         self.parseNext()
 
@@ -17,7 +18,7 @@ class GraphLogReaderJson:
     def parseNext(self):
         nextLine = self.file.readline()
         if nextLine != '': # EOF
-            self.nextToken = gl.GraphLogJsonFormatter.parseEntry(nextLine)
+            self.nextToken = self.formatter.parseEntry(nextLine)
         else:
             self.nextToken = None
 
