@@ -159,7 +159,8 @@ class AdaptationRule(Rule):
         self.internals = {'opinionPair': self._findOperands(graph),
                           'nodePosToAdapt': random.choice([0,1])
                           }
-        self.internals['adaptionDecision'] = random.random() < self._calcAdaptionProbability(graph)
+        if self.internals['opinionPair'] is not None:
+            self.internals['adaptionDecision'] = random.random() < self._calcAdaptionProbability(graph)
         return self.internals
 
     def _findOperands(self, graph):
