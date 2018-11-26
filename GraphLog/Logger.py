@@ -1,4 +1,4 @@
-from GraphLogEntries import GraphLogRuleEntry, GraphLogSnapshotEntry
+from GraphLog import GraphLogRuleEntry, GraphLogSnapshotEntry
 
 class GraphLogger:
     def __init__(self, startGraph, graphLogWriter):

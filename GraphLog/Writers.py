@@ -1,5 +1,5 @@
 import json
-from GraphLogEntries import GraphLogRuleEntry, GraphLogSnapshotEntry
+from GraphLog import GraphLogRuleEntry, GraphLogSnapshotEntry
 from Graph import toJsonStr, fromJsonStr
 
 # TODO: write to and parse from JSON in the classes themselves

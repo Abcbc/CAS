@@ -1,8 +1,7 @@
 from Rules import *
 from Graph import calculateAttributes
 import random
-from GraphLogger import GraphLogger
-from GraphLogWriters import GraphLoggerJson
+import GraphLog as gl
 from utils.Logger import get_graph_logger
 
 class Updater:
@@ -13,7 +12,7 @@ class Updater:
         self.graph = graph
         self.graph = calculateAttributes(self.graph)
 
-        self.graphLogger = GraphLogger(self.graph, GraphLoggerJson(get_graph_logger('GraphLogger','graph.log')))
+        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLoggerJson(get_graph_logger('GraphLogger','graph.log')))
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
     def addRule(self, rule):

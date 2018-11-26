@@ -1,5 +1,4 @@
-from GraphLogEntries import GraphLogRuleEntry, GraphLogSnapshotEntry
-from GraphLogWriters import GraphLogJsonFormatter
+import GraphLog as gl
 
 class GraphLogReaderJson:
     def __init__(self, filename):
@@ -10,15 +9,15 @@ class GraphLogReaderJson:
         return self.nextToken != None
 
     def hasRuleEntry(self):
-        return self.hasEntry() and isinstance(self.nextToken, GraphLogRuleEntry)
+        return self.hasEntry() and isinstance(self.nextToken, gl.GraphLogRuleEntry)
 
     def hasSnapshotEntry(self):
-        return self.hasEntry() and isinstance(self.nextToken, GraphLogSnapshotEntry)
+        return self.hasEntry() and isinstance(self.nextToken, gl.GraphLogSnapshotEntry)
 
     def parseNext(self):
         nextLine = self.file.readline()
         if nextLine != '': # EOF
-            self.nextToken = GraphLogJsonFormatter.parseEntry(nextLine)
+            self.nextToken = gl.GraphLogJsonFormatter.parseEntry(nextLine)
         else:
             self.nextToken = None
 
