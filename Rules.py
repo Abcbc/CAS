@@ -339,7 +339,7 @@ class NewEdgesRule(Rule):
         return self.internals
 
     def _findOperands(self, graph):
-        return selectEdgeFromGraph(graph, weight_getter=lambda edge : graph.edges[edge][Graph.KEY_ORIENTATION])
+        return selectEdgeFromGraph(graph, weight_getter=lambda edge : abs(graph.edges[edge][Graph.KEY_ORIENTATION]))
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
