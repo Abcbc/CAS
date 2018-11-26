@@ -348,7 +348,8 @@ class NewEdgesRule(Rule):
         log.debug('NewEdgeRule add edges ' + str(self.internals['newEdges']))
         if self.internals['newEdges'] is not None:
             for edgeToAdd in self.internals['newEdges']:
-                graph.add_edge(edgeToAdd[0],edgeToAdd[1])
+                edge = Graph.createNewEdgeSkeleton(graph, graph.nodes[edgeToAdd[0]], graph.nodes[edgeToAdd[1]])
+                graph.add_edges_from([(edgeToAdd[0],edgeToAdd[1],edge)])
 
         return graph
 
