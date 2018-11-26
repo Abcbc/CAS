@@ -309,7 +309,9 @@ class NewEdgesRule(Rule):
     # node is returned.
     # Return empty set if nodeToConnect is already connected with all other nodes.
     def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
-        if len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1:
+        fullyConnectedCriterion = len(list(nx.neighbors(graph,nodeToConnect))) == len(list(graph.nodes))-1
+        nothingToCheckCriterion = len(nodesToCheck) == 0
+        if fullyConnectedCriterion or nothingToCheckCriterion:
             return []
         edgesToAdd = set()
         checkedNeighbours = set()
