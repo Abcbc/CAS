@@ -10,7 +10,7 @@ def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
         weights.append(weight_getter(item))
 
     if all(weight == 0 for weight in weights): # probability 0 for all elements is invalid
-        weights = map(lambda val:1, weights)
+        weights = list(map(lambda val:1, weights))
     
     chosenItem = None
     tryCtr = 0
