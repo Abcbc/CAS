@@ -1,4 +1,5 @@
 import utils.ConfigLoader as cnf
+from GraphFactory import Graph_factory
 
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
@@ -17,7 +18,16 @@ import networkx as nx
 #import matplotlib.pyplot as plt
 
 def run_simulation(simulation_setting):
-    print(simulation_setting)
+    log.debug(simulation_setting)
+    g = Graph_factory.create(simulation_setting)
+    updater = Updater()
+    updater.setGraph(g)
+
+    for i in range(simulation_setting["sim_iterations"]):
+        updater.update()
+
+    updater.close()
+
 
 
 def main():
@@ -114,6 +124,7 @@ def testGraphLogWriteRead():
     return True
 
 if __name__ == "__main__":
+    main()
     g = buildTestGraphForNewEdgeRule(3)
 
     g = calculateAttributes(g)

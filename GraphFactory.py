@@ -2,12 +2,102 @@ import copy
 import networkx as nx
 import random
 from Graph import KEY_OPINIONS, calculateAttributes
+from generators.nodes import Actors
 
 NUMBER_OF_KEY_OPINIONS = 4
 LIST_OF_CONSENSE_INDEXES = [0, 2]
 DEFAULT_NUMBER_OF_ATTEMPTS = 100
 
 class Graph_factory:
+    """
+    Verteilungs methoden.
+    """
+    @staticmethod
+    def _even(num_of_nodes, cluster):
+        result = [0 for x in range(cluster)]
+        for i in range(num_of_nodes):
+            idx = num_of_nodes%cluster
+            result[idx] += 1
+        return result
+
+    @staticmethod
+    def _linear(num_of_nodes, num_of_cluster):
+        return
+
+    @staticmethod
+    def _exponential(num_of_nodes, num_of_cluster):
+        return
+
+    @staticmethod
+    def _exponential(num_of_nodes, num_of_cluster):
+        return
+
+    @staticmethod
+    def distrebution_mapper(methode, num_of_nodes, num_of_cluster):
+        cluster_distrebution_mapper = {
+            "even": Graph_factory._even,
+            "linear": Graph_factory._linear,
+            "_exponential": Graph_factory._exponential
+        }
+
+        return cluster_distrebution_mapper[methode](num_of_nodes, num_of_cluster)
+
+
+    """
+    Actor Methods
+    """
+
+    @staticmethod
+    def _random(cluster, actor_complexity):
+        for node in cluster:
+            cluster[node][KEY_OPINIONS] = Actors.create()[KEY_OPINIONS]
+        return cluster
+
+    @staticmethod
+    def actor_mapper(method, cluster, actor_complexity):
+        actor_method_mapper = {
+            "random": Graph_factory._random
+        }
+
+        return actor_method_mapper[method](cluster, actor_complexity)
+
+    @staticmethod
+    def _create_cluster(type, num_of_nodes, initial_connections, probability, actor_method):
+        #TODO: Return 1 cluster
+
+
+        subgraph = nx.generators.barabasi_albert_graph(num_of_nodes, initial_connections , seed=None)
+        subgraph = Graph_factory.actor_mapper(actor_method,subgraph,1)
+        return subgraph
+
+    @staticmethod
+    def _connected(clusters, connection=1):
+
+        return clusters[0]
+
+    @staticmethod
+    def create(sim_settings):
+        num_of_nodes = sim_settings["graph_num_of_node"]
+        num_of_cluster = sim_settings["graph_cluster"]
+        methode = sim_settings["graph_cluster_distrebution"]
+        actor_method = sim_settings["actor_method"]
+        node_distrebution = Graph_factory.distrebution_mapper(methode, num_of_nodes, num_of_cluster)
+        clusters = []
+
+        for nodes in node_distrebution:
+            type = sim_settings["graph_type"]
+            initial_connections = sim_settings["graph_init_connects"]
+            probability = sim_settings["graph_branch_probability"]
+
+            cluster = Graph_factory._create_cluster(type=type, num_of_nodes=nodes, initial_connections=initial_connections,
+                                                    probability=probability, actor_method=actor_method)
+
+            clusters.append(cluster)
+
+            return calculateAttributes(Graph_factory._connected(clusters))
+
+
+
 
     @staticmethod
     def get_default_setup():
@@ -15,8 +105,8 @@ class Graph_factory:
         return graph
 
 
-    @classmethod
-    def get_default_settings(cls):
+    @staticmethod
+    def get_default_settings():
         cluster0 = {'type': "Barabasi-Albert", 'number_of_nodes': 25, 'initial_connections': 3, 'probability':0.4, 'pro_likelihood': 0.7, 'con_likelihood': 0.1, 'consense_indexes': [0, 1]}
         cluster1 = {'type': "Watts-Strogatz", 'number_of_nodes': 15, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.5, 'con_likelihood': 0.3, 'consense_indexes': [1, 2]}
         cluster2 = {'type': "Powerlaw-Cluster", 'number_of_nodes': 5, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
@@ -26,8 +116,8 @@ class Graph_factory:
         settings_dict = {'clusterList': cluster_list}
         return settings_dict
 
-    @classmethod
-    def apply_random_opinions(cls, graph):
+    @staticmethod
+    def apply_random_opinions(graph):
         """
         assigns random opinions to all nodes
         """
@@ -40,9 +130,8 @@ class Graph_factory:
                 graph.node[nodeId][KEY_OPINIONS][idx] = opinion
         return graph
 
-
-    @classmethod
-    def apply_specific_common_opinion(cls, graph, pro_likelihood, con_likelihood, opinion_index):
+    @staticmethod
+    def apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, opinion_index):
         """
         assigns opinions to graphs nodes, adhering to given likelihoods
         """
@@ -63,9 +152,8 @@ class Graph_factory:
 
         return graph
 
-
-    @classmethod
-    def apply_opinions(cls, graph, pro_likelihood, con_likelihood, opinion_indexes):
+    @staticmethod
+    def apply_opinions(graph, pro_likelihood, con_likelihood, opinion_indexes):
         """
         assigns opinions to graphs nodes, adhering to given likelihoods
         """
@@ -81,11 +169,8 @@ class Graph_factory:
 
         return graph
 
-
-
-
-    @classmethod
-    def connect_clusters(cls, graphs):
+    @staticmethod
+    def connect_clusters(graphs):
         """
         inserts edges between given graphs to create connected graph
         """
@@ -158,21 +243,19 @@ class Graph_factory:
         resultGraph = Graph_factory.connect_clusters(subgraphs)
         return resultGraph
 
-
-
-    @classmethod
+    @staticmethod
     def buildWattsStrogatzGraph(g=None):
         if g is None:
             g = nx.generators.connected_watts_strogatz_graph(20, 5, 0.5, 100, seed=None)
         return g
 
-    @classmethod
+    @staticmethod
     def buildPowerlawClusterGraph(g=None):
         if g is None:
             g = nx.powerlaw_cluster_graph(20, 5, 0.7, seed=None)
         return g
 
-    @classmethod
+    @staticmethod
     def buildBarabasiAlbertGraph(g=None):
         if g is None:
             n = 20
@@ -180,8 +263,7 @@ class Graph_factory:
             g = nx.generators.barabasi_albert_graph(n, m, seed=None)
         return g
 
-
-    @classmethod
+    @staticmethod
     def buildCompositeGraph(g=None):
         """
         Creates random clusters connected to each other

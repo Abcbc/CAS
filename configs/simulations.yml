@@ -1,28 +1,47 @@
 simulation_settings:
     group1:
         sim1:
-            name: "some Simulationname"
-            number_of_actors: 100
-            actor_seed: 1237402
-            actor_generation_method: "YES"
-        sim2:
-            name: " another name"
+            sim_name: "some Simulationname"
+            sim_iteration: 20
+            sim_breaks: 2
+            actor_complexity: 4
+            actor_method: random
+            graph_type: default
+            graph_num_of_node: 10
+            graph_init_connects: 2
+            graph_branch_probability: 0.6
+            graph_cluster: 1
+            graph_cluster_distrebution: even
+            graph_cluster_methods: default
     
         defaults:
-            number_of_actors: 100
-            actor_seed: 1237402
-            actor_generation_method: "NO"
+            sim_iteration: 20
+            sim_breaks: 2
+            actor_complexity: 4
+            actor_method: random
+            graph_type: default
+            graph_num_of_node: 10
+            graph_init_connects: 2
+            graph_branch_probability: 0.6
+            graph_cluster: 1
+            graph_cluster_methods: default
+
     group2:
         sim3:
-            name: "some Simulationname"
-            number_of_actors: 100
-            actor_seed: 1237402
-            actor_generation_method: "YES"
+            sim_name: "some Simulationname3"
         sim4:
-            name: " another name"
+            sim_name: "some Simulationname4"
     
         defaults:
-            number_of_actors: 102
-            actor_seed: 1237402
-            actor_generation_method: "NO"
+            sim_iteration: 20
+            sim_breaks: 2
+            actor_complexity: 4
+            actor_method: random
+            graph_type: default
+            graph_num_of_node: 10
+            graph_init_connects: 2
+            graph_branch_probability: 0.6
+            graph_cluster: 1
+            graph_cluster_methods: default
+
       
