@@ -176,7 +176,9 @@ class AdaptationRule(Rule):
         nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
         nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
         nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
-        return nodeToAdaptFrom[Graph.KEY_V] / (nodeToAdapt[Graph.KEY_V]+nodeToAdaptFrom[Graph.KEY_V])
+
+        vSum = (nodeToAdapt[Graph.KEY_V]+nodeToAdaptFrom[Graph.KEY_V])
+        return 0 if vSum == 0 else nodeToAdaptFrom[Graph.KEY_V] / vSum
 
     def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
         opInd = self.internals['opinionPair']['opinionIndex']
