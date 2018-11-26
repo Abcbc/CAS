@@ -326,7 +326,8 @@ class NewEdgesRule(Rule):
         return list(edgesToAdd)
 
     def _createInternals(self, graph):
-        self.internals = {'edgeId': self._findOperands(graph)
+        self.internals = {'edgeId': self._findOperands(graph),
+                          'newEdges': None,
                               }
 
         if self.internals['edgeId'] is not None:
