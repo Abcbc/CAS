@@ -1,5 +1,5 @@
 from Rules import *
-from Graph import calculateAttributes
+import Graph
 import random
 import GraphLog as gl
 from utils.Logger import get_graph_logger
@@ -10,7 +10,7 @@ class Updater:
 
     def setGraph(self, graph):
         self.graph = graph
-        self.graph = calculateAttributes(self.graph)
+        self.graph = Graph.calculateAttributes(self.graph)
 
         self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLoggerJson(get_graph_logger('GraphLogger','graph.log')))
         self.graphLogger.setGraphGetter(lambda : self.graph)
@@ -30,7 +30,7 @@ class Updater:
         try:
             self.graph = self.rules[ruleName].apply(self.graph)
 
-            self.graph = calculateAttributes(self.graph)
+            self.graph = Graph.calculateAttributes(self.graph)
 
             self.graphLogger.logRule(self.rules[ruleName])
         except TimeoutError:
