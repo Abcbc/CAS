@@ -32,6 +32,8 @@ class Updater:
 
             self.graph = Graph.calculateAttributes(self.graph)
 
+            self.graph.graph[Graph.KEY_VERSION] += 1
+
             self.graphLogger.logRule(self.rules[ruleName])
         except TimeoutError:
             pass

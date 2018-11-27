@@ -7,7 +7,7 @@ KEY_SPECTRUM = 'spectrum'
 KEY_OPINIONS = 'opinions'
 KEY_ORIENTATION = 'orientation'
 KEY_V = 'V'
-
+KEY_VERSION = 'version'
 
 def getEdgesFromIndices(graph, ids):
     edges = []

@@ -1,6 +1,6 @@
 import networkx as nx
 import random
-from Graph import addConvenienceAttributes, KEY_OPINIONS
+from Graph import addConvenienceAttributes, KEY_OPINIONS, KEY_VERSION
 
 def getRandomOpinion():
     return random.randint(-1,1)
@@ -17,6 +17,7 @@ def buildGraph(g=None):
         g.edges()[edgeId]['orientation']=0
 
     addConvenienceAttributes(g)
+    g.graph[KEY_VERSION] = 0
     return g
 
 def buildTestGraphForNewEdgeRule(degreeToSearch=1):
