@@ -8,6 +8,10 @@ class Metric:
     def getMetricName():
         raise NotImplementedError('getMetricName method must be implemented by concrete metric class')
 
+    @staticmethod
+    def plot(x,y, plt):
+        raise NotImplementedError('plot method must be implemented by concrete metric class')
+
 def plotLinear(plt, x, y, title, xlabel, ylabel):
     plt.plot(x,y)
     plt.title(title)
@@ -21,6 +25,10 @@ class MetricGraphSize(Metric):
     @staticmethod
     def getMetricName():
         return 'GraphSize'
+
+    @staticmethod
+    def plot(plt, x,y, xlabel='version'):
+        plotLinear(plt, x, y, MetricGraphSize.getMetricName(), xlabel, 'Number of nodes')
 
 defaultConfig = {
     'stepSize' : 10
@@ -54,9 +62,6 @@ class Analyser:
         import matplotlib.pyplot as plt
         for metric in self.metrics:
             plt.figure()
-            plt.plot(self.results['version'], self.results[metric.getMetricName()]) # ToDo configurable plot type
-            plt.title(metric.getMetricName())
-            plt.xlabel('version')
-            plt.ylabel('ToDo: get from metric') # ToDO
+            metric.plot(plt, self.results['version'], self.results[metric.getMetricName()])
 
         plt.show()
