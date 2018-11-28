@@ -1,4 +1,5 @@
 import Graph
+import networkx as nx
 
 class Metric:
     def calculate(self, graph):
@@ -30,12 +31,25 @@ class MetricGraphSize(Metric):
     def plot(plt, x,y, xlabel='version'):
         plotLinear(plt, x, y, MetricGraphSize.getMetricName(), xlabel, 'Number of nodes')
 
+class MetricAvgClustering(Metric):
+    def calculate(self, graph):
+        return nx.average_clustering(graph)
+
+    @staticmethod
+    def getMetricName():
+        return 'AverageClustering'
+
+    @staticmethod
+    def plot(plt, x,y, xlabel='version'):
+        plotLinear(plt, x, y, MetricAvgClustering.getMetricName(), xlabel, 'Clustering coefficient')
+
 defaultConfig = {
     'stepSize' : 10
 }
 
 availableMetrics = [
     MetricGraphSize(),
+    MetricAvgClustering(),
 ]
 
 class Analyser:
