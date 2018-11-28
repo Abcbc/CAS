@@ -51,8 +51,17 @@ def create_distribution_list(negative_weight, postive_weight, neutral_weight, co
              [0 for x in range(int(negative_weight / steps))]
 
 
-def breed(actorA={}, actorB={}, breed_method = ""):
-    return {}
+def breed(actorA, actorB):
+    indices = [x for x in range(len(actorA[KEY_OPINIONS]))]
+    opinions = [x for x in range(len(indices))]
+    parents = [actorA,actorB]
+
+    while not indices:
+        p = r.choice(parents)
+        idx = indices.pop(r.choice(indices))
+        opinions[idx] = p[idx]
+
+    return create(opinions)
 
 
 def clone_with_deviation(actor, deviation):
