@@ -4,14 +4,16 @@ class Metric:
     def calculate(self, graph):
         raise NotImplementedError('calculate method must be implemented by concrete metric class')
 
-    def getMetricName(self):
+    @staticmethod
+    def getMetricName():
         raise NotImplementedError('getMetricName method must be implemented by concrete metric class')
 
 class MetricGraphSize(Metric):
     def calculate(self, graph):
         return len(graph.nodes)
 
-    def getMetricName(self):
+    @staticmethod
+    def getMetricName():
         return 'GraphSize'
 
 defaultConfig = {
