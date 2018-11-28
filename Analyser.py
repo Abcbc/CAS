@@ -8,6 +8,12 @@ class Metric:
     def getMetricName():
         raise NotImplementedError('getMetricName method must be implemented by concrete metric class')
 
+def plotLinear(plt, x, y, title, xlabel, ylabel):
+    plt.plot(x,y)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
 class MetricGraphSize(Metric):
     def calculate(self, graph):
         return len(graph.nodes)
