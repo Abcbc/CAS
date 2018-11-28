@@ -12,7 +12,7 @@ def set_defaults(group):
     result = [group[x] for x in group if x != "defaults"]
     
     for default_key in defaults:
-        print(default_key)
+        # print(default_key)
         for e in result:
             if e.get(default_key) is None:
                 e.update({default_key: defaults.get(default_key)})
