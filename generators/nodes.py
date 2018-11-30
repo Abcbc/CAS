@@ -9,11 +9,11 @@ TYPES = {
 
 }
 ARCHETYPES = {
-       "OPPORTUNIST": [0 for x in range(DEFAULT_COMPLEXITY)],
-       "DEVOTEE": [1 for x in range(DEFAULT_COMPLEXITY)],
-       "NIHILIST": [-1 for x in range(DEFAULT_COMPLEXITY)],
-       "BALANCED": [-1 if x%2==0 else 1 for x in range[DEFAULT_COMPLEXITY]],
-       "INVERTED_BALANCE": [1 if x%2==0 else -1 for x in range[DEFAULT_COMPLEXITY]]
+    "OPPORTUNIST": [0 for x in range(DEFAULT_COMPLEXITY)],
+    "DEVOTEE": [1 for x in range(DEFAULT_COMPLEXITY)],
+    "NIHILIST": [-1 for x in range(DEFAULT_COMPLEXITY)],
+    "BALANCED": [-1 if x%2==0 else 1 for x in range[DEFAULT_COMPLEXITY]],
+    "INVERTED_BALANCE": [1 if x%2==0 else -1 for x in range[DEFAULT_COMPLEXITY]]
 }
 
 def create(opinions):
