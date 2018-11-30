@@ -1,107 +1,114 @@
 import copy
 import networkx as nx
 import random
-from Graph import KEY_OPINIONS, calculateAttributes
-from generators.nodes import Actors
+from Graph import KEY_OPINIONS, calculateAttributes, addConvenienceAttributes
+import generators.actors as act
 
 NUMBER_OF_KEY_OPINIONS = 4
 LIST_OF_CONSENSE_INDEXES = [0, 2]
 DEFAULT_NUMBER_OF_ATTEMPTS = 100
 
-class Graph_factory:
+
+
+
+class GraphFactory:
     """
     Verteilungs methoden.
     """
-    @staticmethod
-    def _even(num_of_nodes, cluster):
+
+    def __init__(self, sim_settings):
+        self.graph_type = sim_settings["graph_type"]
+        self.branch_probability = sim_settings["graph_branch_probability"]
+        self.num_of_nodes = sim_settings["graph_num_of_node"]
+        self.num_of_cluster = sim_settings["graph_cluster"]
+        self.opinion_factory = act.OpinionFactory(sim_settings)
+        self.initial_connections = sim_settings["graph_init_connects"]
+        self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distrebution"])
+        self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
+
+    def _even(self, cluster):
         result = [0 for x in range(cluster)]
-        for i in range(num_of_nodes):
-            idx = num_of_nodes%cluster
+        for i in range(self.num_of_nodes):
+            idx = self.num_of_nodes%cluster
             result[idx] += 1
         return result
 
-    @staticmethod
-    def _linear(num_of_nodes, num_of_cluster):
+
+    def _linear(self, cluster):
         return
 
-    @staticmethod
-    def _exponential(num_of_nodes, num_of_cluster):
+    def _exponential(self, cluster):
         return
 
-    @staticmethod
-    def _exponential(num_of_nodes, num_of_cluster):
-        return
-
-    @staticmethod
-    def distrebution_mapper(methode, num_of_nodes, num_of_cluster):
-        cluster_distrebution_mapper = {
-            "even": Graph_factory._even,
-            "linear": Graph_factory._linear,
-            "_exponential": Graph_factory._exponential
+    def node_distribution_mapper(self, methode):
+        cluster_distribution_mapper = {
+            "even": self._even,
+            "linear": self._linear,
+            "_exponential": self._exponential
         }
 
-        return cluster_distrebution_mapper[methode](num_of_nodes, num_of_cluster)
+        return cluster_distribution_mapper[methode]
 
 
     """
     Actor Methods
     """
 
-    @staticmethod
-    def _random(cluster, actor_complexity):
-        for node in cluster:
-            cluster[node][KEY_OPINIONS] = Actors.create()[KEY_OPINIONS]
+
+    def _random(self, cluster):
+        nodes = cluster.node
+
+        for node in nodes:
+            nodes[node][KEY_OPINIONS] = self.opinion_factory.random_create()[KEY_OPINIONS]
+
         return cluster
 
-    @staticmethod
-    def actor_mapper(method, cluster, actor_complexity):
+    def _deviation(self, cluster):
+        for node in cluster.node:
+            cluster[node][KEY_OPINIONS] = self.opinion_factory.random_create()[KEY_OPINIONS]
+        return cluster
+
+    def actor_method_mapper(self, method):
         actor_method_mapper = {
-            "random": Graph_factory._random
+            "random": self._random,
+            "deviation": self._deviation
         }
 
-        return actor_method_mapper[method](cluster, actor_complexity)
+        return actor_method_mapper[method]
 
-    @staticmethod
-    def _create_cluster(type, num_of_nodes, initial_connections, probability, actor_method):
+    def _create_cluster(self, type, num_of_nodes, initial_connections, probability):
         #TODO: Return 1 cluster
 
+        subgraph = nx.generators.barabasi_albert_graph(self.num_of_nodes, self.initial_connections, seed=None)
+        subgraph = self.actor_init_method(subgraph)
 
-        subgraph = nx.generators.barabasi_albert_graph(num_of_nodes, initial_connections , seed=None)
-        subgraph = Graph_factory.actor_mapper(actor_method,subgraph,1)
         return subgraph
 
-    @staticmethod
-    def _connected(clusters, connection=1):
+
+    def _connected(self, clusters, connection=1):
 
         return clusters[0]
 
-    @staticmethod
-    def create(sim_settings):
-        num_of_nodes = sim_settings["graph_num_of_node"]
-        num_of_cluster = sim_settings["graph_cluster"]
-        methode = sim_settings["graph_cluster_distrebution"]
-        actor_method = sim_settings["actor_method"]
-        node_distrebution = Graph_factory.distrebution_mapper(methode, num_of_nodes, num_of_cluster)
+    def create(self):
+
+        node_distrebution = self.node_distribution_method(self.num_of_cluster)
         clusters = []
 
         for nodes in node_distrebution:
-            type = sim_settings["graph_type"]
-            initial_connections = sim_settings["graph_init_connects"]
-            probability = sim_settings["graph_branch_probability"]
 
-            cluster = Graph_factory._create_cluster(type=type, num_of_nodes=nodes, initial_connections=initial_connections,
-                                                    probability=probability, actor_method=actor_method)
+            cluster = self._create_cluster(type=self.graph_type, num_of_nodes=nodes, initial_connections=self.initial_connections,
+                                                   probability=self.branch_probability)
 
             clusters.append(cluster)
 
-            return calculateAttributes(Graph_factory._connected(clusters))
+        return addConvenienceAttributes(calculateAttributes(self._connected(clusters)))
 
 
 
 
     @staticmethod
     def get_default_setup():
-        graph = Graph_factory.buildConnectedClustersToSpec(Graph_factory.get_default_settings())
+        graph = GraphFactory.buildConnectedClustersToSpec(GraphFactory.get_default_settings())
         return graph
 
 
@@ -159,10 +166,10 @@ class Graph_factory:
         """
         if graph is None:
             return None
-        graph = Graph_factory.apply_random_opinions(graph)
+        graph = GraphFactory.apply_random_opinions(graph)
 
         for idx in opinion_indexes:
-            graph = Graph_factory.apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, idx)
+            graph = GraphFactory.apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, idx)
 
 
         graph = calculateAttributes(graph)
@@ -211,9 +218,9 @@ class Graph_factory:
                 subgraph = nx.powerlaw_cluster_graph(clusterList[cluster_id]['number_of_nodes'], clusterList[cluster_id]['initial_connections'], clusterList[cluster_id]['probability'], seed=None)
             else:
                 subgraph = nx.generators.complete_graph(clusterList[cluster_id]['number_of_nodes'])
-            subgraph = Graph_factory.apply_opinions(subgraph, clusterList[cluster_id]['pro_likelihood'], clusterList[cluster_id]['con_likelihood'], clusterList[cluster_id]['consense_indexes'])
+            subgraph = GraphFactory.apply_opinions(subgraph, clusterList[cluster_id]['pro_likelihood'], clusterList[cluster_id]['con_likelihood'], clusterList[cluster_id]['consense_indexes'])
             subgraphs.append(subgraph)
-        resultGraph = Graph_factory.connect_clusters(subgraphs)
+        resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
 
 
@@ -236,11 +243,11 @@ class Graph_factory:
             else:
                 subgraph = nx.generators.complete_graph(numberOfNodesEach)
 
-            subgraph = Graph_factory.apply_opinions(subgraph, pro_likelihood, con_likelihood, LIST_OF_CONSENSE_INDEXES)
+            subgraph = GraphFactory.apply_opinions(subgraph, pro_likelihood, con_likelihood, LIST_OF_CONSENSE_INDEXES)
             subgraphs.append(subgraph)
             i += 1
 
-        resultGraph = Graph_factory.connect_clusters(subgraphs)
+        resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
 
     @staticmethod
@@ -269,9 +276,9 @@ class Graph_factory:
         Creates random clusters connected to each other
         """
         if g is None:
-            g1 = Graph_factory.buildBarabasiAlbertGraph()
+            g1 = GraphFactory.buildBarabasiAlbertGraph()
             nrG1nodes = g1.number_of_nodes()
-            g2 = Graph_factory.buildWattsStrogatzGraph()
+            g2 = GraphFactory.buildWattsStrogatzGraph()
             nrG2Nodes = g2.number_of_nodes()
 
             g = nx.disjoint_union(g1, g2)
