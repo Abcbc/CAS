@@ -1,8 +1,10 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
-from Graph import KEY_OPINIONS, KEY_V, doOpinionsDiffer, areOppositeOpinions
+import Graph
 from utils.Logger import get_logger
+import community
 import networkx as nx
+import numpy as np
 
 log = get_logger("Rule")
 
@@ -10,6 +12,9 @@ def getRuleset():
     return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
         AdaptationRule.getName():AdaptationRule(),
+        NewNodeRule.getName():NewNodeRule(),
+        NewEdgesRule.getName():NewEdgesRule(),
+        RemoveEdgeRule.getName():RemoveEdgeRule(),
         TakeoverRule.getName():TakeoverRule(),
         }
 
@@ -101,7 +106,7 @@ class OrientationConfirmationRule(Rule):
                           }
         if self.internals['edgeId'] is not None:
             nodeA = graph.nodes[self.internals['edgeId'][0]]
-            for i in range(len(nodeA[KEY_OPINIONS])):
+            for i in range(len(nodeA[Graph.KEY_OPINIONS])):
                 self.internals['fallbackDecision'].append( random.random() > self._calcProbability() )
                 self.internals['fallbackSelection'].append( random.choice([0,1]) )
 
@@ -122,11 +127,11 @@ class OrientationConfirmationRule(Rule):
         if self.internals['edgeId'] is not None:
             nodeA = graph.nodes[self.internals['edgeId'][0]]
             nodeB = graph.nodes[self.internals['edgeId'][1]]
-            opinionsA = nodeA[KEY_OPINIONS]
-            opinionsB = nodeB[KEY_OPINIONS]
+            opinionsA = nodeA[Graph.KEY_OPINIONS]
+            opinionsB = nodeB[Graph.KEY_OPINIONS]
 
-            for i in range(len(nodeA[KEY_OPINIONS])):
-                if doOpinionsDiffer(opinionsA[i], opinionsB[i]):
+            for i in range(len(nodeA[Graph.KEY_OPINIONS])):
+                if Graph.doOpinionsDiffer(opinionsA[i], opinionsB[i]):
                     if self.internals['fallbackDecision'][i]:
                         if self.internals['fallbackSelection'][i] == 0:
                             opToChange = opinionsA
@@ -140,25 +145,44 @@ class OrientationConfirmationRule(Rule):
     def getName():
         return 'OrientationConfirmationRule'
 
-'''
-Parameters: None
-'''
 class AdaptationRule(Rule):
+    """
+    Implementation of Adaptation Rule 2.1.2
+
+    Parameters: None
+
+    Chooses one pair of opinions -1 and 1 of nodes A and B. For this rule, the order of
+    nodes in the edge is chosen randomly, as if the graph were directed.
+    With probability V(B)/(V(A)+V(B)) the opinion of node A is set to the opinion at B.
+    """
     def _createInternals(self, graph):
-        self.internals = {'opinionPair': self._findOperands(graph)
+        self.internals = {'opinionPair': self._findOperands(graph),
+                          'nodePosToAdapt': random.choice([0,1])
                           }
+        if self.internals['opinionPair'] is not None:
+            self.internals['adaptionDecision'] = random.random() < self._calcAdaptionProbability(graph)
         return self.internals
 
     def _findOperands(self, graph):
-        # ToDo always chooses the same edge with the weight_getter_edge lambda, why?
-#         opinionPair =  SelectionRules.selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[KEY_ORIENTATION]), predicate=self._selectionPredicate)
-        # this works
-        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : 1, predicate=self._selectionPredicate, maxChoiceTries=1e6)
+        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[Graph.KEY_ORIENTATION]), predicate=self._selectionPredicate, maxChoiceTries=1e6)
 
     def _selectionPredicate(self, pair):
-        opA = pair['edge']['nodeA'][KEY_OPINIONS][pair['opinionIndex']]
-        opB = pair['edge']['nodeB'][KEY_OPINIONS][pair['opinionIndex']]
-        return areOppositeOpinions(opA, opB)
+        opA = pair['edge']['nodeA'][Graph.KEY_OPINIONS][pair['opinionIndex']]
+        opB = pair['edge']['nodeB'][Graph.KEY_OPINIONS][pair['opinionIndex']]
+        return Graph.areOppositeOpinions(opA, opB)
+
+    def _calcAdaptionProbability(self, graph):
+        nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+        nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+        nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
+        nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
+
+        vSum = (nodeToAdapt[Graph.KEY_V]+nodeToAdaptFrom[Graph.KEY_V])
+        return 0 if vSum == 0 else nodeToAdaptFrom[Graph.KEY_V] / vSum
+
+    def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
+        opInd = self.internals['opinionPair']['opinionIndex']
+        toAdapt[Graph.KEY_OPINIONS][opInd] = toAdaptFrom[Graph.KEY_OPINIONS][opInd]
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph, _parameters, _internals)
@@ -167,16 +191,207 @@ class AdaptationRule(Rule):
                   str(self.internals) + (' (given)' if _internals is not None else ''))
 
         if self.internals['opinionPair'] is not None:
-            # ToDo real behavior, this is only dummy and always changes nodeA
-            nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
-            nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
-            nodeA[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']] += nodeB[KEY_OPINIONS][self.internals['opinionPair']['opinionIndex']]
+            if self.internals['adaptionDecision']:
+                nodeA = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeA']
+                nodeB = graph.edges[self.internals['opinionPair']['edgeId']] ['nodeB']
+                nodeToAdapt = [nodeA, nodeB][self.internals['nodePosToAdapt']]
+                nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
+                self._adaptNodeToNode(nodeToAdapt, nodeToAdaptFrom)
 
         return graph
 
     @staticmethod
     def getName():
         return 'AdaptationRule'
+
+class NewNodeRule(Rule):
+    """
+    densityThreshold: minimum required n_edges/max possible n_edges
+      for a community. Range: 0 to 1. Default: 0.8
+    meanOrientationThreshold: minimum required mean of orientation in
+      a community. Range: -1 to 1. Default: 0.8
+    opMeanThreshold: minimum required mean of |orientation| in a community
+      to give the new node an opinion. Range: 0 to 1. Default: 0.8
+    """
+
+    defaultParameters = { 'densityThreshold' : 0.8,
+                          'meanOrientationThreshold' : 0.8,
+                          'opMeanThreshold' : 0.8 }
+
+    def _createInternals(self, graph):
+        log.debug('NewNodeRule create internals')
+        communities = self._findOperands(graph)
+        self.internals = { 'nodesToAdd' : [] }
+        for comm in communities:
+            opinions = self._calcOpinions(graph, comm)
+            neighbors = comm
+            self.internals['nodesToAdd'].append((opinions,neighbors))
+            log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
+                      + ' to community ' + str(comm))
+
+        return self.internals
+
+    def _getCommunities(self, graph):
+        """
+        Calculates the communities using the python-louvain package.
+        Returns a list of lists. One list of node ids for every community.
+        Nodes outside all communities are not included.
+        """
+        bp = community.best_partition(graph)
+        comms = []
+        if np.all(bp == 0):
+            log.debug('found no communities')
+        else:
+            for nodeId in bp:
+                if bp[nodeId] >= len(comms):
+                    comms.append([nodeId])
+                else:
+                    comms[bp[nodeId]].append(nodeId)
+
+        return comms
+
+    def _findOperands(self, graph):
+        communities = self._getCommunities(graph)
+        connectedCommunities = []
+        for comm in communities:
+            commGraph = graph.subgraph(comm)
+            isDense = nx.density(commGraph) >= self.parameters['densityThreshold']
+            hasHighOrientation = np.mean([graph.edges[eid][Graph.KEY_ORIENTATION] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
+            if isDense and hasHighOrientation:
+                connectedCommunities.append(comm)
+            else:
+                log.debug('Community ' + str(comm) + ' was not selected. isDense: ' + str(isDense)
+                          + ', hasHighOrientation: ' + str(hasHighOrientation))
+
+        return connectedCommunities
+
+    def _calcOpinions(self, graph, nodeSet):
+        opinionMat = np.array([graph.nodes[nid][Graph.KEY_OPINIONS] for nid in nodeSet])
+        opinionMeans = np.mean(opinionMat,0) # mean op_i of all nodes
+        newNodeOpinions = np.sign(opinionMeans)*np.greater(np.abs(opinionMeans),self.parameters['opMeanThreshold'])
+
+        return list(newNodeOpinions)
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+
+        for nodeToAdd in self.internals['nodesToAdd']:
+            opinions = nodeToAdd[0]
+            node = Graph.createNewNodeSkeleton(graph)
+            node[Graph.KEY_OPINIONS] = opinions
+            graph.add_nodes_from([(node[Graph.KEY_NODE_ID],node)])
+            log.debug('Added node ' + str(graph.nodes[node[Graph.KEY_NODE_ID]]))
+            for neighbour in nodeToAdd[1]:
+                edge = Graph.createNewEdgeSkeleton(graph, node, graph.nodes[neighbour])
+                graph.add_edges_from([(node[Graph.KEY_NODE_ID], neighbour,edge)])
+                log.debug('Added edge ' + str(graph.edges[edge[Graph.KEY_EDGE_ID]]))
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'NewNodeRule'
+
+class NewEdgesRule(Rule):
+    """
+    Chooses an edge (probability weighed with orientation). Neighbours of one node can become
+    neighbours of the other node also.
+    createEdgeProbability: probability that an edge is created. Range: 0 to 1. Default: 0.1
+    """
+
+    defaultParameters = {'createEdgeProbability': 0.1}
+
+    def _getNeighbours(self, graph, node, degree):
+        neighbours = set()
+        if degree > 0:
+            for neighbour in self._getNeighbours(node, degree-1):
+                neighbours.update(nx.neighbors(graph, neighbour))
+
+    # Search for nodes that are not connected to nodeToConnect. Starts with the nodesToCheck,
+    # then go on with their neighbours of increasing neighbourhood degree, until at least one
+    # node is returned.
+    # Return empty list if no such edge can be added
+    def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
+        nextToCheck = set()
+        nextToCheck.update([nx.neighbors(graph, n) for n in nodesToCheck])
+        if len(nodesToCheck) == len(nextToCheck):
+            return []
+
+        edgesToAdd = set()
+        edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in nodesToCheck if not (graph.has_edge(neighbour,nodeToConnect) or neighbour==nodeToConnect)])
+
+        if len(edgesToAdd) == 0:
+            self._addUnconnected(graph, nodeToConnect, nextToCheck)
+
+        return list(edgesToAdd)
+
+    def _createInternals(self, graph):
+        self.internals = {'edgeId': self._findOperands(graph),
+                          'newEdges': None,
+                              }
+
+        if self.internals['edgeId'] is not None:
+            nodeToConnect = self.internals['edgeId'][0]
+            fixedNode = self.internals['edgeId'][1]
+            edgeCandidates = self._addUnconnected(graph, nodeToConnect, [fixedNode])
+            edgesToAdd = set()
+            for edgeCandidate in edgeCandidates:
+                if random.random() < self.parameters['createEdgeProbability']:
+                    edgesToAdd.add(edgeCandidate)
+            self.internals['newEdges'] = list(edgesToAdd)
+
+        return self.internals
+
+    def _findOperands(self, graph):
+        return selectEdgeFromGraph(graph, weight_getter=lambda edge : abs(graph.edges[edge][Graph.KEY_ORIENTATION]))
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+        log.debug('NewEdgeRule add edges ' + str(self.internals['newEdges']))
+        if self.internals['newEdges'] is not None:
+            for edgeToAdd in self.internals['newEdges']:
+                edge = Graph.createNewEdgeSkeleton(graph, graph.nodes[edgeToAdd[0]], graph.nodes[edgeToAdd[1]])
+                graph.add_edges_from([(edgeToAdd[0],edgeToAdd[1],edge)])
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'NewEdgesRule'
+
+class RemoveEdgeRule(Rule):
+    """
+    Chooses an edge with low orientation and removes it.
+
+    absOrientationThreshold: maximum absolute orientation to perform edge removal. Range: 0 to 1. Default: 0.1
+    """
+    defaultParameters = {'absOrientationThreshold': 0.1}
+
+    def _createInternals(self, graph):
+        self.internals = {'edgeId': self._findOperands(graph)
+                          }
+
+        return self.internals
+
+    def _findOperands(self, graph):
+        try:
+            return selectEdgeFromGraph(graph,predicate=lambda edgeId: abs(graph.edges[edgeId][Graph.KEY_ORIENTATION]) < self.parameters['absOrientationThreshold'])
+        except(TimeoutError):
+            log.debug('Found no edge with low orientation')
+
+    def apply(self, graph, _parameters=None, _internals=None):
+        self._prepareApply(graph, _parameters, _internals)
+
+        edgeId = self.internals['edgeId']
+        if edgeId is not None:
+            log.debug('Removing edge ' + str(edgeId) + ' with low orientation')
+            graph.remove_edges_from([edgeId])
+
+        return graph
+
+    @staticmethod
+    def getName():
+        return 'RemoveEdgeRule'
 
 class TakeoverRule(Rule):
     """
@@ -195,10 +410,10 @@ class TakeoverRule(Rule):
 
         if self.internals['edgeId'] is not None:
             commonNeighbours = [candidate for candidate in nx.neighbors(graph,self.internals['edgeId'][0]) if candidate in nx.neighbors(graph,self.internals['edgeId'][1])]
-            weakerNodeId = self.internals['edgeId'][0 if graph.nodes[self.internals['edgeId'][0]][KEY_V] < graph.nodes[self.internals['edgeId'][1]][KEY_V] else 1]
+            weakerNodeId = self.internals['edgeId'][0 if graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V] < graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V] else 1]
 
             for commonNeighbour in commonNeighbours:
-                if self._calcVDiffMetrik(graph.nodes[self.internals['edgeId'][0]][KEY_V],graph.nodes[self.internals['edgeId'][1]][KEY_V]) >= self.parameters['minDifference'] and random.random() < self.parameters['removalProbability']:
+                if self._calcVDiffMetrik(graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V],graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V]) >= self.parameters['minDifference'] and random.random() < self.parameters['removalProbability']:
                     self.internals['edgesToRemove'].append((weakerNodeId, commonNeighbour))
 
         return self.internals
@@ -207,7 +422,7 @@ class TakeoverRule(Rule):
         return abs(v1-v2)
 
     def _findOperands(self, graph):
-        return selectEdgeFromGraph(graph, weight_getter=lambda edgeId:self._calcVDiffMetrik(graph.nodes[edgeId[0]][KEY_V],graph.nodes[edgeId[1]][KEY_V]))
+        return selectEdgeFromGraph(graph, weight_getter=lambda edgeId:self._calcVDiffMetrik(graph.nodes[edgeId[0]][Graph.KEY_V],graph.nodes[edgeId[1]][Graph.KEY_V]))
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph,_parameters, _internals)
