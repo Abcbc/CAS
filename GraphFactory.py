@@ -111,7 +111,6 @@ class GraphFactory:
         graph = GraphFactory.buildConnectedClustersToSpec(GraphFactory.get_default_settings())
         return graph
 
-
     @staticmethod
     def get_default_settings():
         cluster0 = {'type': "Barabasi-Albert", 'number_of_nodes': 25, 'initial_connections': 3, 'probability':0.4, 'pro_likelihood': 0.7, 'con_likelihood': 0.1, 'consense_indexes': [0, 1]}
@@ -120,6 +119,14 @@ class GraphFactory:
         cluster3 = {'type': "Barabasi-Albert", 'number_of_nodes': 5, 'initial_connections': 2, 'probability': 0.6,
                     'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
         cluster_list = [cluster0, cluster1, cluster2, cluster3]
+        settings_dict = {'clusterList': cluster_list}
+        return settings_dict
+
+    @staticmethod
+    def get_merging_graphs_settings(cluster_a_size, cluster_b_size):
+        cluster0 = {'type': "complete", 'number_of_nodes': cluster_a_size, 'initial_connections': 0, 'probability':0.0, 'pro_likelihood': 1.0, 'con_likelihood': 0.0, 'consense_indexes': [0, 1, 2, 3]}
+        cluster1 = {'type': "complete", 'number_of_nodes': cluster_b_size, 'initial_connections': 0, 'probability': 0.0, 'pro_likelihood': 1.0, 'con_likelihood': 0.0, 'consense_indexes': [0, 1, 2, 3]}
+        cluster_list = [cluster0, cluster1]
         settings_dict = {'clusterList': cluster_list}
         return settings_dict
 
@@ -155,6 +162,29 @@ class GraphFactory:
             else:
                 graph.node[nodeId][KEY_OPINIONS][opinion_index] = 0
 
+        graph = calculateAttributes(graph)
+
+        return graph
+
+    @staticmethod
+    def apply_alternating_opinions(graph, index_list):
+        """
+        assigns alternating values to graph's opinion indexes in given list
+        """
+        for opinion_index in range(len(index_list)):
+            index_list[opinion_index] = opinion_index % NUMBER_OF_KEY_OPINIONS
+
+        if graph is None:
+            return None
+
+        i = 0;
+        for nodeId in graph.node:
+            for opinion_index in index_list:
+                if i % 2 == 0:
+                    graph.node[nodeId][KEY_OPINIONS][opinion_index] = 1
+                else:
+                    graph.node[nodeId][KEY_OPINIONS][opinion_index] = -1
+            i += 1
         graph = calculateAttributes(graph)
 
         return graph
@@ -199,6 +229,60 @@ class GraphFactory:
 
         return result_graph
 
+    @staticmethod
+    def connect_clusters_n_times(graphs, number_of_times):
+        """
+        inserts edges between given graphs to create connected graph
+        """
+        cpy = copy.deepcopy(graphs)
+        if graphs is None or len(graphs) == 0:
+            return None
+
+        result_graph = cpy.pop()
+        while len(cpy) > 0:
+            rand = random.randint(0, len(cpy)-1)    #select subgraph to add
+            subgraph = cpy.pop(rand)
+            offset_to_new_nodes = nx.number_of_nodes(result_graph)
+            subgraph_number_of_nodes = nx.number_of_nodes(subgraph)
+            result_graph = nx.disjoint_union(result_graph, subgraph)
+            #connect by random edge connected to graph
+
+            used_edges = []
+            current_edge = [-1, -1]
+            for i in range(number_of_times):
+                while current_edge in used_edges:
+                    node_idx_1 = random.randint(0, offset_to_new_nodes - 1)
+                    node_idx_2 = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
+                result_graph.add_edge(node_idx_1, node_idx_2)
+                used_edges.add([node_idx_1, node_idx_2])
+
+        return result_graph
+
+    @staticmethod
+    def connect_clusters_by_overlay(overlay_graph, subgraphs):
+        """
+        inserts subgraphs as edges between given graphs into overlay
+        """
+        cpy = copy.deepcopy(subgraphs)
+        if subgraphs is None or len(subgraphs) == 0:
+            return None
+
+        result_graph = cpy.pop()
+
+        number_overlay_nodes = nx.number_of_nodes(overlay_graph)
+        onverlay_node_index = 0
+        while len(cpy) > 0:
+            rand = random.randint(0, len(cpy) - 1)  # select subgraph to add
+            subgraph = cpy.pop(rand)
+            offset_to_new_nodes = nx.number_of_nodes(result_graph)
+            subgraph_number_of_nodes = nx.number_of_nodes(subgraph)
+            result_graph = nx.disjoint_union(result_graph, subgraph)
+            # connect by random edge connected to graph
+            subgraph_node_idx = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
+            result_graph.add_edge(onverlay_node_index, subgraph_node_idx)
+            onverlay_node_index = (onverlay_node_index + 1) % number_overlay_nodes
+
+        return result_graph
 
     @staticmethod
     def buildConnectedClustersToSpec(settings_dict):
