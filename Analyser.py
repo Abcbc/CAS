@@ -57,7 +57,7 @@ class Analyser:
         self.metrics = metrics
         self.config = config
         self.results = {metric.getMetricName():[] for metric in metrics}
-        self.results['version'] = []
+        self.results['version'] = []                                      #Wird die Variable results mit absicht wieder überschrieben?
 
     def _calcMetrics(self, graph):
         self.results['version'].append(graph.graph[Graph.KEY_VERSION])
@@ -79,3 +79,13 @@ class Analyser:
             metric.plot(plt, self.results['version'], self.results[metric.getMetricName()])
 
         plt.show()
+
+
+    #TODO Comparevalues anpassen, Nur eine Code-Idee konkrete umsetzung kommt noch.
+    def stagnate(self,graph,numberOfIterations = 10,compareValues = []):
+        result = {}
+        for metric in self.metrics:
+        # Von Stackoverflow eine Idee eine Liste auf Sortierung zu prüfen: all(l[i] <= l[i+1] for i in xrange(len(l)-1))
+            lastValues = self.results[metric][-numberOfIterations: -1]
+            compareValue = compareValues[metric]
+            result[metric] = all(lastValues[i]< compareValue for i in range(len(lastValues)))
