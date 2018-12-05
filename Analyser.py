@@ -57,19 +57,19 @@ class Analyser:
         self.metrics = metrics
         self.config = config
         self.results = {metric.getMetricName():[] for metric in metrics}
-        self.results['version'] = []                                      #Wird die Variable results mit absicht wieder überschrieben?
+        self.results['version'] = []
 
     def _calcMetrics(self, graph):
-        self.results['version'].append(graph.graph[Graph.KEY_VERSION])
+        self.results['version'].append(Graph.getVersion(graph))
         for metric in self.metrics:
             self.results[metric.getMetricName()].append(metric.calculate(graph))
 
     def onNewVersion(self, graph):
-        if graph.graph[Graph.KEY_VERSION] % self.config['stepSize'] < 1e5:
+        if Graph.getVersion(graph) % self.config['stepSize'] < 1e5:
             self._calcMetrics(graph)
 
     def finishAnalysis(self, graph):
-        if self.results['version'][-1] != graph.graph[Graph.KEY_VERSION]:
+        if self.results['version'][-1] != Graph.getVersion(graph):
             self._calcMetrics(graph)
 
         # ToDo: export this to a viewer module
@@ -79,13 +79,3 @@ class Analyser:
             metric.plot(plt, self.results['version'], self.results[metric.getMetricName()])
 
         plt.show()
-
-
-    #TODO Comparevalues anpassen, Nur eine Code-Idee konkrete umsetzung kommt noch.
-    def stagnate(self,graph,numberOfIterations = 10,compareValues = []):
-        result = {}
-        for metric in self.metrics:
-        # Von Stackoverflow eine Idee eine Liste auf Sortierung zu prüfen: all(l[i] <= l[i+1] for i in xrange(len(l)-1))
-            lastValues = self.results[metric][-numberOfIterations: -1]
-            compareValue = compareValues[metric]
-            result[metric] = all(lastValues[i]< compareValue for i in range(len(lastValues)))

@@ -2,27 +2,18 @@ import random
 from Graph import KEY_OPINIONS, KEY_EDGE_ID
 
 def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
-    if len(set) == 0:
+    filtered_set = [item for item in set if predicate(item)]
+    if len(filtered_set) == 0:
         return None
 
     weights = []
-    for item in set:
+    for item in filtered_set:
         weights.append(weight_getter(item))
 
     if all(weight == 0 for weight in weights): # probability 0 for all elements is invalid
         weights = list(map(lambda val:1, weights))
     
-    chosenItem = None
-    tryCtr = 0
-    while not chosenItem:
-        if tryCtr >= maxChoiceTries:
-            raise TimeoutError("Choice try limits exceeded. Maybe a problem with the predicate?")
-        
-        itemCandidate = random.choices(set, weights,k=1)[0]
-        if predicate(itemCandidate):
-            chosenItem = itemCandidate
-        
-        tryCtr += 1
+    chosenItem = random.choices(filtered_set, weights,k=1)[0]
 
     return chosenItem
     
