@@ -60,16 +60,16 @@ class Analyser:
         self.results['version'] = []
 
     def _calcMetrics(self, graph):
-        self.results['version'].append(graph.graph[Graph.KEY_VERSION])
+        self.results['version'].append(Graph.getVersion(graph))
         for metric in self.metrics:
             self.results[metric.getMetricName()].append(metric.calculate(graph))
 
     def onNewVersion(self, graph):
-        if graph.graph[Graph.KEY_VERSION] % self.config['stepSize'] < 1e5:
+        if Graph.getVersion(graph) % self.config['stepSize'] < 1e5:
             self._calcMetrics(graph)
 
     def finishAnalysis(self, graph):
-        if self.results['version'][-1] != graph.graph[Graph.KEY_VERSION]:
+        if self.results['version'][-1] != Graph.getVersion(graph):
             self._calcMetrics(graph)
 
         # ToDo: export this to a viewer module
