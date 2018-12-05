@@ -7,6 +7,7 @@ log = get_logger(__name__, __file__) # For Main, call before any include with al
 import Builder
 import Updater
 import GraphLog as gl
+import Rules
 
 
 def run_simulation(simulation_setting):
@@ -16,6 +17,9 @@ def run_simulation(simulation_setting):
 
     updater = Updater.Updater()
     updater.setGraph(g)
+
+    for rulename, rule in Rules.getRuleset().items():
+        rule.setParameters(simulation_setting['Rules'][rulename])
 
     for i in range(simulation_setting["sim_iterations"]):
         updater.update()

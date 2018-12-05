@@ -29,6 +29,21 @@ simulation_settings:
             graph_cluster: 2
             graph_cluster_methods: default
             graph_cluster_distribution: even
+            Rules:
+                OrientationConfirmationRule:
+                    fallbackProbability: 0.5
+                AdaptationRule:
+                NewNodeRule:
+                    densityThreshold: 0.8
+                    meanOrientationThreshold: 0.8
+                    opMeanThreshold: 0.8
+                NewEdgesRule:
+                    createEdgeProbability: 0.1
+                RemoveEdgeRule:
+                    absOrientationThreshold: 0.1
+                TakeoverRule:
+                    removalProbability: 0.5
+                    minDifference: 1
 
     group2:
         sim3:
@@ -48,5 +63,21 @@ simulation_settings:
             graph_cluster: 2
             graph_cluster_methods: default
             graph_cluster_distribution: even
+            Rules:
+                OrientationConfirmationRule:
+                    fallbackProbability: 0.5
+                AdaptationRule:
+                NewNodeRule:
+                    densityThreshold: 0.8
+                    meanOrientationThreshold: 0.8
+                    opMeanThreshold: 0.8
+                NewEdgesRule:
+                    createEdgeProbability: 0.1
+                RemoveEdgeRule:
+                    absOrientationThreshold: 0.1
+                TakeoverRule:
+                    removalProbability: 0.5
+                    minDifference: 1
+
 
       
