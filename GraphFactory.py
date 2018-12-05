@@ -371,3 +371,14 @@ class GraphFactory:
             g2Idx = (nrG1nodes - 1) + random.randint(0, nrG2Nodes - 1)
             g.add_edge(g1Idx, g2Idx)
         return g
+
+    def _core_groups(self, cluster):
+        core_dict = nx.core_number(cluster)
+        result_dict = {}.fromkeys(set(core_dict.values()), [])
+
+        for key in core_dict:
+            result_dict[core_dict[key]].append(key)
+
+        return result_dict
+
+
