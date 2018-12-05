@@ -7,7 +7,7 @@ KEY_SPECTRUM = 'spectrum'
 KEY_OPINIONS = 'opinions'
 KEY_ORIENTATION = 'orientation'
 KEY_V = 'V'
-
+KEY_VERSION = 'version'
 
 def getEdgesFromIndices(graph, ids):
     edges = []
@@ -120,3 +120,13 @@ def toPickle(graph, filename):
 
 def fromPickle(filename):
     return addConvenienceAttributes(nx.read_gpickle(filename))
+
+def getVersion(graph):
+    return graph.graph[KEY_VERSION]
+
+def setVersion(graph, version):
+    graph.graph[KEY_VERSION] = version
+
+def incrementVersion(graph):
+    graph.graph[KEY_VERSION] += 1
+    return getVersion(graph)
