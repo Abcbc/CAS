@@ -3,10 +3,12 @@ import Graph
 import random
 import GraphLog as gl
 from utils.Logger import get_graph_logger
+import Analyser
 
 class Updater:
     def __init__(self):
         self.rules = getRuleset()
+        self.analyzer = Analyser.Analyser()
 
     def setGraph(self, graph):
         self.graph = graph
@@ -14,6 +16,8 @@ class Updater:
 
         self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(get_graph_logger('GraphLogger', 'graph.log')))
         self.graphLogger.setGraphGetter(lambda : self.graph)
+
+        self.analyzer.initAnalysis(self.graph, config={'stepSize':1})
 
     def addRule(self, rule):
         self.rules[rule.getName()] = rule
@@ -32,9 +36,14 @@ class Updater:
 
             self.graph = Graph.calculateAttributes(self.graph)
 
+            Graph.incrementVersion(self.graph)
+
             self.graphLogger.logRule(self.rules[ruleName])
+
+            self.analyzer.onNewVersion(self.graph)
         except TimeoutError:
             pass
 
     def close(self):
         self.graphLogger.close()
+        self.analyzer.finishAnalysis(self.graph)
