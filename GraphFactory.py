@@ -23,7 +23,7 @@ class GraphFactory:
         self.num_of_cluster = sim_settings["graph_cluster"]
         self.opinion_factory = act.OpinionFactory(sim_settings)
         self.initial_connections = sim_settings["graph_init_connects"]
-        self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distrebution"])
+        self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
 
     def _even(self, cluster):

@@ -11,11 +11,11 @@ simulation_settings:
             graph_init_connects: 2
             graph_branch_probability: 0.6
             graph_cluster: 1
-            graph_cluster_distrebution: even
+            graph_cluster_distribution: even
             graph_cluster_methods: default
 
         defaults:
-            sim_iteration: 20
+            sim_iterations: 20
             sim_breaks: 2
             actor_complexity: 4
             actor_method: random
@@ -25,6 +25,7 @@ simulation_settings:
             graph_branch_probability: 0.6
             graph_cluster: 1
             graph_cluster_methods: default
+            graph_cluster_distribution: even
 
     group2:
         sim3:
@@ -33,7 +34,7 @@ simulation_settings:
             sim_name: "some Simulationname4"
 
         defaults:
-            sim_iteration: 20
+            sim_iterations: 20
             sim_breaks: 2
             actor_complexity: 4
             actor_method: random
@@ -43,5 +44,6 @@ simulation_settings:
             graph_branch_probability: 0.6
             graph_cluster: 1
             graph_cluster_methods: default
+            graph_cluster_distribution: even
 
       

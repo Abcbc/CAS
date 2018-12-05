@@ -22,8 +22,8 @@ def run_simulation(simulation_setting):
 
     updater.close()
 
-    gExe = g.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
-    gExe.performSteps(20)
+    #gExe = g.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
+    #gExe.performSteps(20)
 
 
 def main():
