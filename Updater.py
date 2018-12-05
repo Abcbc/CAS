@@ -36,7 +36,7 @@ class Updater:
 
             self.graph = Graph.calculateAttributes(self.graph)
 
-            self.graph.graph[Graph.KEY_VERSION] += 1
+            Graph.incrementVersion(self.graph)
 
             self.graphLogger.logRule(self.rules[ruleName])
 

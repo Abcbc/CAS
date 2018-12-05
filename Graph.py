@@ -120,3 +120,13 @@ def toPickle(graph, filename):
 
 def fromPickle(filename):
     return addConvenienceAttributes(nx.read_gpickle(filename))
+
+def getVersion(graph):
+    return graph.graph[KEY_VERSION]
+
+def setVersion(graph, version):
+    graph.graph[KEY_VERSION] = version
+
+def incrementVersion(graph):
+    graph.graph[KEY_VERSION] += 1
+    return getVersion(graph)
