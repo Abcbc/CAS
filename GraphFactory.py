@@ -1,7 +1,7 @@
 import copy
 import networkx as nx
 import random
-from Graph import KEY_OPINIONS, calculateAttributes, addConvenienceAttributes
+from Graph import KEY_OPINIONS, calculateAttributes, addConvenienceAttributes, setVersion
 import generators.actors as act
 
 NUMBER_OF_KEY_OPINIONS = 4
@@ -101,7 +101,9 @@ class GraphFactory:
 
             clusters.append(cluster)
 
-        return addConvenienceAttributes(calculateAttributes(self._connected(clusters)))
+        g = self._connected(clusters)
+        setVersion(g,0)
+        return addConvenienceAttributes(calculateAttributes(g))
 
 
 
