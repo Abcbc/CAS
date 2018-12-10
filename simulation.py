@@ -1,4 +1,5 @@
 import utils.ConfigLoader as cnf
+from ConvergensChecker import ConvergensChecker
 from GraphFactory import GraphFactory
 import networkx as nx
 
@@ -8,6 +9,7 @@ import Builder
 import Updater
 import GraphLog as gl
 import Rules
+import Analyser
 
 
 def run_simulation(simulation_setting):
@@ -18,11 +20,20 @@ def run_simulation(simulation_setting):
     updater = Updater.Updater()
     updater.setGraph(g)
 
+    convegens_checker = ConvergensChecker(simulation_setting)
+    analyser = Analyser.Analyser()
+    analyser.initAnalysis(g)
+
+
     for rulename, rule in Rules.getRuleset().items():
         rule.setParameters(simulation_setting['Rules'][rulename])
 
     for i in range(simulation_setting["sim_iterations"]):
         updater.update()
+        if convegens_checker.converges(analyser.onNewVersion(g)):
+            analyser.finishAnalysis(g)
+            break
+
 
     updater.close()
 
