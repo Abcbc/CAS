@@ -47,9 +47,9 @@ class TestGraphFactory(TestCase):
 
         settings = cnf.load_config()[0]  # get list of settings
         factory = gf.GraphFactory(settings)  # get specialized factory
+
         overlay_graph = factory.buildSingleGraph(factory.overlay_type, factory.num_of_clusters,
                                                  factory.overlay_initial_connections, factory.overlay_branch_probability)
-
         graph_list = []
         for idx in range(factory.num_of_clusters):
             graph_list.append(factory.buildSingleGraph(factory.graph_type, factory.num_of_nodes, factory.initial_connections, factory.branch_probability))

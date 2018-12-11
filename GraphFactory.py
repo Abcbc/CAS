@@ -39,8 +39,8 @@ class GraphFactory:
 
         # self.setup_type = SETUP_TYPE_DEFAULT
         # self.setup_type = SETUP_TYPE_MERGING
-        self.setup_type = SETUP_TYPE_DISSOCIATING
-        # self.setup_type = SETUP_TYPE_OVERLAY
+        # self.setup_type = SETUP_TYPE_DISSOCIATING
+        self.setup_type = SETUP_TYPE_OVERLAY
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
         self.con_likelihood = DEFAULT_CON_LIKELIHOOD
@@ -119,12 +119,23 @@ class GraphFactory:
         elif self.setup_type == SETUP_TYPE_DISSOCIATING:
             graph = self._build_dissociating_graph(self)
         elif self.setup_type == SETUP_TYPE_OVERLAY:
-            overlay = self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.branch_probability)
+            overlay = self.buildSingleGraph(self.overlay_type, self.num_of_clusters, self.overlay_initial_connections, self.overlay_branch_probability)
             overlay = self._apply_random_opinions(overlay)
+
+            graph_list = []
+            for idx in range(self.num_of_clusters):
+                subgraph = self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.initial_connections,
+                                          self.branch_probability)
+                subgraph = graph = self._apply_random_opinions(subgraph)
+                graph_list.append(subgraph)
+
+            graph = self.connect_clusters_by_overlay(overlay, graph_list)
+
             # graph = self.buildGraphsWithOverlay(overlay, self.num_of_clusters, self.num_of_nodes,
             #                                                self.initial_connections, self.branch_probability,
             #                                                self.pro_likelihood, self.con_likelihood,
             #                                                self.consense_indexes, self.number_of_interconnections)
+            # graph = overlay
         else:
             graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
                                                            self.initial_connections, self.branch_probability,
@@ -157,7 +168,8 @@ class GraphFactory:
         #                                            probability=self.branch_probability)
         g = self._create_clusters()
         setVersion(g, 1.0)
-        return addConvenienceAttributes(calculateAttributes(g))
+        g = addConvenienceAttributes(calculateAttributes(g))
+        return g
 
     @staticmethod
     def get_default_setup():
