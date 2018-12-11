@@ -28,14 +28,21 @@ class TestGraphFactory(TestCase):
         g = factory.create()
         print(factory._core_groups(g))
 
-    def test_get_merging_graphs_settings(self):
+    def test_merging_graphs_setup(self):
         settings = cnf.load_config()[0]  # get list of settings
         factory = gf.GraphFactory(settings)  # get specialized factory
-        g = factory.buildConnectedClustersToSpec(factory._get_merging_graphs_settings(10, 15))
+        g = factory.buildConnectedClustersToSpec(factory._get_merging_graphs_settings(10, 15), 7)
         nx.draw(g)
         plt.show()
 
-    def test_get_merging_graphs_settings(self):
+    def test_dissociating_graphs_setup(self):
+        settings = cnf.load_config()[0]  # get list of settings
+        factory = gf.GraphFactory(settings)  # get specialized factory
+        g = factory._build_dissociating_graph()
+        nx.draw(g)
+        plt.show()
+
+    def test_overlay_graphs_setup(self):
         settings = cnf.load_config()[0]  # get list of settings
         factory = gf.GraphFactory(settings)  # get specialized factory
         g = factory._build_dissociating_graph()

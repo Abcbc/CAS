@@ -7,7 +7,7 @@ import generators.actors as act
 NUMBER_OF_KEY_OPINIONS = 4
 LIST_OF_CONSENSE_INDEXES = [0, 2]
 DEFAULT_NUMBER_OF_ATTEMPTS = 100
-DEFAULT_NUMBER_OF_INTERCONNECTIONS = 3
+DEFAULT_NUMBER_OF_INTERCONNECTIONS = 5
 DEFAULT_PRO_LIKELIHOOD = 0.5
 DEFAULT_CON_LIKELIHOOD = 0.2
 
@@ -31,7 +31,7 @@ class GraphFactory:
         self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
         #missing in config
-        self.setup_type = SETUP_TYPE_DISSOCIATING
+        self.setup_type = SETUP_TYPE_MERGING
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
         self.con_likelihood = DEFAULT_CON_LIKELIHOOD
@@ -102,21 +102,23 @@ class GraphFactory:
     #     return subgraph
 
     def _create_clusters(self):
-        if self.setup_type == SETUP_TYPE_DEFAULT:
-            graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
-                                                           self.initial_connections, self.branch_probability, self.pro_likelihood, self.con_likelihood, self.consense_indexes, self.number_of_interconnections)
-        elif self.setup_type == SETUP_TYPE_MERGING:
-            graph = self.buildConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes))
+        if self.setup_type == SETUP_TYPE_MERGING:
+            graph = self.buildConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes), self.number_of_interconnections)
         elif self.setup_type == SETUP_TYPE_DISSOCIATING:
             graph = self._build_dissociating_graph()
+        else:
+            graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
+                                                           self.initial_connections, self.branch_probability,
+                                                           self.pro_likelihood, self.con_likelihood,
+                                                           self.consense_indexes, self.number_of_interconnections)
         # graph = self.actor_init_method(subgraph)
 
         return graph
 
 
-    def _connected(self, clusters, connection=1):
-        #TODO: all
-        return clusters[0]
+    # def _connected(self, clusters, connection=1):
+    #     #TODO: all
+    #     return clusters[0]
 
     def create(self):
         # TODO: all
@@ -170,7 +172,10 @@ class GraphFactory:
         if graph is None:
             return None
         for nodeId in graph.node:
-            graph.node[nodeId][KEY_OPINIONS] = [0, 0, 0, 0]
+            graph.node[nodeId][KEY_OPINIONS] = []
+            for opinion_index in range(NUMBER_OF_KEY_OPINIONS):
+                graph.node[nodeId][KEY_OPINIONS].append(0)
+
             for idx in range(NUMBER_OF_KEY_OPINIONS):
                 opinion = random.randint(-1, 1)
                 graph.node[nodeId][KEY_OPINIONS][idx] = opinion
@@ -211,9 +216,6 @@ class GraphFactory:
 
         i = 0;
         for nodeId in graph.node:
-            graph.node[nodeId][KEY_OPINIONS] = []
-            for opinion_index in range(NUMBER_OF_KEY_OPINIONS):
-                graph.node[nodeId][KEY_OPINIONS].append(0)
             for opinion_index in index_list:
                 if i % 2 == 0:
                     graph.node[nodeId][KEY_OPINIONS][opinion_index] = 1
@@ -312,11 +314,12 @@ class GraphFactory:
 
     def _build_dissociating_graph(self):
         graph = self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.initial_connections, self.branch_probability)
+        graph = self._apply_random_opinions(graph)
         graph = self._apply_alternating_opinions(graph, self.consense_indexes)
         return graph
 
     @staticmethod
-    def buildConnectedClustersToSpec(settings_dict):
+    def buildConnectedClustersToSpec(settings_dict, interconnections):
         """
         creates creates initialised connected clusters
         """
@@ -331,8 +334,8 @@ class GraphFactory:
             subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
             subgraph = GraphFactory._apply_opinions(subgraph, clusterList[cluster_id]['pro_likelihood'], clusterList[cluster_id]['con_likelihood'], clusterList[cluster_id]['consense_indexes'])
             subgraphs.append(subgraph)
-        # resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, 3)
-        resultGraph = GraphFactory.connect_clusters(subgraphs)
+        resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, interconnections)
+        # resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
 
     @staticmethod
@@ -365,31 +368,31 @@ class GraphFactory:
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, number_of_interconnections)
         return resultGraph
 
-    @staticmethod
-    def buildRandomConnectedClusters(type, numberOfClusters, numberOfNodesEach, numberOfInitialConnections, probability, pro_likelihood=0.3, con_likelihood=0.2, numberOfAttempts=100):
-        """
-        creates creates initialised connected clusters
-        """
-        subgraphs = []
-        i = 0
-
-        while i < numberOfClusters:
-            subgraph = None
-            if type == "Barabasi-Albert":
-                subgraph = nx.generators.barabasi_albert_graph(numberOfNodesEach, numberOfInitialConnections, seed = None)
-            elif type == "Watts-Strogatz":
-                subgraph = nx.generators.connected_watts_strogatz_graph(numberOfNodesEach, numberOfInitialConnections, probability, numberOfAttempts, seed = None)
-            elif type == "Powerlaw-Cluster":
-                subgraph = nx.powerlaw_cluster_graph(numberOfNodesEach, numberOfInitialConnections, probability, seed = None)
-            else:
-                subgraph = nx.generators.complete_graph(numberOfNodesEach)
-
-            subgraph = GraphFactory._apply_opinions(subgraph, pro_likelihood, con_likelihood, LIST_OF_CONSENSE_INDEXES)
-            subgraphs.append(subgraph)
-            i += 1
-
-        resultGraph = GraphFactory.connect_clusters(subgraphs)
-        return resultGraph
+    # @staticmethod
+    # def buildRandomConnectedClusters(type, numberOfClusters, numberOfNodesEach, numberOfInitialConnections, probability, pro_likelihood=0.3, con_likelihood=0.2, numberOfAttempts=100):
+    #     """
+    #     creates creates initialised connected clusters
+    #     """
+    #     subgraphs = []
+    #     i = 0
+    #
+    #     while i < numberOfClusters:
+    #         subgraph = None
+    #         if type == "Barabasi-Albert":
+    #             subgraph = nx.generators.barabasi_albert_graph(numberOfNodesEach, numberOfInitialConnections, seed = None)
+    #         elif type == "Watts-Strogatz":
+    #             subgraph = nx.generators.connected_watts_strogatz_graph(numberOfNodesEach, numberOfInitialConnections, probability, numberOfAttempts, seed = None)
+    #         elif type == "Powerlaw-Cluster":
+    #             subgraph = nx.powerlaw_cluster_graph(numberOfNodesEach, numberOfInitialConnections, probability, seed = None)
+    #         else:
+    #             subgraph = nx.generators.complete_graph(numberOfNodesEach)
+    #
+    #         subgraph = GraphFactory._apply_opinions(subgraph, pro_likelihood, con_likelihood, LIST_OF_CONSENSE_INDEXES)
+    #         subgraphs.append(subgraph)
+    #         i += 1
+    #
+    #     resultGraph = GraphFactory.connect_clusters(subgraphs)
+    #     return resultGraph
 
     def _core_groups(self, cluster):
         core_dict = nx.core_number(cluster)
