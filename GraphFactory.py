@@ -10,10 +10,15 @@ DEFAULT_NUMBER_OF_ATTEMPTS = 100
 DEFAULT_NUMBER_OF_INTERCONNECTIONS = 5
 DEFAULT_PRO_LIKELIHOOD = 0.5
 DEFAULT_CON_LIKELIHOOD = 0.2
-
+# experiment types
 SETUP_TYPE_DEFAULT = "default"
 SETUP_TYPE_MERGING = "merging"
 SETUP_TYPE_DISSOCIATING = "dissociating"
+SETUP_TYPE_OVERLAY = "overlay"
+# overlay network specifics
+DEFAULT_OVERLAY_TYPE = "Barabasi-Albert"
+DEFAULT_OVERLAY_INITIAL_CONNECTIONS = 3
+DEFAULT_OVERLAY_BRANCH_PROBABIITY = 0.9
 
 
 class GraphFactory:
@@ -31,12 +36,19 @@ class GraphFactory:
         self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
         #missing in config
-        self.setup_type = SETUP_TYPE_MERGING
+
+        # self.setup_type = SETUP_TYPE_DEFAULT
+        # self.setup_type = SETUP_TYPE_MERGING
+        self.setup_type = SETUP_TYPE_DISSOCIATING
+        # self.setup_type = SETUP_TYPE_OVERLAY
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
         self.con_likelihood = DEFAULT_CON_LIKELIHOOD
         self.consense_indexes = LIST_OF_CONSENSE_INDEXES
-
+        #overlay neteork specifics
+        self.overlay_type = DEFAULT_OVERLAY_TYPE
+        self.overlay_initial_connections = DEFAULT_OVERLAY_INITIAL_CONNECTIONS
+        self.overlay_branch_probability = DEFAULT_OVERLAY_BRANCH_PROBABIITY
 
     def _even(self, cluster):
         result = [0 for x in range(cluster)]
@@ -105,7 +117,14 @@ class GraphFactory:
         if self.setup_type == SETUP_TYPE_MERGING:
             graph = self.buildConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes), self.number_of_interconnections)
         elif self.setup_type == SETUP_TYPE_DISSOCIATING:
-            graph = self._build_dissociating_graph()
+            graph = self._build_dissociating_graph(self)
+        elif self.setup_type == SETUP_TYPE_OVERLAY:
+            overlay = self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.branch_probability)
+            overlay = self._apply_random_opinions(overlay)
+            # graph = self.buildGraphsWithOverlay(overlay, self.num_of_clusters, self.num_of_nodes,
+            #                                                self.initial_connections, self.branch_probability,
+            #                                                self.pro_likelihood, self.con_likelihood,
+            #                                                self.consense_indexes, self.number_of_interconnections)
         else:
             graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
                                                            self.initial_connections, self.branch_probability,
@@ -291,10 +310,11 @@ class GraphFactory:
         """
         inserts subgraphs as edges between given graphs into overlay
         """
-        cpy = copy.deepcopy(subgraphs)
+
         if subgraphs is None or len(subgraphs) == 0:
             return None
 
+        cpy = copy.deepcopy(subgraphs)
         result_graph = cpy.pop()
 
         number_overlay_nodes = nx.number_of_nodes(overlay_graph)
@@ -309,7 +329,32 @@ class GraphFactory:
             subgraph_node_idx = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
             result_graph.add_edge(onverlay_node_index, subgraph_node_idx)
             onverlay_node_index = (onverlay_node_index + 1) % number_overlay_nodes
+        return result_graph
 
+    @staticmethod
+    def connect_clusters_by_overlay(overlay_graph, subgraphs):
+        """
+        inserts subgraphs as edges between given graphs into overlay
+        """
+
+        if subgraphs is None or len(subgraphs) == 0:
+            return None
+
+        cpy = copy.deepcopy(subgraphs)
+        result_graph = cpy.pop()
+
+        number_overlay_nodes = nx.number_of_nodes(overlay_graph)
+        onverlay_node_index = 0
+        while len(cpy) > 0:
+            rand = random.randint(0, len(cpy) - 1)  # select subgraph to add
+            subgraph = cpy.pop(rand)
+            offset_to_new_nodes = nx.number_of_nodes(result_graph)
+            subgraph_number_of_nodes = nx.number_of_nodes(subgraph)
+            result_graph = nx.disjoint_union(result_graph, subgraph)
+            # connect by random edge connected to graph
+            subgraph_node_idx = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
+            result_graph.add_edge(onverlay_node_index, subgraph_node_idx)
+            onverlay_node_index = (onverlay_node_index + 1) % number_overlay_nodes
         return result_graph
 
     def _build_dissociating_graph(self):
@@ -367,6 +412,17 @@ class GraphFactory:
             subgraphs.append(subgraph)
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, number_of_interconnections)
         return resultGraph
+
+    @staticmethod
+    def buildGraphsWithOverlay(self):
+        overlay_graph = self.buildSingleGraph(self)
+        graph_list = []
+        for idx in range(self.num_of_clusters):
+            graph_list.append(
+                self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.initial_connections,
+                                      self.branch_probability))
+        graph = self.connect_clusters_by_overlay(overlay_graph, graph_list)
+        return graph
 
     # @staticmethod
     # def buildRandomConnectedClusters(type, numberOfClusters, numberOfNodesEach, numberOfInitialConnections, probability, pro_likelihood=0.3, con_likelihood=0.2, numberOfAttempts=100):

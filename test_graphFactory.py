@@ -43,8 +43,16 @@ class TestGraphFactory(TestCase):
         plt.show()
 
     def test_overlay_graphs_setup(self):
+        # ot = self.overlay_type
+
         settings = cnf.load_config()[0]  # get list of settings
         factory = gf.GraphFactory(settings)  # get specialized factory
-        g = factory._build_dissociating_graph()
+        overlay_graph = factory.buildSingleGraph(factory.overlay_type, factory.num_of_clusters,
+                                                 factory.overlay_initial_connections, factory.overlay_branch_probability)
+
+        graph_list = []
+        for idx in range(factory.num_of_clusters):
+            graph_list.append(factory.buildSingleGraph(factory.graph_type, factory.num_of_nodes, factory.initial_connections, factory.branch_probability))
+        g = factory.connect_clusters_by_overlay(overlay_graph, graph_list)
         nx.draw(g)
         plt.show()
