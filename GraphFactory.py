@@ -1,7 +1,7 @@
 import copy
 import networkx as nx
 import random
-from Graph import KEY_OPINIONS, calculateAttributes, addConvenienceAttributes
+from Graph import KEY_OPINIONS, calculateAttributes, addConvenienceAttributes, setVersion
 import generators.actors as act
 
 NUMBER_OF_KEY_OPINIONS = 4
@@ -23,8 +23,14 @@ class GraphFactory:
         self.num_of_cluster = sim_settings["graph_cluster"]
         self.opinion_factory = act.OpinionFactory(sim_settings)
         self.initial_connections = sim_settings["graph_init_connects"]
-        self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distrebution"])
+        self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
+        #missing in config
+        self.number_of_interconnections = 3
+        self. pro_likelihood = 0.7
+        self.con_likelihood = 0.2
+        self.consense_indexes = [0, 1]
+
 
     def _even(self, cluster):
         result = [0 for x in range(cluster)]
@@ -44,7 +50,9 @@ class GraphFactory:
         cluster_distribution_mapper = {
             "even": self._even,
             "linear": self._linear,
-            "_exponential": self._exponential
+            "exponential": self._exponential,
+            "alternating": self._apply_alternating_opinions,
+            "common_opinions": self._apply_specific_common_opinion
         }
 
         return cluster_distribution_mapper[methode]
@@ -78,30 +86,48 @@ class GraphFactory:
 
     def _create_cluster(self, type, num_of_nodes, initial_connections, probability):
         #TODO: Return 1 cluster
+        subgraph = nx.complete_graph(8)
+        if self.graph_type == "default":
+            # subgraph = nx.generators.barabasi_albert_graph(self.num_of_nodes, self.initial_connections, seed=None)
+            subgraph = self.buildConnectedClustersToSpec(self.get_default_settings())
 
-        subgraph = nx.generators.barabasi_albert_graph(self.num_of_nodes, self.initial_connections, seed=None)
-        subgraph = self.actor_init_method(subgraph)
+        # subgraph = self.actor_init_method(subgraph)
+
+        return subgraph
+
+    def _create_clusters(self):
+        #TODO: Return 1 cluster
+        if self.graph_type == "default":
+            subgraph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_cluster, self.num_of_nodes,
+                                                              self.initial_connections, self.branch_probability, self.pro_likelihood, self.con_likelihood, self.consense_indexes, self.number_of_interconnections)
+        # subgraph = self.actor_init_method(subgraph)
 
         return subgraph
 
 
     def _connected(self, clusters, connection=1):
-
+        #TODO: all
         return clusters[0]
 
     def create(self):
+        # TODO: all
+        # node_distrebution = self.node_distribution_method(self.num_of_cluster)
+        # clusters = []
 
-        node_distrebution = self.node_distribution_method(self.num_of_cluster)
-        clusters = []
+        # for nodes in node_distrebution:
+        #
+        #     cluster = self._create_cluster(type=self.graph_type, num_of_nodes=nodes, initial_connections=self.initial_connections,
+        #                                            probability=self.branch_probability)
+        #
+        #     clusters.append(cluster)
+        #
+        # g = self._connected(clusters)
 
-        for nodes in node_distrebution:
-
-            cluster = self._create_cluster(type=self.graph_type, num_of_nodes=nodes, initial_connections=self.initial_connections,
-                                                   probability=self.branch_probability)
-
-            clusters.append(cluster)
-
-        return addConvenienceAttributes(calculateAttributes(self._connected(clusters)))
+        # g = self._create_cluster(type=self.graph_type, num_of_nodes=10, initial_connections=self.initial_connections,
+        #                                            probability=self.branch_probability)
+        g = self._create_clusters()
+        setVersion(g, 1.0)
+        return addConvenienceAttributes(calculateAttributes(g))
 
 
 
@@ -113,10 +139,10 @@ class GraphFactory:
 
     @staticmethod
     def get_default_settings():
-        cluster0 = {'type': "Barabasi-Albert", 'number_of_nodes': 25, 'initial_connections': 3, 'probability':0.4, 'pro_likelihood': 0.7, 'con_likelihood': 0.1, 'consense_indexes': [0, 1]}
-        cluster1 = {'type': "Watts-Strogatz", 'number_of_nodes': 15, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.5, 'con_likelihood': 0.3, 'consense_indexes': [1, 2]}
-        cluster2 = {'type': "Powerlaw-Cluster", 'number_of_nodes': 5, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
-        cluster3 = {'type': "Barabasi-Albert", 'number_of_nodes': 5, 'initial_connections': 2, 'probability': 0.6,
+        cluster0 = {'type': "complete", 'number_of_nodes': 25, 'initial_connections': 3, 'probability':0.4, 'pro_likelihood': 0.7, 'con_likelihood': 0.1, 'consense_indexes': [0, 1]}
+        cluster1 = {'type': "complete", 'number_of_nodes': 15, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.5, 'con_likelihood': 0.3, 'consense_indexes': [1, 2]}
+        cluster2 = {'type': "complete", 'number_of_nodes': 10, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
+        cluster3 = {'type': "complete", 'number_of_nodes': 7, 'initial_connections': 2, 'probability': 0.6,
                     'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
         cluster_list = [cluster0, cluster1, cluster2, cluster3]
         settings_dict = {'clusterList': cluster_list}
@@ -131,7 +157,7 @@ class GraphFactory:
         return settings_dict
 
     @staticmethod
-    def apply_random_opinions(graph):
+    def _apply_random_opinions(graph):
         """
         assigns random opinions to all nodes
         """
@@ -145,7 +171,7 @@ class GraphFactory:
         return graph
 
     @staticmethod
-    def apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, opinion_index):
+    def _apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, opinion_index):
         """
         assigns opinions to graphs nodes, adhering to given likelihoods
         """
@@ -167,7 +193,7 @@ class GraphFactory:
         return graph
 
     @staticmethod
-    def apply_alternating_opinions(graph, index_list):
+    def _apply_alternating_opinions(graph, index_list):
         """
         assigns alternating values to graph's opinion indexes in given list
         """
@@ -196,10 +222,10 @@ class GraphFactory:
         """
         if graph is None:
             return None
-        graph = GraphFactory.apply_random_opinions(graph)
+        graph = GraphFactory._apply_random_opinions(graph)
 
         for idx in opinion_indexes:
-            graph = GraphFactory.apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, idx)
+            graph = GraphFactory._apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, idx)
 
 
         graph = calculateAttributes(graph)
@@ -211,23 +237,7 @@ class GraphFactory:
         """
         inserts edges between given graphs to create connected graph
         """
-        cpy = copy.deepcopy(graphs)
-        if graphs is None or len(graphs) == 0:
-            return None
-
-        result_graph = cpy.pop()
-        while len(cpy) > 0:
-            rand = random.randint(0, len(cpy)-1)    #select subgraph to add
-            subgraph = cpy.pop(rand)
-            offset_to_new_nodes = nx.number_of_nodes(result_graph)
-            subgraph_number_of_nodes = nx.number_of_nodes(subgraph)
-            result_graph = nx.disjoint_union(result_graph, subgraph)
-            #connect by random edge connected to graph
-            node_idx_1 = random.randint(0, offset_to_new_nodes - 1)
-            node_idx_2 = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
-            result_graph.add_edge(node_idx_1, node_idx_2)
-
-        return result_graph
+        return GraphFactory.connect_clusters_n_times(graphs, 1)
 
     @staticmethod
     def connect_clusters_n_times(graphs, number_of_times):
@@ -238,7 +248,11 @@ class GraphFactory:
         if graphs is None or len(graphs) == 0:
             return None
 
+        used_edges = []
+        current_edge = [-1, -1]
+        used_edges.append(current_edge)
         result_graph = cpy.pop()
+
         while len(cpy) > 0:
             rand = random.randint(0, len(cpy)-1)    #select subgraph to add
             subgraph = cpy.pop(rand)
@@ -247,15 +261,18 @@ class GraphFactory:
             result_graph = nx.disjoint_union(result_graph, subgraph)
             #connect by random edge connected to graph
 
-            used_edges = []
-            current_edge = [-1, -1]
+            node_idx_1 = 0
+            node_idx_2 = 0
             for i in range(number_of_times):
+
                 while current_edge in used_edges:
                     node_idx_1 = random.randint(0, offset_to_new_nodes - 1)
                     node_idx_2 = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
+                    current_edge = [node_idx_1, node_idx_2]
+                #
                 result_graph.add_edge(node_idx_1, node_idx_2)
-                used_edges.add([node_idx_1, node_idx_2])
-
+                used_edges.append(current_edge)
+        print(used_edges)
         return result_graph
 
     @staticmethod
@@ -304,9 +321,32 @@ class GraphFactory:
                 subgraph = nx.generators.complete_graph(clusterList[cluster_id]['number_of_nodes'])
             subgraph = GraphFactory.apply_opinions(subgraph, clusterList[cluster_id]['pro_likelihood'], clusterList[cluster_id]['con_likelihood'], clusterList[cluster_id]['consense_indexes'])
             subgraphs.append(subgraph)
+        # resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, 3)
         resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
 
+    @staticmethod
+    def buildEqualConnectedClustersToSpec(type, num_of_clusters, number_of_nodes, initial_connections, probability, pro_likelihood, con_likelihood, consense_indexes, number_of_interconnections):
+        """
+        creates creates initialised connected clusters
+        """
+        subgraphs = []
+
+        # clusterList = settings_dict['clusterList']
+        for cluster_id in range(num_of_clusters):
+            if type == "Barabasi-Albert":
+                subgraph = nx.generators.barabasi_albert_graph(number_of_nodes, initial_connections, seed=None)
+            elif type == "Watts-Strogatz":
+                subgraph = nx.generators.connected_watts_strogatz_graph(number_of_nodes, initial_connections, probability, DEFAULT_NUMBER_OF_ATTEMPTS, seed=None)
+            elif type == "Powerlaw-Cluster":
+                subgraph = nx.powerlaw_cluster_graph(number_of_nodes, initial_connections, probability, seed=None)
+            else:
+                subgraph = nx.generators.complete_graph(number_of_nodes)
+            subgraph = GraphFactory.apply_opinions(subgraph, pro_likelihood, con_likelihood, consense_indexes)
+            subgraphs.append(subgraph)
+        resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, number_of_interconnections)
+        # resultGraph = GraphFactory.connect_clusters(subgraphs)
+        return resultGraph
 
     @staticmethod
     def buildRandomConnectedClusters(type, numberOfClusters, numberOfNodesEach, numberOfInitialConnections, probability, pro_likelihood=0.3, con_likelihood=0.2, numberOfAttempts=100):
@@ -371,3 +411,15 @@ class GraphFactory:
             g2Idx = (nrG1nodes - 1) + random.randint(0, nrG2Nodes - 1)
             g.add_edge(g1Idx, g2Idx)
         return g
+
+    def _core_groups(self, cluster):
+        core_dict = nx.core_number(cluster)
+        # print(core_dict)
+        result_dict = {}.fromkeys(set(core_dict.values()), [])
+
+        for key in core_dict:
+            result_dict[core_dict[key]].append(key)
+
+        return result_dict
+
+

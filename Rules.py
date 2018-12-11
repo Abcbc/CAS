@@ -8,16 +8,6 @@ import numpy as np
 
 log = get_logger("Rule")
 
-def getRuleset():
-    return {
-        OrientationConfirmationRule.getName():OrientationConfirmationRule(),
-        AdaptationRule.getName():AdaptationRule(),
-        NewNodeRule.getName():NewNodeRule(),
-        NewEdgesRule.getName():NewEdgesRule(),
-        RemoveEdgeRule.getName():RemoveEdgeRule(),
-        TakeoverRule.getName():TakeoverRule(),
-        }
-
 class Rule:
     """
     Base class for implementing rules
@@ -436,3 +426,18 @@ class TakeoverRule(Rule):
     @staticmethod
     def getName():
         return 'TakeoverRule'
+
+"""
+Global ruleset. Created once, configured globally, accessed via getRuleset()
+"""
+ruleset = {
+        OrientationConfirmationRule.getName():OrientationConfirmationRule(),
+        AdaptationRule.getName():AdaptationRule(),
+        NewNodeRule.getName():NewNodeRule(),
+        NewEdgesRule.getName():NewEdgesRule(),
+        RemoveEdgeRule.getName():RemoveEdgeRule(),
+        TakeoverRule.getName():TakeoverRule(),
+        }
+
+def getRuleset():
+    return ruleset

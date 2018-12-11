@@ -1,7 +1,23 @@
 simulation_settings:
     group1:
         sim1:
-            sim_name: "some Simulationname"
+            sim_name: "2 CLuster Same opinion 20"
+            sim_iterations: 20
+        sim2:
+            sim_name: "2 CLuster Same opinion 20"
+            sim_iterations: 40
+        sim3:
+            sim_name: "2 CLuster Same opinion 20"
+            sim_iterations: 60
+        sim4:
+            sim_name: "2 CLuster Same opinion 20"
+            sim_iterations: 80
+        sim5:
+            sim_name: "2 CLuster Same opinion 20"
+            sim_iterations: 100
+
+
+        defaults:
             sim_iterations: 20
             sim_breaks: 2
             actor_complexity: 4
@@ -10,21 +26,23 @@ simulation_settings:
             graph_num_of_node: 10
             graph_init_connects: 2
             graph_branch_probability: 0.6
-            graph_cluster: 1
-            graph_cluster_distrebution: even
+            graph_cluster: 2
             graph_cluster_methods: default
-
-        defaults:
-            sim_iteration: 20
-            sim_breaks: 2
-            actor_complexity: 4
-            actor_method: random
-            graph_type: default
-            graph_num_of_node: 10
-            graph_init_connects: 2
-            graph_branch_probability: 0.6
-            graph_cluster: 1
-            graph_cluster_methods: default
+            graph_cluster_distribution: even
+            OrientationConfirmationRule:
+                fallbackProbability: 0.5
+            AdaptationRule:
+            NewNodeRule:
+                densityThreshold: 0.8
+                meanOrientationThreshold: 0.8
+                opMeanThreshold: 0.8
+            NewEdgesRule:
+                createEdgeProbability: 0.1
+            RemoveEdgeRule:
+                absOrientationThreshold: 0.1
+            TakeoverRule:
+                removalProbability: 0.5
+                minDifference: 1
 
     group2:
         sim3:
@@ -33,15 +51,31 @@ simulation_settings:
             sim_name: "some Simulationname4"
 
         defaults:
-            sim_iteration: 20
-            sim_breaks: 2
+            sim_iterations: 20
+            sim_breaks: 20
             actor_complexity: 4
             actor_method: random
             graph_type: default
             graph_num_of_node: 10
             graph_init_connects: 2
             graph_branch_probability: 0.6
-            graph_cluster: 1
+            graph_cluster: 2
             graph_cluster_methods: default
+            graph_cluster_distribution: even
+            OrientationConfirmationRule:
+                fallbackProbability: 0.5
+            AdaptationRule:
+            NewNodeRule:
+                densityThreshold: 0.8
+                meanOrientationThreshold: 0.8
+                opMeanThreshold: 0.8
+            NewEdgesRule:
+                createEdgeProbability: 0.1
+            RemoveEdgeRule:
+                absOrientationThreshold: 0.1
+            TakeoverRule:
+                removalProbability: 0.5
+                minDifference: 1
+
 
       
