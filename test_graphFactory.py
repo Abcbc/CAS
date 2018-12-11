@@ -31,6 +31,6 @@ class TestGraphFactory(TestCase):
     def test_get_merging_graphs_settings(self):
         settings = cnf.load_config()[0]  # get list of settings
         factory = gf.GraphFactory(settings)  # get specialized factory
-        g = factory.buildConnectedClustersToSpec(factory.get_merging_graphs_settings(10, 15))
+        g = factory.buildConnectedClustersToSpec(factory._get_merging_graphs_settings(10, 15))
         nx.draw(g)
         plt.show()
