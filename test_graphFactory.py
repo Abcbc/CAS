@@ -13,7 +13,7 @@ class TestGraphFactory(TestCase):
         assert(n != 0)
 
     def test_graph_building(self):
-        settings = cnf.load_config()[0]         #get list of settings
+        settings = cnf.load_config()[0]         #get list of settings; use first entry
         factory = gf.GraphFactory(settings)     #get specialized factory
         g = factory.create()                    #get graph
 
@@ -32,5 +32,12 @@ class TestGraphFactory(TestCase):
         settings = cnf.load_config()[0]  # get list of settings
         factory = gf.GraphFactory(settings)  # get specialized factory
         g = factory.buildConnectedClustersToSpec(factory._get_merging_graphs_settings(10, 15))
+        nx.draw(g)
+        plt.show()
+
+    def test_get_merging_graphs_settings(self):
+        settings = cnf.load_config()[0]  # get list of settings
+        factory = gf.GraphFactory(settings)  # get specialized factory
+        g = factory._build_dissociating_graph()
         nx.draw(g)
         plt.show()

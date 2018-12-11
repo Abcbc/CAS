@@ -31,6 +31,7 @@ class GraphFactory:
         self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
         #missing in config
+        self.setup_type = SETUP_TYPE_DISSOCIATING
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
         self.con_likelihood = DEFAULT_CON_LIKELIHOOD
@@ -89,24 +90,24 @@ class GraphFactory:
 
         return actor_method_mapper[method]
 
-    def _create_cluster(self, type, num_of_nodes, initial_connections, probability):
-        #TODO: Return 1 cluster
-        subgraph = nx.complete_graph(8)
-        if self.graph_type == "default":
-            # subgraph = nx.generators.barabasi_albert_graph(self.num_of_nodes, self.initial_connections, seed=None)
-            subgraph = self.buildConnectedClustersToSpec(self.get_default_settings())
-
-        # subgraph = self.actor_init_method(subgraph)
-
-        return subgraph
+    # def _create_cluster(self, type, num_of_nodes, initial_connections, probability):
+    #     #TODO: Return 1 cluster
+    #     subgraph = nx.complete_graph(8)
+    #     if self.graph_type == "default":
+    #         # subgraph = nx.generators.barabasi_albert_graph(self.num_of_nodes, self.initial_connections, seed=None)
+    #         subgraph = self.buildConnectedClustersToSpec(self.get_default_settings())
+    #
+    #     # subgraph = self.actor_init_method(subgraph)
+    #
+    #     return subgraph
 
     def _create_clusters(self):
-        if self.graph_type == SETUP_TYPE_DEFAULT:
+        if self.setup_type == SETUP_TYPE_DEFAULT:
             graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
                                                            self.initial_connections, self.branch_probability, self.pro_likelihood, self.con_likelihood, self.consense_indexes, self.number_of_interconnections)
-        elif self.graph_type == SETUP_TYPE_MERGING:
-            graph = self.buildEqualConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_clusters, self.num_of_clusters))
-        elif self.graph_type == SETUP_TYPE_DISSOCIATING:
+        elif self.setup_type == SETUP_TYPE_MERGING:
+            graph = self.buildConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes))
+        elif self.setup_type == SETUP_TYPE_DISSOCIATING:
             graph = self._build_dissociating_graph()
         # graph = self.actor_init_method(subgraph)
 
@@ -210,6 +211,9 @@ class GraphFactory:
 
         i = 0;
         for nodeId in graph.node:
+            graph.node[nodeId][KEY_OPINIONS] = []
+            for opinion_index in range(NUMBER_OF_KEY_OPINIONS):
+                graph.node[nodeId][KEY_OPINIONS].append(0)
             for opinion_index in index_list:
                 if i % 2 == 0:
                     graph.node[nodeId][KEY_OPINIONS][opinion_index] = 1
@@ -386,44 +390,6 @@ class GraphFactory:
 
         resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
-
-    @staticmethod
-    def buildWattsStrogatzGraph(g=None):
-        if g is None:
-            g = nx.generators.connected_watts_strogatz_graph(20, 5, 0.5, 100, seed=None)
-        return g
-
-    @staticmethod
-    def buildPowerlawClusterGraph(g=None):
-        if g is None:
-            g = nx.powerlaw_cluster_graph(20, 5, 0.7, seed=None)
-        return g
-
-    @staticmethod
-    def buildBarabasiAlbertGraph(g=None):
-        if g is None:
-            n = 20
-            m = 3
-            g = nx.generators.barabasi_albert_graph(n, m, seed=None)
-        return g
-
-    @staticmethod
-    def buildCompositeGraph(g=None):
-        """
-        Creates random clusters connected to each other
-        """
-        if g is None:
-            g1 = GraphFactory.buildBarabasiAlbertGraph()
-            nrG1nodes = g1.number_of_nodes()
-            g2 = GraphFactory.buildWattsStrogatzGraph()
-            nrG2Nodes = g2.number_of_nodes()
-
-            g = nx.disjoint_union(g1, g2)
-
-            g1Idx = random.randint(0, nrG1nodes - 1)
-            g2Idx = (nrG1nodes - 1) + random.randint(0, nrG2Nodes - 1)
-            g.add_edge(g1Idx, g2Idx)
-        return g
 
     def _core_groups(self, cluster):
         core_dict = nx.core_number(cluster)
