@@ -449,50 +449,12 @@ class GraphFactory:
 
         subgraphs = []
 
-        # clusterList = settings_dict['clusterList']
         for cluster_id in range(num_of_clusters):
             subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
             subgraph = GraphFactory._apply_opinions(subgraph, pro_likelihood, con_likelihood, consense_indexes)
             subgraphs.append(subgraph)
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, number_of_interconnections)
         return resultGraph
-
-    @staticmethod
-    def buildGraphsWithOverlay(self):
-        overlay_graph = self.buildSingleGraph(self)
-        graph_list = []
-        for idx in range(self.num_of_clusters):
-            graph_list.append(
-                self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.initial_connections,
-                                      self.branch_probability))
-        graph = self.connect_clusters_by_overlay(overlay_graph, graph_list)
-        return graph
-
-    # @staticmethod
-    # def buildRandomConnectedClusters(type, numberOfClusters, numberOfNodesEach, numberOfInitialConnections, probability, pro_likelihood=0.3, con_likelihood=0.2, numberOfAttempts=100):
-    #     """
-    #     creates creates initialised connected clusters
-    #     """
-    #     subgraphs = []
-    #     i = 0
-    #
-    #     while i < numberOfClusters:
-    #         subgraph = None
-    #         if type == "Barabasi-Albert":
-    #             subgraph = nx.generators.barabasi_albert_graph(numberOfNodesEach, numberOfInitialConnections, seed = None)
-    #         elif type == "Watts-Strogatz":
-    #             subgraph = nx.generators.connected_watts_strogatz_graph(numberOfNodesEach, numberOfInitialConnections, probability, numberOfAttempts, seed = None)
-    #         elif type == "Powerlaw-Cluster":
-    #             subgraph = nx.powerlaw_cluster_graph(numberOfNodesEach, numberOfInitialConnections, probability, seed = None)
-    #         else:
-    #             subgraph = nx.generators.complete_graph(numberOfNodesEach)
-    #
-    #         subgraph = GraphFactory._apply_opinions(subgraph, pro_likelihood, con_likelihood, LIST_OF_CONSENSE_INDEXES)
-    #         subgraphs.append(subgraph)
-    #         i += 1
-    #
-    #     resultGraph = GraphFactory.connect_clusters(subgraphs)
-    #     return resultGraph
 
     def _core_groups(self, cluster):
         core_dict = nx.core_number(cluster)
