@@ -12,6 +12,39 @@ class TestGraphFactory(TestCase):
 
         assert(n != 0)
 
+    def test_building_multiple_setups(self):
+        settings_list = cnf.load_config()
+
+        settings_merging = settings_list[0]                 #get list of settings; use first entry
+        factory_merging = gf.GraphFactory(settings_merging)     #get specialized factory
+        gm = factory_merging.create()                           #get graph
+        nx.draw(gm)
+        plt.show()
+
+        settings_dissociating = settings_list[1]
+        factory_dissociating = gf.GraphFactory(settings_dissociating)
+        gd = factory_dissociating.create()
+        nx.draw(gd)
+        plt.show()
+
+        settings_overlay = settings_list[2]
+        factory_overlay = gf.GraphFactory(settings_overlay)
+        go = factory_overlay.create()
+        nx.draw(go)
+        plt.show()
+
+        settings_default = settings_list[3]
+        factory_default = gf.GraphFactory(settings_default)
+        gdef = factory_default.create()
+        nx.draw(gdef)
+        plt.show()
+
+        self.assertTrue(gm != None)
+        self.assertTrue(gd != None)
+        self.assertTrue(go != None)
+        self.assertTrue(gdef != None)
+
+
     def test_graph_building(self):
         settings = cnf.load_config()[0]         #get list of settings; use first entry
         factory = gf.GraphFactory(settings)     #get specialized factory

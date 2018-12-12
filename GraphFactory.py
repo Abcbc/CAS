@@ -35,17 +35,18 @@ class GraphFactory:
         self.initial_connections = sim_settings["graph_init_connects"]
         self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
-        #missing in config
-
+        self.setup_type = sim_settings["setup_type"]
         # self.setup_type = SETUP_TYPE_DEFAULT
         # self.setup_type = SETUP_TYPE_MERGING
         # self.setup_type = SETUP_TYPE_DISSOCIATING
-        self.setup_type = SETUP_TYPE_OVERLAY
+        # self.setup_type = SETUP_TYPE_OVERLAY
+
+        # missing in config
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
         self.con_likelihood = DEFAULT_CON_LIKELIHOOD
         self.consense_indexes = LIST_OF_CONSENSE_INDEXES
-        #overlay neteork specifics
+        #overlay network specifics
         self.overlay_type = DEFAULT_OVERLAY_TYPE
         self.overlay_initial_connections = DEFAULT_OVERLAY_INITIAL_CONNECTIONS
         self.overlay_branch_probability = DEFAULT_OVERLAY_BRANCH_PROBABIITY
@@ -80,7 +81,6 @@ class GraphFactory:
     Actor Methods
     """
 
-
     def _random(self, cluster):
         nodes = cluster.node
 
@@ -113,23 +113,27 @@ class GraphFactory:
     #
     #     return subgraph
 
+    def _build_clusters_with_overlay(self):
+        overlay = self.buildSingleGraph(self.overlay_type, self.num_of_clusters, self.overlay_initial_connections,
+                                        self.overlay_branch_probability)
+        overlay = self._apply_random_opinions(overlay)
+
+        graph_list = []
+        for idx in range(self.num_of_clusters):
+            subgraph = self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.initial_connections,
+                                             self.branch_probability)
+            subgraph = graph = self._apply_random_opinions(subgraph)
+            graph_list.append(subgraph)
+
+        return self.connect_clusters_by_overlay(overlay, graph_list)
+
     def _create_clusters(self):
         if self.setup_type == SETUP_TYPE_MERGING:
             graph = self.buildConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes), self.number_of_interconnections)
         elif self.setup_type == SETUP_TYPE_DISSOCIATING:
-            graph = self._build_dissociating_graph(self)
+            graph = self._build_dissociating_graph()
         elif self.setup_type == SETUP_TYPE_OVERLAY:
-            overlay = self.buildSingleGraph(self.overlay_type, self.num_of_clusters, self.overlay_initial_connections, self.overlay_branch_probability)
-            overlay = self._apply_random_opinions(overlay)
-
-            graph_list = []
-            for idx in range(self.num_of_clusters):
-                subgraph = self.buildSingleGraph(self.graph_type, self.num_of_nodes, self.initial_connections,
-                                          self.branch_probability)
-                subgraph = graph = self._apply_random_opinions(subgraph)
-                graph_list.append(subgraph)
-
-            graph = self.connect_clusters_by_overlay(overlay, graph_list)
+            graph = self._build_clusters_with_overlay()
 
             # graph = self.buildGraphsWithOverlay(overlay, self.num_of_clusters, self.num_of_nodes,
             #                                                self.initial_connections, self.branch_probability,
