@@ -17,7 +17,7 @@ simulation_settings:
             overlay_branch_probability: 0.9
 
         sim4:
-            sim_name: "2 CLuster Same opinion 20"
+            sim_name: "several diverse_clusters"
             sim_iterations: 80
             setup_type: "diverse_clusters"
             subgraph_list:
@@ -44,7 +44,7 @@ simulation_settings:
                 consense_indexes: [3]
             number_of_interconnections: 3
         sim5:
-            sim_name: "2 CLuster Same opinion 20"
+            sim_name: "default setup"
             sim_iterations: 100
 
 

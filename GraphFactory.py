@@ -37,12 +37,8 @@ class GraphFactory:
         self.node_distribution_method = self.node_distribution_mapper(sim_settings["graph_cluster_distribution"])
         self.actor_init_method = self.actor_method_mapper(sim_settings["actor_method"])
         self.setup_type = sim_settings["setup_type"]
-        # self.setup_type = SETUP_TYPE_DEFAULT
-        # self.setup_type = SETUP_TYPE_MERGING
-        # self.setup_type = SETUP_TYPE_DISSOCIATING
-        # self.setup_type = SETUP_TYPE_OVERLAY
-        # self.subgraph_dict = self.get_default_settings()
         self.subgraph_list = sim_settings["subgraph_list"]
+        self.setup_method = self.setup_type_mapper(self.setup_type)
         # missing in config
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
@@ -66,6 +62,21 @@ class GraphFactory:
 
     def _exponential(self, cluster):
         return
+
+    def setup_type_mapper(self, setup_type):
+        """
+        Maps graph construction method to name
+        :param setup_type:
+        :return:    method
+        """
+        setup_type_map = {
+            SETUP_TYPE_DEFAULT: self.buildEqualConnectedClustersToSpec,
+            SETUP_TYPE_MERGING: self._buildConnectedClustersToSpec,
+            SETUP_TYPE_DISSOCIATING: self._build_dissociating_graph,
+            SETUP_TYPE_OVERLAY: self._build_clusters_with_overlay,
+            SETUP_TYPE_DIVERSE_CLUSTERS: self._buildConnectedClustersToSpecList,
+        }
+        return setup_type_map[setup_type]
 
     def node_distribution_mapper(self, methode):
         cluster_distribution_mapper = {
@@ -129,23 +140,8 @@ class GraphFactory:
 
         return self.connect_clusters_by_overlay(overlay, graph_list)
 
-    def _create_clusters(self):
-        if self.setup_type == SETUP_TYPE_MERGING:
-            graph = self.buildConnectedClustersToSpec(self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes), self.number_of_interconnections)
-        elif self.setup_type == SETUP_TYPE_DISSOCIATING:
-            graph = self._build_dissociating_graph()
-        elif self.setup_type == SETUP_TYPE_OVERLAY:
-            graph = self._build_clusters_with_overlay()
-        elif self.setup_type == SETUP_TYPE_DIVERSE_CLUSTERS:
-            graph = self.buildConnectedClustersToSpecList(self.subgraph_list, self.number_of_interconnections)
-            print("********* diverse ***********")
-        else:
-            graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
-                                                           self.initial_connections, self.branch_probability,
-                                                           self.pro_likelihood, self.con_likelihood,
-                                                           self.consense_indexes, self.number_of_interconnections)
-        # graph = self.actor_init_method(subgraph)
-
+    def create_graph_for_simulation(self):
+        graph = self.setup_method()
         return graph
 
 
@@ -169,26 +165,26 @@ class GraphFactory:
 
         # g = self._create_cluster(type=self.graph_type, num_of_nodes=10, initial_connections=self.initial_connections,
         #                                            probability=self.branch_probability)
-        g = self._create_clusters()
+        g = self.create_graph_for_simulation()
         setVersion(g, 1.0)
         g = addConvenienceAttributes(calculateAttributes(g))
         return g
 
     @staticmethod
     def get_default_setup():
-        graph = GraphFactory.buildConnectedClustersToSpec(GraphFactory.get_default_settings())
+        graph = GraphFactory._buildConnectedClustersToSpec(GraphFactory.get_default_settings())
         return graph
 
-    @staticmethod
-    def get_default_settings():
-        cluster0 = {'type': "complete", 'number_of_nodes': 25, 'initial_connections': 3, 'probability':0.4, 'pro_likelihood': 0.7, 'con_likelihood': 0.1, 'consense_indexes': [0, 1]}
-        cluster1 = {'type': "complete", 'number_of_nodes': 15, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.5, 'con_likelihood': 0.3, 'consense_indexes': [1, 2]}
-        cluster2 = {'type': "complete", 'number_of_nodes': 10, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
-        cluster3 = {'type': "complete", 'number_of_nodes': 7, 'initial_connections': 2, 'probability': 0.6,
-                    'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
-        cluster_list = [cluster0, cluster1, cluster2, cluster3]
-        settings_dict = {'clusterList': cluster_list}
-        return settings_dict
+    # @staticmethod
+    # def get_default_settings():
+    #     cluster0 = {'type': "complete", 'number_of_nodes': 25, 'initial_connections': 3, 'probability':0.4, 'pro_likelihood': 0.7, 'con_likelihood': 0.1, 'consense_indexes': [0, 1]}
+    #     cluster1 = {'type': "complete", 'number_of_nodes': 15, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.5, 'con_likelihood': 0.3, 'consense_indexes': [1, 2]}
+    #     cluster2 = {'type': "complete", 'number_of_nodes': 10, 'initial_connections': 2, 'probability': 0.6, 'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
+    #     cluster3 = {'type': "complete", 'number_of_nodes': 7, 'initial_connections': 2, 'probability': 0.6,
+    #                 'pro_likelihood': 0.2, 'con_likelihood': 0.1, 'consense_indexes': [3]}
+    #     cluster_list = [cluster0, cluster1, cluster2, cluster3]
+    #     settings_dict = {'clusterList': cluster_list}
+    #     return settings_dict
 
     @staticmethod
     def _get_merging_graphs_settings(cluster_a_size, cluster_b_size):
@@ -378,11 +374,14 @@ class GraphFactory:
         graph = self._apply_alternating_opinions(graph, self.consense_indexes)
         return graph
 
-    @staticmethod
-    def buildConnectedClustersToSpec(settings_dict, interconnections):
+    # @staticmethod
+    def _buildConnectedClustersToSpec(self):
         """
         creates creates initialised connected clusters
         """
+        # self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes), self.number_of_interconnections
+        settings_dict = self._get_merging_graphs_settings(self.num_of_nodes, self.num_of_nodes)
+        interconnections = self.number_of_interconnections
         subgraphs = []
 
         clusterList = settings_dict['clusterList']
@@ -399,11 +398,13 @@ class GraphFactory:
         # resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
 
-    @staticmethod
-    def buildConnectedClustersToSpecList(subgraph_List, num_of_interconnections):
+    def _buildConnectedClustersToSpecList(self):
         """
         creates creates initialised connected clusters
         """
+        subgraph_List = self.subgraph_list
+        num_of_interconnections = self.number_of_interconnections
+        num_of_interconnections = self.number_of_interconnections
         subgraphs_with_attributes = []
         for idx in range(len(subgraph_List)):
             type = subgraph_List[idx]['type']
@@ -432,11 +433,20 @@ class GraphFactory:
             graph = nx.generators.complete_graph(number_of_nodes)
         return graph
 
-    @staticmethod
-    def buildEqualConnectedClustersToSpec(type, num_of_clusters, number_of_nodes, initial_connections, probability, pro_likelihood, con_likelihood, consense_indexes, number_of_interconnections):
+    def buildEqualConnectedClustersToSpec(self):
         """
         creates creates initialised connected clusters
         """
+        type = self.graph_type
+        num_of_clusters = self.num_of_clusters
+        number_of_nodes = self.num_of_nodes
+        initial_connections = self.initial_connections
+        probability = self.branch_probability
+        pro_likelihood = self.pro_likelihood
+        con_likelihood = self.con_likelihood
+        consense_indexes = self.consense_indexes
+        number_of_interconnections = self.number_of_interconnections
+
         subgraphs = []
 
         # clusterList = settings_dict['clusterList']
