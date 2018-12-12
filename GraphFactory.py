@@ -15,6 +15,7 @@ SETUP_TYPE_DEFAULT = "default"
 SETUP_TYPE_MERGING = "merging"
 SETUP_TYPE_DISSOCIATING = "dissociating"
 SETUP_TYPE_OVERLAY = "overlay"
+SETUP_TYPE_DIVERSE_CLUSTERS = "diverse_clusters"
 # overlay network specifics
 DEFAULT_OVERLAY_TYPE = "Barabasi-Albert"
 DEFAULT_OVERLAY_INITIAL_CONNECTIONS = 3
@@ -40,7 +41,8 @@ class GraphFactory:
         # self.setup_type = SETUP_TYPE_MERGING
         # self.setup_type = SETUP_TYPE_DISSOCIATING
         # self.setup_type = SETUP_TYPE_OVERLAY
-
+        # self.subgraph_dict = self.get_default_settings()
+        self.subgraph_list = sim_settings["subgraph_list"]
         # missing in config
         self.number_of_interconnections = DEFAULT_NUMBER_OF_INTERCONNECTIONS
         self. pro_likelihood = DEFAULT_PRO_LIKELIHOOD
@@ -134,12 +136,9 @@ class GraphFactory:
             graph = self._build_dissociating_graph()
         elif self.setup_type == SETUP_TYPE_OVERLAY:
             graph = self._build_clusters_with_overlay()
-
-            # graph = self.buildGraphsWithOverlay(overlay, self.num_of_clusters, self.num_of_nodes,
-            #                                                self.initial_connections, self.branch_probability,
-            #                                                self.pro_likelihood, self.con_likelihood,
-            #                                                self.consense_indexes, self.number_of_interconnections)
-            # graph = overlay
+        elif self.setup_type == SETUP_TYPE_DIVERSE_CLUSTERS:
+            graph = self.buildConnectedClustersToSpecList(self.subgraph_list, self.number_of_interconnections)
+            print("********* diverse ***********")
         else:
             graph = self.buildEqualConnectedClustersToSpec(self.graph_type, self.num_of_clusters, self.num_of_nodes,
                                                            self.initial_connections, self.branch_probability,
@@ -387,6 +386,7 @@ class GraphFactory:
         subgraphs = []
 
         clusterList = settings_dict['clusterList']
+
         for cluster_id in range(len(clusterList)):
             type = clusterList[cluster_id]['type']
             number_of_nodes = clusterList[cluster_id]['number_of_nodes']
@@ -397,6 +397,24 @@ class GraphFactory:
             subgraphs.append(subgraph)
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, interconnections)
         # resultGraph = GraphFactory.connect_clusters(subgraphs)
+        return resultGraph
+
+    @staticmethod
+    def buildConnectedClustersToSpecList(subgraph_List, num_of_interconnections):
+        """
+        creates creates initialised connected clusters
+        """
+        subgraphs_with_attributes = []
+        for idx in range(len(subgraph_List)):
+            type = subgraph_List[idx]['type']
+            number_of_nodes = subgraph_List[idx]['number_of_nodes']
+            initial_connections = subgraph_List[idx]['initial_connections']
+            probability = subgraph_List[idx]['probability']
+            subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
+            subgraph = GraphFactory._apply_opinions(subgraph, subgraph_List[idx]['pro_likelihood'], subgraph_List[idx]['con_likelihood'], subgraph_List[idx]['consense_indexes'])
+            subgraphs_with_attributes.append(subgraph)
+        resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
+        # resultGraph = GraphFactory.connect_clusters(subgraphs_with_attributes)
         return resultGraph
 
     @staticmethod

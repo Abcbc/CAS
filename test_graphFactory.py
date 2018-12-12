@@ -5,17 +5,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 class TestGraphFactory(TestCase):
-    def test_get_default_setup(self):
-        # settingsDict = GraphFactory.get_default_settings()
-        n = gf.NUMBER_OF_KEY_OPINIONS
-        print(gf.NUMBER_OF_KEY_OPINIONS)
-
-        assert(n != 0)
 
     def test_building_multiple_setups(self):
-        settings_list = cnf.load_config()
+        settings_list = cnf.load_config()                       #get list of settings; use first entry
 
-        settings_merging = settings_list[0]                 #get list of settings; use first entry
+        settings_merging = settings_list[0]
         factory_merging = gf.GraphFactory(settings_merging)     #get specialized factory
         gm = factory_merging.create()                           #get graph
         nx.draw(gm)
@@ -33,7 +27,13 @@ class TestGraphFactory(TestCase):
         nx.draw(go)
         plt.show()
 
-        settings_default = settings_list[3]
+        settings_diverse_clusters = settings_list[3]
+        factory_diverse_clusters = gf.GraphFactory(settings_diverse_clusters)
+        gdiv = factory_diverse_clusters.create()
+        nx.draw(gdiv)
+        plt.show()
+
+        settings_default = settings_list[4]
         factory_default = gf.GraphFactory(settings_default)
         gdef = factory_default.create()
         nx.draw(gdef)
@@ -43,7 +43,16 @@ class TestGraphFactory(TestCase):
         self.assertTrue(gd != None)
         self.assertTrue(go != None)
         self.assertTrue(gdef != None)
+        self.assertTrue(gdiv != None)
 
+    def test_building_diverse_setup(self):
+        settings_list = cnf.load_config()
+        settings_diverse_clusters = settings_list[3]
+        factory_diverse_clusters = gf.GraphFactory(settings_diverse_clusters)
+        gdiv = factory_diverse_clusters.create()
+        nx.draw(gdiv)
+        plt.show()
+        self.assertTrue(gdiv != None)
 
     def test_graph_building(self):
         settings = cnf.load_config()[0]         #get list of settings; use first entry
@@ -89,3 +98,10 @@ class TestGraphFactory(TestCase):
         g = factory.connect_clusters_by_overlay(overlay_graph, graph_list)
         nx.draw(g)
         plt.show()
+
+    def test_get_default_setup(self):
+        # settingsDict = GraphFactory.get_default_settings()
+        n = gf.NUMBER_OF_KEY_OPINIONS
+        print(gf.NUMBER_OF_KEY_OPINIONS)
+
+        assert(n != 0)

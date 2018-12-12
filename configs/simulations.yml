@@ -1,26 +1,59 @@
 simulation_settings:
     group1:
         sim1:
-            sim_name: "2 CLuster Same opinion 20"
+            sim_name: "2 cluster Same opinion merging"
             sim_iterations: 20
             setup_type: "merging"
         sim2:
-            sim_name: "2 CLuster Same opinion 20"
+            sim_name: "2 cluster opposite opinions dissociating"
             sim_iterations: 40
             setup_type: "dissociating"
         sim3:
-            sim_name: "2 CLuster Same opinion 20"
+            sim_name: "clusters connected by overlay graph"
             sim_iterations: 60
             setup_type: "overlay"
+            overlay_type: "Barabasi-Albert"
+            overlay_initial_connections: 3
+            overlay_branch_probability: 0.9
+
         sim4:
             sim_name: "2 CLuster Same opinion 20"
             sim_iterations: 80
+            setup_type: "diverse_clusters"
+            subgraph_list:
+              - type: "complete"
+                number_of_nodes: 25
+                initial_connections: 3
+                probability: 0.4
+                pro_likelihood: 0.7
+                con_likelihood: 0.1
+                consense_indexes: [0, 1]
+              - type: "complete"
+                number_of_nodes: 15
+                initial_connections: 2
+                probability: 0.6
+                pro_likelihood: 0.
+                con_likelihood: 0.3
+                consense_indexes: [1, 2]
+              - type: "complete"
+                number_of_nodes: 10
+                initial_connections: 2
+                probability: 0.6
+                pro_likelihood: 0.2
+                con_likelihood: 0.1
+                consense_indexes: [3]
+            number_of_interconnections: 3
         sim5:
             sim_name: "2 CLuster Same opinion 20"
             sim_iterations: 100
 
 
         defaults:
+            number_of_interconnections: 0
+            subgraph_list: None
+            overlay_type: None
+            overlay_initial_connections: None
+            overlay_branch_probability: None
             setup_type: "default"
             sim_iterations: 20
             sim_breaks: 2
