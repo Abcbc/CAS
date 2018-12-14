@@ -39,11 +39,18 @@ class TestGraphFactory(TestCase):
         nx.draw(gdef)
         plt.show()
 
+        # settings_default = settings_list[5]
+        # factory_default = gf.GraphFactory(settings_default)
+        # gcore = factory_default.create()
+        # nx.draw(gcore)
+        # plt.show()
+
         self.assertTrue(gm != None)
         self.assertTrue(gd != None)
         self.assertTrue(go != None)
         self.assertTrue(gdef != None)
         self.assertTrue(gdiv != None)
+        # self.assertTrue(gcore != None)
 
     def test_building_diverse_setup(self):
         settings_list = cnf.load_config()

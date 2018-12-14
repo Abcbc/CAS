@@ -197,16 +197,37 @@ class GraphFactory:
         return settings_dict
 
     @staticmethod
+    def _clone_opinions_with_div(source_oppinions):
+        cloned_oppinions = copy.deepcopy(source_oppinions)
+        # set divergent oppinion
+        div_idx = random.randint(0, NUMBER_OF_KEY_OPINIONS)
+        cloned_oppinions[div_idx] = random.randint(-1, +1)
+        return cloned_oppinions
+
+    @staticmethod
+    def _apply_cloned_opinions_with_div(source_node, dest_node):
+        original_oppinions = source_node[KEY_OPINIONS]
+        dest_node[KEY_OPINIONS] = GraphFactory._clone_opinions_with_div(original_oppinions)
+        return dest_node
+
+    @staticmethod
+    def _create_random_oppinions():
+        opinions = []
+        for i in range(NUMBER_OF_KEY_OPINIONS):
+            opinions.append(random.randint(-1, 1))
+        return opinions
+
+    @staticmethod
     def _apply_random_opinions_to_node(node):
         """
         assigns random opinion to node
         """
 
-        opinions = []
-        for i in range(NUMBER_OF_KEY_OPINIONS):
-            opinions.append(random.randint(-1, 1))
+        # opinions = []
+        # for i in range(NUMBER_OF_KEY_OPINIONS):
+        #     opinions.append(random.randint(-1, 1))
 
-        node[KEY_OPINIONS] = opinions
+        node[KEY_OPINIONS] = GraphFactory._create_random_oppinions()
         return node
 
     @staticmethod
@@ -418,7 +439,6 @@ class GraphFactory:
         """
         subgraph_List = self.subgraph_list
         num_of_interconnections = self.number_of_interconnections
-        num_of_interconnections = self.number_of_interconnections
         subgraphs_with_attributes = []
         for idx in range(len(subgraph_List)):
             type = subgraph_List[idx]['type']
@@ -437,15 +457,34 @@ class GraphFactory:
         Creates clusters with opinions deviating with descending coreness
         :return: the resulting graph
         """
-    #     TODO: zusammenbau
-        return None
+        subgraph_List = self.subgraph_list
+        num_of_interconnections = self.number_of_interconnections
+        subgraphs_with_attributes = []
+        for idx in range(len(subgraph_List)):
+            type = subgraph_List[idx]['type']
+            number_of_nodes = subgraph_List[idx]['number_of_nodes']
+            initial_connections = subgraph_List[idx]['initial_connections']
+            probability = subgraph_List[idx]['probability']
+            subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
+            subgraph = GraphFactory._applyOpinionsUsingCoreness(subgraph)
+            subgraphs_with_attributes.append(subgraph)
+        resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
+        return resultGraph
 
-    def _applyOpinionsUsingCoreness(self, subgraph):
-        core_group_map = self._core_groups(subgraph)
+    def _applyOpinionsUsingCoreness(subgraph):
+        core_group_map = GraphFactory._core_groups(subgraph)
         descending_order_keylist = sorted(core_group_map, reverse=True)
-        for key in descending_order_keylist:
-            _apply_same_oppinion(same_coreness_list)
-        return dict
+
+        prev_oppinions = GraphFactory._create_random_oppinions()
+        for coreness_key in descending_order_keylist:
+            div_oppinions = GraphFactory._clone_opinions_with_div(prev_oppinions)
+            for node_idx in core_group_map[coreness_key]:
+                for idx in range(NUMBER_OF_KEY_OPINIONS):
+                    subgraph.node[node_idx][idx] = div_oppinions[idx]
+
+                # subgraph.node[node_idx] = div_oppinions
+            prev_oppinions = div_oppinions
+        return subgraph
 
     @staticmethod
     def buildSingleGraph(type, number_of_nodes, initial_connections, probability):
@@ -485,7 +524,7 @@ class GraphFactory:
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs, number_of_interconnections)
         return resultGraph
 
-    def _core_groups(self, cluster):
+    def _core_groups(cluster):
         """
         creates dictionary mapping lists of all node IDs to their coreness
 

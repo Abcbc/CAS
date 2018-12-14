@@ -47,6 +47,32 @@ simulation_settings:
             sim_name: "default setup"
             sim_iterations: 100
 
+        sim6:
+            sim_name: "several diverse_clusters"
+            sim_iterations: 80
+            setup_type: "coreness"
+            subgraph_list:
+            - type: "complete"
+              number_of_nodes: 25
+              initial_connections: 3
+              probability: 0.4
+              pro_likelihood: 0.7
+              con_likelihood: 0.1
+            - type: "complete"
+              number_of_nodes: 15
+              initial_connections: 2
+              probability: 0.6
+              pro_likelihood: 0.
+              con_likelihood: 0.3
+              consense_indexes: [1, 2]
+            - type: "complete"
+              number_of_nodes: 10
+              initial_connections: 2
+              probability: 0.6
+              pro_likelihood: 0.2
+              con_likelihood: 0.1
+              consense_indexes: [3]
+            number_of_interconnections: 3
 
         defaults:
             number_of_interconnections: 0
