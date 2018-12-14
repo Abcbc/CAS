@@ -16,6 +16,7 @@ SETUP_TYPE_MERGING = "merging"
 SETUP_TYPE_DISSOCIATING = "dissociating"
 SETUP_TYPE_OVERLAY = "overlay"
 SETUP_TYPE_DIVERSE_CLUSTERS = "diverse_clusters"
+SETUP_TYPE_DIVERSE_CORENESS = "coreness"
 # overlay network specifics
 DEFAULT_OVERLAY_TYPE = "Barabasi-Albert"
 DEFAULT_OVERLAY_INITIAL_CONNECTIONS = 3
@@ -75,6 +76,7 @@ class GraphFactory:
             SETUP_TYPE_DISSOCIATING: self._build_dissociating_graph,
             SETUP_TYPE_OVERLAY: self._build_clusters_with_overlay,
             SETUP_TYPE_DIVERSE_CLUSTERS: self._buildConnectedClustersToSpecList,
+            SETUP_TYPE_DIVERSE_CORENESS: self._buildClustersWithCoreness
         }
         return setup_type_map[setup_type]
 
@@ -195,6 +197,19 @@ class GraphFactory:
         return settings_dict
 
     @staticmethod
+    def _apply_random_opinions_to_node(node):
+        """
+        assigns random opinion to node
+        """
+
+        opinions = []
+        for i in range(NUMBER_OF_KEY_OPINIONS):
+            opinions.append(random.randint(-1, 1))
+
+        node[KEY_OPINIONS] = opinions
+        return node
+
+    @staticmethod
     def _apply_random_opinions(graph):
         """
         assigns random opinions to all nodes
@@ -202,35 +217,35 @@ class GraphFactory:
         if graph is None:
             return None
         for nodeId in graph.node:
-            graph.node[nodeId][KEY_OPINIONS] = []
-            for opinion_index in range(NUMBER_OF_KEY_OPINIONS):
-                graph.node[nodeId][KEY_OPINIONS].append(0)
-
-            for idx in range(NUMBER_OF_KEY_OPINIONS):
-                opinion = random.randint(-1, 1)
-                graph.node[nodeId][KEY_OPINIONS][idx] = opinion
+            GraphFactory._apply_random_opinions_to_node(graph.node[nodeId])
         return graph
+
+    @staticmethod
+    def _apply_specific_common_opinion_to_node(node, pro_likelihood, con_likelihood, opinion_index):
+        """
+        assigns opinions to node, adhering to given likelihoods
+        """
+        rand = random.uniform(0, 1)
+        if rand <= pro_likelihood:
+            node[KEY_OPINIONS][opinion_index] = 1
+        elif rand >= 1 - con_likelihood:
+            node[KEY_OPINIONS][opinion_index] = -1
+        else:
+            node[KEY_OPINIONS][opinion_index] = 0
+        return node
 
     @staticmethod
     def _apply_specific_common_opinion(graph, pro_likelihood, con_likelihood, opinion_index):
         """
         assigns opinions to graphs nodes, adhering to given likelihoods
         """
-
         opinion_index = opinion_index % NUMBER_OF_KEY_OPINIONS
         if graph is None:
             return None
         for nodeId in graph.node:
-            rand = random.uniform(0, 1)
-            if rand <= pro_likelihood:
-                graph.node[nodeId][KEY_OPINIONS][opinion_index] = 1
-            elif rand >= 1 - con_likelihood:
-                graph.node[nodeId][KEY_OPINIONS][opinion_index] = -1
-            else:
-                graph.node[nodeId][KEY_OPINIONS][opinion_index] = 0
-
+            node = graph.node[nodeId]
+            GraphFactory._apply_specific_common_opinion_to_node(node, pro_likelihood, con_likelihood, opinion_index)
         graph = calculateAttributes(graph)
-
         return graph
 
     @staticmethod
@@ -374,7 +389,6 @@ class GraphFactory:
         graph = self._apply_alternating_opinions(graph, self.consense_indexes)
         return graph
 
-    # @staticmethod
     def _buildConnectedClustersToSpec(self):
         """
         creates creates initialised connected clusters
@@ -418,6 +432,21 @@ class GraphFactory:
         # resultGraph = GraphFactory.connect_clusters(subgraphs_with_attributes)
         return resultGraph
 
+    def _buildClustersWithCoreness(self):
+        """
+        Creates clusters with opinions deviating with descending coreness
+        :return: the resulting graph
+        """
+    #     TODO: zusammenbau
+        return None
+
+    def _applyOpinionsUsingCoreness(self, subgraph):
+        core_group_map = self._core_groups(subgraph)
+        descending_order_keylist = sorted(core_group_map, reverse=True)
+        for key in descending_order_keylist:
+            _apply_same_oppinion(same_coreness_list)
+        return dict
+
     @staticmethod
     def buildSingleGraph(type, number_of_nodes, initial_connections, probability):
         """
@@ -457,6 +486,12 @@ class GraphFactory:
         return resultGraph
 
     def _core_groups(self, cluster):
+        """
+        creates dictionary mapping lists of all node IDs to their coreness
+
+        :param cluster: the evaluated graph
+        :return: node ID dictionary
+        """
         core_dict = nx.core_number(cluster)
         # print(core_dict)
         result_dict = {}.fromkeys(set(core_dict.values()), [])
