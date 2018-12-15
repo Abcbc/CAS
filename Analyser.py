@@ -1,16 +1,15 @@
 import Graph
 import networkx as nx
+import numpy as np
 
 class Metric:
     def calculate(self, graph):
         raise NotImplementedError('calculate method must be implemented by concrete metric class')
 
-    @staticmethod
-    def getMetricName():
+    def getMetricName(self):
         raise NotImplementedError('getMetricName method must be implemented by concrete metric class')
 
-    @staticmethod
-    def plot(x,y, plt):
+    def plot(self, plt, x,y, xlabel='version'):
         raise NotImplementedError('plot method must be implemented by concrete metric class')
 
 def plotLinear(plt, x, y, title, xlabel, ylabel):
@@ -23,25 +22,21 @@ class MetricGraphSize(Metric):
     def calculate(self, graph):
         return len(graph.nodes)
 
-    @staticmethod
-    def getMetricName():
+    def getMetricName(self):
         return 'GraphSize'
 
-    @staticmethod
-    def plot(plt, x,y, xlabel='version'):
-        plotLinear(plt, x, y, MetricGraphSize.getMetricName(), xlabel, 'Number of nodes')
+    def plot(self, plt, x,y, xlabel='version'):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Number of nodes')
 
 class MetricAvgClustering(Metric):
     def calculate(self, graph):
         return nx.average_clustering(graph)
 
-    @staticmethod
-    def getMetricName():
+    def getMetricName(self):
         return 'AverageClustering'
 
-    @staticmethod
-    def plot(plt, x,y, xlabel='version'):
-        plotLinear(plt, x, y, MetricAvgClustering.getMetricName(), xlabel, 'Clustering coefficient')
+    def plot(self, plt, x,y, xlabel='version'):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Clustering coefficient')
 
 defaultConfig = {
     'stepSize' : 10
