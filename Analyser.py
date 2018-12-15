@@ -38,6 +38,16 @@ class MetricAvgClustering(Metric):
     def plot(self, plt, x,y, xlabel='version'):
         plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Clustering coefficient')
 
+class MetricDensity(Metric):
+    def calculate(self, graph):
+        return nx.density(graph)
+
+    def getMetricName(self):
+        return 'Density'
+
+    def plot(self, plt, x,y, xlabel='version'):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Density')
+
 defaultConfig = {
     'stepSize' : 10
 }
@@ -45,6 +55,7 @@ defaultConfig = {
 availableMetrics = [
     MetricGraphSize(),
     MetricAvgClustering(),
+    MetricDensity(),
 ]
 
 class Analyser:
