@@ -48,6 +48,31 @@ class MetricDensity(Metric):
     def plot(self, plt, x,y, xlabel='version'):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Density')
 
+class MetricOpinionConsensus(Metric):
+    def __init__(self, topicIndex=None):
+        self.topicIndex = topicIndex if topicIndex is not None else 'All'
+
+    def _calcForTopic(self, graph, ind):
+        opinions = [graph.nodes[nid][Graph.KEY_OPINIONS][ind] for nid in graph.nodes]
+        numberPositive = np.sum(np.array(opinions) > 0)
+        numberNegative = np.sum(np.array(opinions) < 0)
+        return 1 - min(numberPositive,numberNegative)/max(numberPositive,numberNegative)
+
+    def calculate(self, graph):
+        consensus = []
+        topicIndex = self.topicIndex if self.topicIndex is not 'All' else list(range(len(graph.nodes[0][Graph.KEY_OPINIONS])))
+
+        for i in topicIndex:
+            consensus.append(self._calcForTopic(graph, i))
+
+        return np.mean(consensus)
+
+    def getMetricName(self):
+        return 'OpinionConsensus' + str(self.topicIndex)
+
+    def plot(self, plt, x,y, xlabel='version'):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Consensus')
+
 defaultConfig = {
     'stepSize' : 10
 }
@@ -56,6 +81,7 @@ availableMetrics = [
     MetricGraphSize(),
     MetricAvgClustering(),
     MetricDensity(),
+    MetricOpinionConsensus(),
 ]
 
 class Analyser:
