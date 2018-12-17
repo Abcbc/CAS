@@ -228,7 +228,7 @@ class GraphFactory:
     def _clone_opinions_with_div(source_oppinions):
         cloned_oppinions = copy.deepcopy(source_oppinions)
         # set divergent oppinion
-        div_idx = random.randint(0, NUMBER_OF_KEY_OPINIONS)
+        div_idx = random.randint(0, NUMBER_OF_KEY_OPINIONS) % NUMBER_OF_KEY_OPINIONS
         cloned_oppinions[div_idx] = random.randint(-1, +1)
         return cloned_oppinions
 
@@ -516,15 +516,15 @@ class GraphFactory:
     def _applyOpinionsUsingCoreness(graph):
         core_group_map = GraphFactory._core_groups(graph)
         descending_order_keylist = sorted(core_group_map, reverse=True)
-
         prev_oppinions = GraphFactory._create_random_oppinions()
+
         for coreness_key in descending_order_keylist:
             div_oppinions = GraphFactory._clone_opinions_with_div(prev_oppinions)
-            for node_idx in core_group_map[coreness_key]:
-                for idx in range(NUMBER_OF_KEY_OPINIONS):
-                    graph.node[node_idx][idx] = div_oppinions[idx]
+            print(div_oppinions)
 
-                # subgraph.node[node_idx] = div_oppinions
+            for node_idx in core_group_map[coreness_key]:
+                graph.node[node_idx][KEY_OPINIONS] = div_oppinions
+
             prev_oppinions = div_oppinions
 
         return graph

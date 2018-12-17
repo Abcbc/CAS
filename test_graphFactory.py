@@ -45,11 +45,11 @@ class TestGraphFactory(TestCase):
         nx.draw(gcore)
         plt.show()
 
-        settings_neu = settings_list[6]
-        factory_neu = gf.GraphFactory(settings_neu)
-        gneu = factory_neu.create()
-        nx.draw(gneu)
-        plt.show()
+        # settings_neu = settings_list[6]
+        # factory_neu = gf.GraphFactory(settings_neu)
+        # gneu = factory_neu.create()
+        # nx.draw(gneu)
+        # plt.show()
 
         # self.assertTrue(gm != None)
         # self.assertTrue(gd != None)
