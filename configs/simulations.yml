@@ -77,7 +77,7 @@ simulation_settings:
         sim7:
             sim_name: "custom"
             sim_iterations: 80
-            setup_type: "custom"
+            setup_type: "neu"
             overlay_type: "Barabasi-Albert"
             overlay_initial_connections: 3
             overlay_branch_probability: 0.9
@@ -90,11 +90,11 @@ simulation_settings:
                 con_likelihood: 0.1
                 consense_indexes: [3]
                 oppinion_distribution_type: "equal"
-              - type: "complete"
+              - type: "Powerlaw-Cluster"
                 number_of_nodes: 15
                 initial_connections: 2
                 probability: 0.6
-                pro_likelihood: 0.
+                pro_likelihood: 0.4
                 con_likelihood: 0.3
                 consense_indexes: [1, 2]
                 oppinion_distribution_type: "equal"
@@ -104,8 +104,8 @@ simulation_settings:
                 probability: 0.6
                 pro_likelihood: 0.2
                 con_likelihood: 0.1
-                consense_indexes: [3]
-                oppinion_distribution_type: "equal"
+                fixed_oppinion_list: [3, 4, 5, 1]
+                oppinion_distribution_type: "fixed"
                 number_of_interconnections: 3
 
         defaults:

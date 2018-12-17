@@ -9,47 +9,53 @@ class TestGraphFactory(TestCase):
     def test_building_multiple_setups(self):
         settings_list = cnf.load_config()                       #get list of settings; use first entry
 
-        settings_merging = settings_list[0]
-        factory_merging = gf.GraphFactory(settings_merging)     #get specialized factory
-        gm = factory_merging.create()                           #get graph
-        nx.draw(gm)
-        plt.show()
-
-        settings_dissociating = settings_list[1]
-        factory_dissociating = gf.GraphFactory(settings_dissociating)
-        gd = factory_dissociating.create()
-        nx.draw(gd)
-        plt.show()
-
-        settings_overlay = settings_list[2]
-        factory_overlay = gf.GraphFactory(settings_overlay)
-        go = factory_overlay.create()
-        nx.draw(go)
-        plt.show()
-
-        settings_diverse_clusters = settings_list[3]
-        factory_diverse_clusters = gf.GraphFactory(settings_diverse_clusters)
-        gdiv = factory_diverse_clusters.create()
-        nx.draw(gdiv)
-        plt.show()
-
-        settings_default = settings_list[4]
-        factory_default = gf.GraphFactory(settings_default)
-        gdef = factory_default.create()
-        nx.draw(gdef)
-        plt.show()
-
-        # settings_default = settings_list[5]
+        # settings_merging = settings_list[0]
+        # factory_merging = gf.GraphFactory(settings_merging)     #get specialized factory
+        # gm = factory_merging.create()                           #get graph
+        # nx.draw(gm)
+        # plt.show()
+        #
+        # settings_dissociating = settings_list[1]
+        # factory_dissociating = gf.GraphFactory(settings_dissociating)
+        # gd = factory_dissociating.create()
+        # nx.draw(gd)
+        # plt.show()
+        #
+        # settings_overlay = settings_list[2]
+        # factory_overlay = gf.GraphFactory(settings_overlay)
+        # go = factory_overlay.create()
+        # nx.draw(go)
+        # plt.show()
+        #
+        # settings_diverse_clusters = settings_list[3]
+        # factory_diverse_clusters = gf.GraphFactory(settings_diverse_clusters)
+        # gdiv = factory_diverse_clusters.create()
+        # nx.draw(gdiv)
+        # plt.show()
+        #
+        # settings_default = settings_list[4]
         # factory_default = gf.GraphFactory(settings_default)
-        # gcore = factory_default.create()
-        # nx.draw(gcore)
+        # gdef = factory_default.create()
+        # nx.draw(gdef)
         # plt.show()
 
-        self.assertTrue(gm != None)
-        self.assertTrue(gd != None)
-        self.assertTrue(go != None)
-        self.assertTrue(gdef != None)
-        self.assertTrue(gdiv != None)
+        settings_default = settings_list[5]
+        factory_default = gf.GraphFactory(settings_default)
+        gcore = factory_default.create()
+        nx.draw(gcore)
+        plt.show()
+
+        settings_neu = settings_list[6]
+        factory_neu = gf.GraphFactory(settings_neu)
+        gneu = factory_neu.create()
+        nx.draw(gneu)
+        plt.show()
+
+        # self.assertTrue(gm != None)
+        # self.assertTrue(gd != None)
+        # self.assertTrue(go != None)
+        # self.assertTrue(gdef != None)
+        # self.assertTrue(gdiv != None)
         # self.assertTrue(gcore != None)
 
     def test_building_diverse_setup(self):

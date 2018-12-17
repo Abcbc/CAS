@@ -18,12 +18,18 @@ SETUP_TYPE_OVERLAY = "overlay"
 SETUP_TYPE_DIVERSE_CLUSTERS = "diverse_clusters"
 SETUP_TYPE_DIVERSE_CORENESS = "coreness"
 SETUP_TYPE_DETAILED = "custom"
+SETUP_TYPE_DIVERSE_CLUSTERS_NEU = "neu"
 # overlay network specifics
 DEFAULT_OVERLAY_TYPE = "Barabasi-Albert"
 DEFAULT_OVERLAY_INITIAL_CONNECTIONS = 3
 DEFAULT_OVERLAY_BRANCH_PROBABIITY = 0.9
 # graph specifics
 GRAPH_TYPE = "type"
+GRAPH_TYPE_BARABASI = "Barabasi-Albert"
+GRAPH_TYPE_WATTS_STROGATZ = "Watts-Strogatz"
+GRAPH_TYPE_POWERLAW = "Powerlaw-Cluster"
+
+
 GRAPH_NUMBER_OF_NODES = "number_of_nodes"
 GRAPH_NUMBER_OF_INITIAL_CONNECTIONS = "initial_connections"
 GRAPH_PRO_LIKELIHOOD = "pro_likelihood"
@@ -31,10 +37,13 @@ GRAPH_CON_LIKELIHOOD = "con_likelihood"
 GRAPH_BRANCH_PROBABILITY = "probability"
 GRAPH_OPPINION_DISTRIBUTION_TYPE = "oppinion_distribution_type"
 GRAPH_CONSENSE_INDEXES = "consense_indexes"
+GRAPH_OPPINION_FIXED_LIST = "fixed_oppinion_list"
+
 #oppinion_distributions
 OPPINION_DISTRIBUTION_RANDOM = "random"
 OPPINION_DISTRIBUTION_SPECIFIC = "detailed"
 OPPINION_DISTRIBUTION_ALTERNATING = "alternating"
+OPPINION_DISTRIBUTION_FIXED = "fixed"
 
 class GraphFactory:
     """
@@ -89,6 +98,7 @@ class GraphFactory:
             SETUP_TYPE_DISSOCIATING: self._build_dissociating_graph,
             SETUP_TYPE_OVERLAY: self._build_clusters_with_overlay,
             SETUP_TYPE_DIVERSE_CLUSTERS: self._buildConnectedClustersToSpecList,
+            SETUP_TYPE_DIVERSE_CLUSTERS_NEU: self.neu_buildConnectedClustersToSpecList,
             SETUP_TYPE_DIVERSE_CORENESS: self._buildClustersWithCoreness,
             SETUP_TYPE_DETAILED: self._build_graphs_to_detailed_description
         }
@@ -450,19 +460,31 @@ class GraphFactory:
         """
         creates creates initialised connected clusters
         """
-        subgraph_List = self.subgraph_list
+        subgraph_list = self.subgraph_list
         num_of_interconnections = self.number_of_interconnections
         subgraphs_with_attributes = []
-        for idx in range(len(subgraph_List)):
-            type = subgraph_List[idx]['type']
-            number_of_nodes = subgraph_List[idx]['number_of_nodes']
-            initial_connections = subgraph_List[idx]['initial_connections']
-            probability = subgraph_List[idx]['probability']
+        for idx in range(len(subgraph_list)):
+            type = subgraph_list[idx]['type']
+            number_of_nodes = subgraph_list[idx]['number_of_nodes']
+            initial_connections = subgraph_list[idx]['initial_connections']
+            probability = subgraph_list[idx]['probability']
             subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
-            subgraph = GraphFactory._apply_opinions(subgraph, subgraph_List[idx]['pro_likelihood'], subgraph_List[idx]['con_likelihood'], subgraph_List[idx]['consense_indexes'])
+            subgraph = GraphFactory._apply_opinions(subgraph, subgraph_list[idx]['pro_likelihood'], subgraph_list[idx]['con_likelihood'], subgraph_list[idx]['consense_indexes'])
             subgraphs_with_attributes.append(subgraph)
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
-        # resultGraph = GraphFactory.connect_clusters(subgraphs_with_attributes)
+        return resultGraph
+
+    def neu_buildConnectedClustersToSpecList(self):
+        """
+        creates creates initialised connected clusters
+        """
+        subgraph_list = self.subgraph_list
+        num_of_interconnections = self.number_of_interconnections
+        subgraphs_with_attributes = []
+        for idx in range(len(subgraph_list)):
+            subgraph = GraphFactory.build_single_graph_with_oppinions(subgraph_list[idx])
+            subgraphs_with_attributes.append(subgraph)
+        resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
         return resultGraph
 
     def _buildClustersWithCoreness(self):
@@ -482,10 +504,17 @@ class GraphFactory:
             subgraph = GraphFactory._applyOpinionsUsingCoreness(subgraph)
             subgraphs_with_attributes.append(subgraph)
         resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
+
         return resultGraph
 
-    def _applyOpinionsUsingCoreness(subgraph):
-        core_group_map = GraphFactory._core_groups(subgraph)
+    @staticmethod
+    def _apply_fixed_oppinions(graph, graph_dict):
+        for i in range(nx.number_of_nodes(graph)):
+            graph.nodes()[i][KEY_OPINIONS] = graph_dict[OPPINION_DISTRIBUTION_FIXED]
+
+    @staticmethod
+    def _applyOpinionsUsingCoreness(graph):
+        core_group_map = GraphFactory._core_groups(graph)
         descending_order_keylist = sorted(core_group_map, reverse=True)
 
         prev_oppinions = GraphFactory._create_random_oppinions()
@@ -493,11 +522,12 @@ class GraphFactory:
             div_oppinions = GraphFactory._clone_opinions_with_div(prev_oppinions)
             for node_idx in core_group_map[coreness_key]:
                 for idx in range(NUMBER_OF_KEY_OPINIONS):
-                    subgraph.node[node_idx][idx] = div_oppinions[idx]
+                    graph.node[node_idx][idx] = div_oppinions[idx]
 
                 # subgraph.node[node_idx] = div_oppinions
             prev_oppinions = div_oppinions
-        return subgraph
+
+        return graph
 
     @staticmethod
     def buildSingleGraph(type, number_of_nodes, initial_connections, probability):
@@ -522,11 +552,15 @@ class GraphFactory:
             graph = GraphFactory._apply_opinions(graph, graph_dict[GRAPH_PRO_LIKELIHOOD], graph_dict[GRAPH_CON_LIKELIHOOD], graph_dict[GRAPH_CONSENSE_INDEXES])
         elif distr_type == OPPINION_DISTRIBUTION_ALTERNATING:
             graph = GraphFactory._apply_alternating_opinions(graph, graph_dict[GRAPH_CONSENSE_INDEXES])
+        elif distr_type == GRAPH_OPPINION_FIXED_LIST:
+            graph = GraphFactory._apply_fixed_oppinions(graph, graph_dict[GRAPH_OPPINION_FIXED_LIST])
+        else:
+            graph = GraphFactory._apply_random_opinions(graph)
         return graph
 
 
     @staticmethod
-    def buildSingleGraphWithOppinions(graph_dict):
+    def build_single_graph_with_oppinions(graph_dict):
         """
         creates creates initialised connected clusters
         """
@@ -534,17 +568,18 @@ class GraphFactory:
         number_of_nodes = graph_dict[GRAPH_NUMBER_OF_NODES]
         initial_connections = graph_dict[GRAPH_NUMBER_OF_INITIAL_CONNECTIONS]
         probability = graph_dict[GRAPH_BRANCH_PROBABILITY]
-        distribution_type = GRAPH_OPPINION_DISTRIBUTION_TYPE
-
-        if type == "Barabasi-Albert":
+        if type == GRAPH_TYPE_BARABASI:
             graph = nx.generators.barabasi_albert_graph(number_of_nodes, initial_connections, seed=None)
-        elif type == "Watts-Strogatz":
+        elif type == GRAPH_TYPE_WATTS_STROGATZ:
             graph = nx.generators.connected_watts_strogatz_graph(number_of_nodes, initial_connections, probability, DEFAULT_NUMBER_OF_ATTEMPTS, seed=None)
-        elif type == "Powerlaw-Cluster":
+        elif type == GRAPH_TYPE_POWERLAW:
             graph = nx.powerlaw_cluster_graph(number_of_nodes, initial_connections, probability, seed=None)
         else:
             graph = nx.generators.complete_graph(number_of_nodes)
         graph = GraphFactory._set_oppinins(graph, graph_dict)
+
+        # graph = GraphFactory._set_oppinins(graph, graph_dict)
+
         return graph
 
     def buildEqualConnectedClustersToSpec(self):
