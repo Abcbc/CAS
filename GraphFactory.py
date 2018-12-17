@@ -107,7 +107,7 @@ class GraphFactory:
             SETUP_TYPE_MERGING: self._build_merging_graphs,
             SETUP_TYPE_DISSOCIATING: self._build_dissociating_graph,
             SETUP_TYPE_OVERLAY: self._build_clusters_with_overlay,
-            # SETUP_TYPE_DIVERSE_CLUSTERS: self._buildConnectedClustersToSpecList,
+            SETUP_TYPE_DIVERSE_CLUSTERS: self._buildConnectedClustersToSpecList,
             SETUP_TYPE_DIVERSE_CLUSTERS_NEU: self.neu_buildConnectedClustersToSpecList,
             SETUP_TYPE_DIVERSE_CORENESS: self._buildClustersWithCoreness,
         }
@@ -470,23 +470,23 @@ class GraphFactory:
         # resultGraph = GraphFactory.connect_clusters(subgraphs)
         return resultGraph
 
-    # def _buildConnectedClustersToSpecList(self):
-    #     """
-    #     creates creates initialised connected clusters
-    #     """
-    #     subgraph_list = self.subgraph_list
-    #     num_of_interconnections = self.number_of_interconnections
-    #     subgraphs_with_attributes = []
-    #     for idx in range(len(subgraph_list)):
-    #         type = subgraph_list[idx]['type']
-    #         number_of_nodes = subgraph_list[idx]['number_of_nodes']
-    #         initial_connections = subgraph_list[idx]['initial_connections']
-    #         probability = subgraph_list[idx]['probability']
-    #         subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
-    #         subgraph = GraphFactory._apply_opinions(subgraph, subgraph_list[idx]['pro_likelihood'], subgraph_list[idx]['con_likelihood'], subgraph_list[idx]['consense_indexes'])
-    #         subgraphs_with_attributes.append(subgraph)
-    #     resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
-    #     return resultGraph
+    def _buildConnectedClustersToSpecList(self):
+        """
+        creates creates initialised connected clusters
+        """
+        subgraph_list = self.subgraph_list
+        num_of_interconnections = self.number_of_interconnections
+        subgraphs_with_attributes = []
+        for idx in range(len(subgraph_list)):
+            type = subgraph_list[idx]['type']
+            number_of_nodes = subgraph_list[idx]['number_of_nodes']
+            initial_connections = subgraph_list[idx]['initial_connections']
+            probability = subgraph_list[idx]['probability']
+            subgraph = GraphFactory.buildSingleGraph(type, number_of_nodes, initial_connections, probability)
+            subgraph = GraphFactory._apply_opinions(subgraph, subgraph_list[idx]['pro_likelihood'], subgraph_list[idx]['con_likelihood'], subgraph_list[idx]['consense_indexes'])
+            subgraphs_with_attributes.append(subgraph)
+        resultGraph = GraphFactory.connect_clusters_n_times(subgraphs_with_attributes, num_of_interconnections)
+        return resultGraph
 
     def neu_buildConnectedClustersToSpecList(self):
         """

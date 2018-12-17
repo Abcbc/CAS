@@ -75,10 +75,10 @@ simulation_settings:
             number_of_interconnections: 3
 
         sim7:
-            sim_name: "custom"
+            sim_name: "overlay_neu"
             sim_iterations: 80
-            setup_type: "neu"
-            overlay_type: "Barabasi-Albert"
+            setup_type: "overlay"
+            overlay_type: "Watts-Strogatz"
             overlay_oppinion_list: [1, 1, 1, 1]
             overlay_initial_connections: 3
             overlay_branch_probability: 0.9
