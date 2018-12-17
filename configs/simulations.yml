@@ -79,6 +79,7 @@ simulation_settings:
             sim_iterations: 80
             setup_type: "neu"
             overlay_type: "Barabasi-Albert"
+            overlay_oppinion_list: [1, 1, 1, 1]
             overlay_initial_connections: 3
             overlay_branch_probability: 0.9
             subgraph_list:

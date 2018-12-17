@@ -21,11 +21,11 @@ class TestGraphFactory(TestCase):
         # nx.draw(gd)
         # plt.show()
         #
-        # settings_overlay = settings_list[2]
-        # factory_overlay = gf.GraphFactory(settings_overlay)
-        # go = factory_overlay.create()
-        # nx.draw(go)
-        # plt.show()
+        settings_overlay = settings_list[2]
+        factory_overlay = gf.GraphFactory(settings_overlay)
+        go = factory_overlay.create()
+        nx.draw(go)
+        plt.show()
         #
         # settings_diverse_clusters = settings_list[3]
         # factory_diverse_clusters = gf.GraphFactory(settings_diverse_clusters)
@@ -71,7 +71,6 @@ class TestGraphFactory(TestCase):
         settings = cnf.load_config()[0]         #get list of settings; use first entry
         factory = gf.GraphFactory(settings)     #get specialized factory
         g = factory.create()                    #get graph
-
         nx.draw(g)
         plt.show()
 
