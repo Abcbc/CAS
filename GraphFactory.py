@@ -30,10 +30,12 @@ GRAPH_PRO_LIKELIHOOD = "pro_likelihood"
 GRAPH_CON_LIKELIHOOD = "con_likelihood"
 GRAPH_BRANCH_PROBABILITY = "probability"
 GRAPH_OPPINION_DISTRIBUTION_TYPE = "oppinion_distribution_type"
+GRAPH_CONSENSE_INDEXES = "consense_indexes"
 #oppinion_distributions
 OPPINION_DISTRIBUTION_RANDOM = "random"
 OPPINION_DISTRIBUTION_SPECIFIC = "detailed"
 OPPINION_DISTRIBUTION_ALTERNATING = "alternating"
+
 class GraphFactory:
     """
     Verteilungs methoden.
@@ -92,16 +94,16 @@ class GraphFactory:
         }
         return setup_type_map[setup_type]
 
-    # def node_distribution_mapper(self, methode):
-    #     cluster_distribution_mapper = {
-    #         "even": self._even,
-    #         "linear": self._linear,
-    #         "exponential": self._exponential,
-    #         "alternating": self._apply_alternating_opinions,
-    #         "common_opinions": self._apply_specific_common_opinion
-    #     }
-    #
-    #     return cluster_distribution_mapper[methode]
+    def node_distribution_mapper(self, methode):
+        cluster_distribution_mapper = {
+            "even": self._even,
+            "linear": self._linear,
+            "exponential": self._exponential,
+            "alternating": self._apply_alternating_opinions,
+            "common_opinions": self._apply_specific_common_opinion
+        }
+
+        return cluster_distribution_mapper[methode]
 
 
     """
@@ -514,10 +516,12 @@ class GraphFactory:
 
     # test
     @staticmethod
-    def _apply_oppinins(graph, graph_dict):
+    def _set_oppinins(graph, graph_dict):
         distr_type = graph_dict[GRAPH_OPPINION_DISTRIBUTION_TYPE]
         if distr_type == OPPINION_DISTRIBUTION_SPECIFIC:
-            graph = GraphFactory._apply_opinions(graph, graph_dict[GR])
+            graph = GraphFactory._apply_opinions(graph, graph_dict[GRAPH_PRO_LIKELIHOOD], graph_dict[GRAPH_CON_LIKELIHOOD], graph_dict[GRAPH_CONSENSE_INDEXES])
+        elif distr_type == OPPINION_DISTRIBUTION_ALTERNATING:
+            graph = GraphFactory._apply_alternating_opinions(graph, graph_dict[GRAPH_CONSENSE_INDEXES])
         return graph
 
 
@@ -540,8 +544,7 @@ class GraphFactory:
             graph = nx.powerlaw_cluster_graph(number_of_nodes, initial_connections, probability, seed=None)
         else:
             graph = nx.generators.complete_graph(number_of_nodes)
-
-        graph = GraphFactory._apply_oppinins(graph, graph_dict)
+        graph = GraphFactory._set_oppinins(graph, graph_dict)
         return graph
 
     def buildEqualConnectedClustersToSpec(self):
