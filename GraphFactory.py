@@ -17,12 +17,23 @@ SETUP_TYPE_DISSOCIATING = "dissociating"
 SETUP_TYPE_OVERLAY = "overlay"
 SETUP_TYPE_DIVERSE_CLUSTERS = "diverse_clusters"
 SETUP_TYPE_DIVERSE_CORENESS = "coreness"
+SETUP_TYPE_DETAILED = "custom"
 # overlay network specifics
 DEFAULT_OVERLAY_TYPE = "Barabasi-Albert"
 DEFAULT_OVERLAY_INITIAL_CONNECTIONS = 3
 DEFAULT_OVERLAY_BRANCH_PROBABIITY = 0.9
-
-
+# graph specifics
+GRAPH_TYPE = "type"
+GRAPH_NUMBER_OF_NODES = "number_of_nodes"
+GRAPH_NUMBER_OF_INITIAL_CONNECTIONS = "initial_connections"
+GRAPH_PRO_LIKELIHOOD = "pro_likelihood"
+GRAPH_CON_LIKELIHOOD = "con_likelihood"
+GRAPH_BRANCH_PROBABILITY = "probability"
+GRAPH_OPPINION_DISTRIBUTION_TYPE = "oppinion_distribution_type"
+#oppinion_distributions
+OPPINION_DISTRIBUTION_RANDOM = "random"
+OPPINION_DISTRIBUTION_SPECIFIC = "detailed"
+OPPINION_DISTRIBUTION_ALTERNATING = "alternating"
 class GraphFactory:
     """
     Verteilungs methoden.
@@ -76,20 +87,21 @@ class GraphFactory:
             SETUP_TYPE_DISSOCIATING: self._build_dissociating_graph,
             SETUP_TYPE_OVERLAY: self._build_clusters_with_overlay,
             SETUP_TYPE_DIVERSE_CLUSTERS: self._buildConnectedClustersToSpecList,
-            SETUP_TYPE_DIVERSE_CORENESS: self._buildClustersWithCoreness
+            SETUP_TYPE_DIVERSE_CORENESS: self._buildClustersWithCoreness,
+            SETUP_TYPE_DETAILED: self._build_graphs_to_detailed_description
         }
         return setup_type_map[setup_type]
 
-    def node_distribution_mapper(self, methode):
-        cluster_distribution_mapper = {
-            "even": self._even,
-            "linear": self._linear,
-            "exponential": self._exponential,
-            "alternating": self._apply_alternating_opinions,
-            "common_opinions": self._apply_specific_common_opinion
-        }
-
-        return cluster_distribution_mapper[methode]
+    # def node_distribution_mapper(self, methode):
+    #     cluster_distribution_mapper = {
+    #         "even": self._even,
+    #         "linear": self._linear,
+    #         "exponential": self._exponential,
+    #         "alternating": self._apply_alternating_opinions,
+    #         "common_opinions": self._apply_specific_common_opinion
+    #     }
+    #
+    #     return cluster_distribution_mapper[methode]
 
 
     """
@@ -127,6 +139,10 @@ class GraphFactory:
     #     # subgraph = self.actor_init_method(subgraph)
     #
     #     return subgraph
+
+    def _build_graphs_to_detailed_description(self):
+        graph = None
+        return graph
 
     def _build_clusters_with_overlay(self):
         overlay = self.buildSingleGraph(self.overlay_type, self.num_of_clusters, self.overlay_initial_connections,
@@ -222,11 +238,6 @@ class GraphFactory:
         """
         assigns random opinion to node
         """
-
-        # opinions = []
-        # for i in range(NUMBER_OF_KEY_OPINIONS):
-        #     opinions.append(random.randint(-1, 1))
-
         node[KEY_OPINIONS] = GraphFactory._create_random_oppinions()
         return node
 
@@ -499,6 +510,38 @@ class GraphFactory:
             graph = nx.powerlaw_cluster_graph(number_of_nodes, initial_connections, probability, seed=None)
         else:
             graph = nx.generators.complete_graph(number_of_nodes)
+        return graph
+
+    # test
+    @staticmethod
+    def _apply_oppinins(graph, graph_dict):
+        distr_type = graph_dict[GRAPH_OPPINION_DISTRIBUTION_TYPE]
+        if distr_type == OPPINION_DISTRIBUTION_SPECIFIC:
+            graph = GraphFactory._apply_opinions(graph, graph_dict[GR])
+        return graph
+
+
+    @staticmethod
+    def buildSingleGraphWithOppinions(graph_dict):
+        """
+        creates creates initialised connected clusters
+        """
+        type = graph_dict[GRAPH_TYPE]
+        number_of_nodes = graph_dict[GRAPH_NUMBER_OF_NODES]
+        initial_connections = graph_dict[GRAPH_NUMBER_OF_INITIAL_CONNECTIONS]
+        probability = graph_dict[GRAPH_BRANCH_PROBABILITY]
+        distribution_type = GRAPH_OPPINION_DISTRIBUTION_TYPE
+
+        if type == "Barabasi-Albert":
+            graph = nx.generators.barabasi_albert_graph(number_of_nodes, initial_connections, seed=None)
+        elif type == "Watts-Strogatz":
+            graph = nx.generators.connected_watts_strogatz_graph(number_of_nodes, initial_connections, probability, DEFAULT_NUMBER_OF_ATTEMPTS, seed=None)
+        elif type == "Powerlaw-Cluster":
+            graph = nx.powerlaw_cluster_graph(number_of_nodes, initial_connections, probability, seed=None)
+        else:
+            graph = nx.generators.complete_graph(number_of_nodes)
+
+        graph = GraphFactory._apply_oppinins(graph, graph_dict)
         return graph
 
     def buildEqualConnectedClustersToSpec(self):

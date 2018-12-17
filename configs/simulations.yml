@@ -74,6 +74,40 @@ simulation_settings:
               consense_indexes: [3]
             number_of_interconnections: 3
 
+        sim7:
+            sim_name: "custom"
+                sim_iterations: 80
+                setup_type: "custom"
+                overlay_type: "Barabasi-Albert"
+                overlay_initial_connections: 3
+                overlay_branch_probability: 0.9
+                subgraph_list:
+                - type: "complete"
+                  number_of_nodes: 25
+                  initial_connections: 3
+                  probability: 0.4
+                  pro_likelihood: 0.7
+                  con_likelihood: 0.1
+                  consense_indexes: [3]
+                  oppinion_distribution_type: "equal"
+                - type: "complete"
+                  number_of_nodes: 15
+                  initial_connections: 2
+                  probability: 0.6
+                  pro_likelihood: 0.
+                  con_likelihood: 0.3
+                  consense_indexes: [1, 2]
+                  oppinion_distribution_type: "equal"
+                - type: "complete"
+                  number_of_nodes: 10
+                  initial_connections: 2
+                  probability: 0.6
+                  pro_likelihood: 0.2
+                  con_likelihood: 0.1
+                  consense_indexes: [3]
+                  oppinion_distribution_type: "equal"
+                number_of_interconnections: 3
+
         defaults:
             number_of_interconnections: 0
             subgraph_list: None
