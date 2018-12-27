@@ -1,6 +1,6 @@
 from Rules import getRuleset
 import GraphLog as gl
-from Graph import calculateAttributes
+from Graph import calculateAttributes, incrementVersion
 from utils.Logger import get_graph_logger
 
 class GraphLogExecuter:
@@ -31,6 +31,8 @@ class GraphLogExecuter:
             log = self.graphLogReader.getRuleEntry()
             self.graph = self.rules[log.rulename].apply(self.graph,log.parameters,log.internals)
             self.graph = calculateAttributes(self.graph)
+
+            incrementVersion(self.graph)
 
             self.graphLogger.logRule(self.rules[log.rulename])
 
