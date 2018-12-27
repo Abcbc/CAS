@@ -1,6 +1,7 @@
 import Graph
 import networkx as nx
 import numpy as np
+import community
 
 class Metric:
     def calculate(self, graph):
@@ -73,6 +74,16 @@ class MetricOpinionConsensus(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Consensus', label)
 
+class MetricNumberOfClusters(Metric):
+    def calculate(self, graph):
+        return max(community.best_partition(graph))
+
+    def getMetricName(self):
+        return 'NumberOfClusters'
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Number', label)
+
 defaultConfig = {
     'stepSize' : 10
 }
@@ -82,6 +93,7 @@ availableMetrics = [
     MetricAvgClustering(),
     MetricDensity(),
     MetricOpinionConsensus(),
+    MetricNumberOfClusters(),
 ]
 
 class Analyser:
