@@ -16,6 +16,7 @@ class GraphLogJsonFormatter:
         if isinstance(entry, gl.GraphLogSnapshotEntry):
             jsonStr = json.dumps({
                 'type':'GraphLogSnapshotEntry',
+                'version':Graph.getVersion(entry.graph),
                 'graph':Graph.toJsonStr(entry.graph)
                 })
             return jsonStr
@@ -26,4 +27,6 @@ class GraphLogJsonFormatter:
         if jsonDict['type'] == 'GraphLogRuleEntry':
             return gl.GraphLogRuleEntry(jsonDict['rulename'], jsonDict['parameters'], jsonDict['internals'])
         elif jsonDict['type'] == 'GraphLogSnapshotEntry':
-            return gl.GraphLogSnapshotEntry(Graph.fromJsonStr(jsonDict['graph']))
+            g = Graph.fromJsonStr(jsonDict['graph'])
+            Graph.setVersion(g, jsonDict['version'])
+            return gl.GraphLogSnapshotEntry(g)
