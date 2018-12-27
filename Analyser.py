@@ -9,11 +9,11 @@ class Metric:
     def getMetricName(self):
         raise NotImplementedError('getMetricName method must be implemented by concrete metric class')
 
-    def plot(self, plt, x,y, xlabel='version'):
+    def plot(self, plt, x,y, xlabel='version', label=''):
         raise NotImplementedError('plot method must be implemented by concrete metric class')
 
-def plotLinear(plt, x, y, title, xlabel, ylabel):
-    plt.plot(x,y)
+def plotLinear(plt, x, y, title, xlabel, ylabel,label):
+    plt.plot(x,y,label=label)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -25,8 +25,8 @@ class MetricGraphSize(Metric):
     def getMetricName(self):
         return 'GraphSize'
 
-    def plot(self, plt, x,y, xlabel='version'):
-        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Number of nodes')
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Number of nodes', label)
 
 class MetricAvgClustering(Metric):
     def calculate(self, graph):
@@ -35,8 +35,8 @@ class MetricAvgClustering(Metric):
     def getMetricName(self):
         return 'AverageClustering'
 
-    def plot(self, plt, x,y, xlabel='version'):
-        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Clustering coefficient')
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Clustering coefficient', label)
 
 class MetricDensity(Metric):
     def calculate(self, graph):
@@ -45,8 +45,8 @@ class MetricDensity(Metric):
     def getMetricName(self):
         return 'Density'
 
-    def plot(self, plt, x,y, xlabel='version'):
-        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Density')
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Density', label)
 
 class MetricOpinionConsensus(Metric):
     def __init__(self, topicIndex=None):
@@ -70,8 +70,8 @@ class MetricOpinionConsensus(Metric):
     def getMetricName(self):
         return 'OpinionConsensus' + str(self.topicIndex)
 
-    def plot(self, plt, x,y, xlabel='version'):
-        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Consensus')
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Consensus', label)
 
 defaultConfig = {
     'stepSize' : 10
