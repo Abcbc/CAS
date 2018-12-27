@@ -45,5 +45,9 @@ class GraphLogExecuter:
     def performStep(self):
         self.performSteps(1)
 
+    def performFullSimulation(self):
+        while self.graphLogReader.hasEntry():
+            self.performSteps(1)
+
     def getAnalyzer(self):
         return self.analyzer
