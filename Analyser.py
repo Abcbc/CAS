@@ -14,7 +14,7 @@ class Metric:
         raise NotImplementedError('plot method must be implemented by concrete metric class')
 
 def plotLinear(plt, x, y, title, xlabel, ylabel,label):
-    plt.plot(x,y,label=label)
+    plt.plot(x,y,label=label,marker='*',linestyle='dashed')
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
