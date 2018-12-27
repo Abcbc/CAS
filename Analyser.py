@@ -39,6 +39,16 @@ class MetricAvgClustering(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Clustering coefficient', label)
 
+class MetricTransitivity(Metric):
+    def calculate(self, graph):
+        return nx.transitivity(graph)
+
+    def getMetricName(self):
+        return 'Transitivity'
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Transitivity', label)
+
 class MetricDensity(Metric):
     def calculate(self, graph):
         return nx.density(graph)
@@ -93,6 +103,7 @@ availableMetrics = [
     MetricAvgClustering(),
     MetricDensity(),
     MetricOpinionConsensus(),
+    MetricTransitivity(),
     MetricNumberOfClusters(),
 ]
 
