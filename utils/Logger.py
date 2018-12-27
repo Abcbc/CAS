@@ -25,7 +25,6 @@ def get_logger(name=None, filepath=None):
     """
     global log_file
     if name == "__main__":
-        print(filepath)
         log_file = filepath.rsplit("/")[-1].replace(".py", ".log")
     elif name == "__mp_main__":
         log_file= "mp_dump.log"
@@ -56,7 +55,6 @@ def get_graph_logger(name=None, filepath=None, doPrint=False):
     :return:
     """
     if name == "__main__":
-        print(filepath)
         log_file = filepath.rsplit("/")[-1].replace(".py", ".log")
     elif name == "__mp_main__":
         log_file= "mp_dump.log"
