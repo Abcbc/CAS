@@ -2,6 +2,7 @@ from Rules import getRuleset
 import GraphLog as gl
 from Graph import calculateAttributes, incrementVersion
 from utils.Logger import get_graph_logger
+import Analyser
 
 class GraphLogExecuter:
     def __init__(self, graphLogReader):
@@ -14,6 +15,9 @@ class GraphLogExecuter:
 
         self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(get_graph_logger('GraphLogger', 'graphReproduced.log')))
         self.graphLogger.setGraphGetter(lambda : self.graph)
+
+        self.analyzer = Analyser.Analyser()
+        self.analyzer.initAnalysis(self.graph, config={'stepSize':10})
 
     def getGraph(self):
         return self.graph
@@ -36,5 +40,10 @@ class GraphLogExecuter:
 
             self.graphLogger.logRule(self.rules[log.rulename])
 
+            self.analyzer.onNewVersion(self.graph)
+
     def performStep(self):
         self.performSteps(1)
+
+    def getAnalyzer(self):
+        return self.analyzer
