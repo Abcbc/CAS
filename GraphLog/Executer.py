@@ -16,7 +16,7 @@ class GraphLogExecuter:
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
     def getGraph(self):
-        self.graph
+        return self.graph
 
     def performSteps(self, n=1):
         # TODO: implement shortcut using graph snapshots
