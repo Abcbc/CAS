@@ -2,6 +2,7 @@ import Graph
 import networkx as nx
 import numpy as np
 import community
+import utility
 
 class Metric:
     def calculate(self, graph):
@@ -120,7 +121,7 @@ class Analyser:
             self.results[metric.getMetricName()].append(metric.calculate(graph))
 
     def onNewVersion(self, graph):
-        if Graph.getVersion(graph) % self.config['stepSize'] < 1e-5:
+        if utility.isDivisor(Graph.getVersion(graph), self.config['stepSize']):
             self._calcMetrics(graph)
 
     def finishAnalysis(self, graph):
