@@ -120,7 +120,7 @@ class Analyser:
             self.results[metric.getMetricName()].append(metric.calculate(graph))
 
     def onNewVersion(self, graph):
-        if Graph.getVersion(graph) % self.config['stepSize'] < 1e5:
+        if Graph.getVersion(graph) % self.config['stepSize'] < 1e-5:
             self._calcMetrics(graph)
 
     def finishAnalysis(self, graph):
