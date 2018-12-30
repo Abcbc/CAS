@@ -432,10 +432,8 @@ class TakeoverRule(Rule):
     def getName():
         return 'TakeoverRule'
 
-"""
-Global ruleset. Created once, configured globally, accessed via getRuleset()
-"""
-ruleset = {
+def getNewRuleset():
+    return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
         AdaptationRule.getName():AdaptationRule(),
         NewNodeRule.getName():NewNodeRule(),
@@ -443,6 +441,11 @@ ruleset = {
         RemoveEdgeRule.getName():RemoveEdgeRule(),
         TakeoverRule.getName():TakeoverRule(),
         }
+
+"""
+Global ruleset. Created once, configured globally, accessed via getRuleset()
+"""
+ruleset = getNewRuleset()
 
 def getRuleset():
     return ruleset
