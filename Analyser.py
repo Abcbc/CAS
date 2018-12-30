@@ -104,7 +104,8 @@ class Analyser:
         if self.results['version'][-1] != Graph.getVersion(graph):
             self._calcMetrics(graph)
 
-        # ToDo: export this to a viewer module
+    # ToDo: export this to a viewer module
+    def plot(self):
         import matplotlib.pyplot as plt
         for metric in self.metrics:
             plt.figure()
