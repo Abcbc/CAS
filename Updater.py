@@ -47,3 +47,6 @@ class Updater:
     def close(self):
         self.graphLogger.close()
         self.analyzer.finishAnalysis(self.graph)
+
+    def getAnalyzer(self):
+        return self.analyzer
