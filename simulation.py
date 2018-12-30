@@ -34,7 +34,9 @@ def main():
     log.info("Loading Config.")
     settings = cnf.load_config()
     for simulation_setting in settings:
-        run_simulation(simulation_setting)
+        stepConfigs = cnf.get_iteration_steps(simulation_setting)
+        for stepConfig in stepConfigs:
+            run_simulation(stepConfig)
 
 if __name__ == "__main__":
     main()
