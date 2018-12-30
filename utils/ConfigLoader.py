@@ -32,6 +32,16 @@ def load_config():
 
     return result
 
+def save_config(config, file):
+    """
+
+    :param config: assumed to be the config for one run, not a group
+    :param file:
+    :return:
+    """
+    yml.dump({"simulation_settings":{'group':{'config':config}}},open(file, "w"))
+
+
 regex_float_lit_str = '\d+(\.\d+)?'
 regex_range_identifier = re.compile('^range.*')
 regex_range = re.compile('^range\((?P<first>'+regex_float_lit_str+'):(?P<step>'+regex_float_lit_str+'):(?P<last>'+regex_float_lit_str+')\)$')
