@@ -13,16 +13,18 @@ import Rules
 def run_simulation(simulation_setting):
     log.debug(simulation_setting)
     gf = GraphFactory(simulation_setting)
-    g = gf.create()
 
-    updater = Updater.Updater()
-    updater.setGraph(g)
+    for repetition in range(simulation_setting["sim_repetitions"]):
+        g = gf.create()
 
-    for rulename, rule in Rules.getRuleset().items():
-        rule.setParameters(simulation_setting[rulename])
+        updater = Updater.Updater()
+        updater.setGraph(g)
 
-    for i in range(simulation_setting["sim_iterations"]):
-        updater.update()
+        for rulename, rule in Rules.getRuleset().items():
+            rule.setParameters(simulation_setting[rulename])
+
+        for iteration in range(simulation_setting["sim_iterations"]):
+            updater.update()
 
     updater.close()
 
