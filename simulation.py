@@ -18,7 +18,7 @@ def run_simulation(simulation_setting):
         g = gf.create()
 
         updater = Updater.Updater()
-        updater.setGraph(g)
+        updater.setGraph(g, name='graph_'+str(repetition))
 
         for rulename, rule in Rules.getRuleset().items():
             rule.setParameters(simulation_setting[rulename])
