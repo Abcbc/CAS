@@ -13,12 +13,12 @@ def get_groups(config):
 def set_defaults(group):
     defaults = group.get("defaults")
     result = [group[x] for x in group if x != "defaults"]
-    
-    for default_key in defaults:
-        # print(default_key)
-        for e in result:
-            if e.get(default_key) is None:
-                e.update({default_key: defaults.get(default_key)})
+
+    if defaults is not None:
+        for default_key in defaults:
+            for e in result:
+                if e.get(default_key) is None:
+                    e.update({default_key: defaults.get(default_key)})
 
     return result
 
