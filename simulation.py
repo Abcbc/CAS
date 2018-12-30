@@ -19,7 +19,7 @@ def run_simulation(simulation_setting):
     updater.setGraph(g)
 
     for rulename, rule in Rules.getRuleset().items():
-        rule.setParameters(simulation_setting['Rules'][rulename])
+        rule.setParameters(simulation_setting[rulename])
 
     for i in range(simulation_setting["sim_iterations"]):
         updater.update()
