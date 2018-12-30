@@ -83,8 +83,10 @@ simulation_settings:
     iterationtest:
         range:
             key: "range(0:0.5:5)"
+            sim_name: "RangeTest"
         list:
             key: "list(0:1:1.5:20)"
+            sim_name: "ListTest"
 
         defaults:
 

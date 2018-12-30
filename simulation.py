@@ -37,6 +37,13 @@ def main():
     log.info("Loading Config.")
     settings = cnf.load_config()
     for simulation_setting in settings:
+        simulation_dir = './experiment/' + simulation_setting['sim_name'] + '/'
+        try:
+            os.makedirs(simulation_dir)
+        except(FileExistsError):
+            pass
+        cnf.save_config(simulation_setting, simulation_dir+'settings.yaml')
+
         stepConfigs = cnf.get_iteration_steps(simulation_setting)
         for stepConfig in stepConfigs:
             run_simulation(stepConfig)
