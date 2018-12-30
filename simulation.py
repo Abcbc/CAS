@@ -36,9 +36,5 @@ def main():
     for simulation_setting in settings:
         run_simulation(simulation_setting)
 
-    log.debug("First Commit")
-
-    graph = nx.complete_graph(3)
-
 if __name__ == "__main__":
     main()
