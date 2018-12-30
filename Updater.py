@@ -6,8 +6,10 @@ from utils.Logger import get_graph_logger
 import Analyser
 
 class Updater:
-    def __init__(self):
-        self.rules = getRuleset()
+    def __init__(self, ruleset=None):
+        if ruleset is None:
+            ruleset = getRuleset()
+        self.rules = ruleset
         self.analyzer = Analyser.Analyser()
 
     def setGraph(self, graph, name='graph'):
