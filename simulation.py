@@ -17,11 +17,12 @@ def run_simulation(simulation_setting):
     for repetition in range(simulation_setting["sim_repetitions"]):
         g = gf.create()
 
-        updater = Updater.Updater()
-        updater.setGraph(g, name='graph_'+str(repetition))
-
-        for rulename, rule in Rules.getRuleset().items():
+        ruleset = Rules.getNewRuleset()
+        for rulename, rule in ruleset.items():
             rule.setParameters(simulation_setting[rulename])
+
+        updater = Updater.Updater(ruleset)
+        updater.setGraph(g, name='graph_'+str(repetition))
 
         for iteration in range(simulation_setting["sim_iterations"]):
             updater.update()
