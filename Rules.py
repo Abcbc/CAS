@@ -1,12 +1,17 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
 import Graph
+import utils.Logger as Logger
 from utils.Logger import get_logger
 import community
 import networkx as nx
 import numpy as np
+import logging
 
+Logger.cmd_level = logging.ERROR
+Logger.file_level = logging.DEBUG
 log = get_logger("Rule")
+
 
 class Rule:
     """
