@@ -45,7 +45,13 @@ def main():
         cnf.save_config(simulation_setting, simulation_dir+'settings.yaml')
 
         stepConfigs = cnf.get_iteration_steps(simulation_setting)
-        for stepConfig in stepConfigs:
+        for ind, stepConfig in enumerate(stepConfigs):
+            stepDir = simulation_dir + str(ind) + '/'
+            try:
+                os.mkdir(stepDir)
+            except(FileExistsError):
+                pass
+            cnf.save_config(stepConfig,  stepDir+'settings.yaml')
             run_simulation(stepConfig)
 
 if __name__ == "__main__":
