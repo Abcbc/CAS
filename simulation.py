@@ -3,6 +3,7 @@ from GraphFactory import GraphFactory
 import networkx as nx
 import multiprocessing as mp
 import time
+import matplotlib.pyplot as plt
 
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
@@ -87,6 +88,30 @@ def main():
         time.sleep(1)
 
     pool.join()
+
+    for name, sim in results.items():
+        try:
+            os.mkdir(sim['dir'] + 'img/')
+        except FileExistsError:
+            pass
+        for step in sim['steps']:
+            if  sum([not rep.successful() for rep in step['repetitions']]) > 0:
+                log.error('an exception occurrent in a simulation')
+            analyzers = [rep.get()['analyzer'] for rep in step['repetitions']]
+
+            for metric in analyzers[0].metrics:
+                plt.figure()
+                for ind, analyser in enumerate(analyzers):
+                    metric.plot(plt, analyser.results['version'], analyser.results[metric.getMetricName()],label=str(ind))
+                plt.legend(loc='upper left')
+                plt.savefig(sim['dir'] + 'img/' + metric.getMetricName() + '.png')
+
+            changedGraphsCnt = 0
+            for analyser in analyzers:
+                if analyser.results['GraphSize'][0] != analyser.results['GraphSize'][-1]:
+                    changedGraphsCnt += 1
+            print('percentage abweichler: '+str(step['settings']['tmp_percentage']))
+            print('percentage changed graphs: '+str(changedGraphsCnt/simulation_setting['sim_repetitions']))
 
 if __name__ == "__main__":
     start = time.perf_counter()
