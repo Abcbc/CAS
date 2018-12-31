@@ -113,6 +113,28 @@ def main():
             print('percentage abweichler: '+str(step['settings']['tmp_percentage']))
             print('percentage changed graphs: '+str(changedGraphsCnt/simulation_setting['sim_repetitions']))
 
+def run_from_log():
+    logfile = '.log'
+    import GraphLog as gl
+    gExe = gl.GraphLogExecuter(gl.GraphLogReader(logfile))
+    g = gExe.getGraph()
+
+    plt.figure()
+    nx.draw_networkx(gExe.getGraph())
+    plt.title('before')
+
+    gExe.performFullSimulation()
+
+    plt.figure()
+    nx.draw_networkx(gExe.getGraph())
+    plt.title('after')
+
+    for metric in gExe.getAnalyzer().metrics:
+        plt.figure()
+        metric.plot(plt, gExe.getAnalyzer().results['version'],gExe.getAnalyzer().results[metric.getMetricName()])
+
+    plt.show()
+
 if __name__ == "__main__":
     start = time.perf_counter()
     main()
