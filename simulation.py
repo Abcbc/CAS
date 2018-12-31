@@ -20,6 +20,7 @@ def _run(ruleset, graph, logDir, repetition, iterations):
 
     updater.close()
 
+results = []
 
 def run_simulation(simulation_setting, logDir, pool):
     log.debug(simulation_setting)
@@ -32,7 +33,7 @@ def run_simulation(simulation_setting, logDir, pool):
         for rulename, rule in ruleset.items():
             rule.setParameters(simulation_setting[rulename])
 
-        pool.apply_async(_run, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"]))
+        results.append(pool.apply_async(_run, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
 
 
     #gExe = g.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
@@ -63,6 +64,15 @@ def main():
             run_simulation(stepConfig, stepDir, pool)
 
     pool.close()
+    # monitor progress
+    ready = False
+    while not ready:
+        all = sum([1 for res in results])
+        finished = sum([1 for res in results if res.ready()])
+        print(str(finished) + ' of ' + str(all) + ' jobs finished')
+        ready = (all <= finished)
+        time.sleep(1)
+
     pool.join()
 
 if __name__ == "__main__":
