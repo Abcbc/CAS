@@ -2,6 +2,7 @@ import utils.ConfigLoader as cnf
 from GraphFactory import GraphFactory
 import networkx as nx
 import multiprocessing as mp
+import time
 
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
@@ -65,4 +66,7 @@ def main():
     pool.join()
 
 if __name__ == "__main__":
+    start = time.perf_counter()
     main()
+    end = time.perf_counter()
+    print("time consumed: " + str(end-start) + " s")
