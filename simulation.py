@@ -20,11 +20,15 @@ def run_repetition(ruleset, graph, logDir, repetition, iterations):
 
     updater.close()
 
-results = []
+    return {
+        'log': logDir+'graph_'+str(repetition)+'.log',
+        'analyzer': updater.getAnalyzer(),
+    }
 
 def run_simulation(simulation_setting, logDir, pool):
     log.debug(simulation_setting)
     gf = GraphFactory(simulation_setting)
+    repetitions = []
 
     for repetition in range(simulation_setting["sim_repetitions"]):
         g = gf.create()
@@ -35,16 +39,15 @@ def run_simulation(simulation_setting, logDir, pool):
 
 
 
-    #gExe = g.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
-    #gExe.performSteps(20)
-
-        results.append(pool.apply_async(run_repetition, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
+        repetitions.append(pool.apply_async(run_repetition, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
+    return repetitions
 
 def main():
     pool = mp.Pool()
 
     log.info("Loading Config.")
     settings = cnf.load_config()
+    results = {}
     for simulation_setting in settings:
         simulation_dir = './experiment/' + simulation_setting['sim_name'] + '/'
         try:
@@ -54,6 +57,10 @@ def main():
         cnf.save_config(simulation_setting, simulation_dir+'settings.yaml')
 
         stepConfigs = cnf.get_iteration_steps(simulation_setting)
+        results[simulation_setting['sim_name']] = {
+            'dir': simulation_dir,
+            'steps': [],
+        }
         for ind, stepConfig in enumerate(stepConfigs):
             stepDir = simulation_dir + str(ind) + '/'
             try:
@@ -61,14 +68,20 @@ def main():
             except(FileExistsError):
                 pass
             cnf.save_config(stepConfig,  stepDir+'settings.yaml')
-            run_simulation(stepConfig, stepDir, pool)
+            repetitions = run_simulation(stepConfig, stepDir, pool)
+
+            results[simulation_setting['sim_name']]['steps'].append({
+                'settings':stepConfig,
+                'repetitions': repetitions,
+                'stepDir': stepDir,
+            })
 
     pool.close()
     # monitor progress
     ready = False
     while not ready:
-        all = sum([1 for res in results])
-        finished = sum([1 for res in results if res.ready()])
+        all = sum([1 for sim in results.values() for step in sim['steps'] for rep in step['repetitions']])
+        finished = sum([1 for sim in results.values() for step in sim['steps'] for rep in step['repetitions'] if rep.ready()])
         print(str(finished) + ' of ' + str(all) + ' jobs finished')
         ready = (all <= finished)
         time.sleep(1)
