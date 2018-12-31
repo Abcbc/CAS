@@ -11,7 +11,7 @@ import Updater
 import GraphLog as gl
 import Rules
 
-def _run(ruleset, graph, logDir, repetition, iterations):
+def run_repetition(ruleset, graph, logDir, repetition, iterations):
     updater = Updater.Updater(ruleset)
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
 
@@ -33,12 +33,12 @@ def run_simulation(simulation_setting, logDir, pool):
         for rulename, rule in ruleset.items():
             rule.setParameters(simulation_setting[rulename])
 
-        results.append(pool.apply_async(_run, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
 
 
     #gExe = g.GraphLogExecuter(gl.GraphLogReader('logs/graph.log'))
     #gExe.performSteps(20)
 
+        results.append(pool.apply_async(run_repetition, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
 
 def main():
     pool = mp.Pool()
