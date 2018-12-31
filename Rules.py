@@ -173,7 +173,7 @@ class AdaptationRule(Rule):
         nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
 
         vSum = (nodeToAdapt[Graph.KEY_V]+nodeToAdaptFrom[Graph.KEY_V])
-        return 0 if vSum == 0 else nodeToAdaptFrom[Graph.KEY_V] / vSum
+        return 0 if vSum == 0 else float(nodeToAdaptFrom[Graph.KEY_V] / vSum)
 
     def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
         opInd = self.internals['opinionPair']['opinionIndex']
