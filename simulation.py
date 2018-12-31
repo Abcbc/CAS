@@ -10,7 +10,7 @@ import GraphLog as gl
 import Rules
 
 
-def run_simulation(simulation_setting):
+def run_simulation(simulation_setting, logDir):
     log.debug(simulation_setting)
     gf = GraphFactory(simulation_setting)
 
@@ -22,7 +22,7 @@ def run_simulation(simulation_setting):
             rule.setParameters(simulation_setting[rulename])
 
         updater = Updater.Updater(ruleset)
-        updater.setGraph(g, name='graph_'+str(repetition))
+        updater.setGraph(g, get_graph_logger('GraphLogger', logDir+'graph_'+str(repetition)+'.log'))
 
         for iteration in range(simulation_setting["sim_iterations"]):
             updater.update()
@@ -52,7 +52,7 @@ def main():
             except(FileExistsError):
                 pass
             cnf.save_config(stepConfig,  stepDir+'settings.yaml')
-            run_simulation(stepConfig)
+            run_simulation(stepConfig, stepDir)
 
 if __name__ == "__main__":
     main()

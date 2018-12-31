@@ -12,11 +12,11 @@ class Updater:
         self.rules = ruleset
         self.analyzer = Analyser.Analyser()
 
-    def setGraph(self, graph, name='graph'):
+    def setGraph(self, graph, logger):
         self.graph = graph
         self.graph = Graph.calculateAttributes(self.graph)
 
-        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(get_graph_logger('GraphLogger', name+'.log')))
+        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(logger))
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
         self.analyzer.initAnalysis(self.graph, config={'stepSize':1})
