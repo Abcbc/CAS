@@ -3,6 +3,7 @@ import networkx as nx
 import numpy as np
 import community
 import utility
+import csv
 
 class Metric:
     def calculate(self, graph):
@@ -127,6 +128,12 @@ class Analyser:
     def finishAnalysis(self, graph):
         if self.results['version'][-1] != Graph.getVersion(graph):
             self._calcMetrics(graph)
+
+    def write(self, filename):
+        w = csv.writer(open(filename, 'w'))
+        w.writerow([name for name in self.results.keys()])
+        for i in range(len(self.results[HelperMetricVersion().getMetricName()])):
+            w.writerow([m[i] for m in self.results.values()])
 
     # ToDo: export this to a viewer module
     def plot(self):
