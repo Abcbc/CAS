@@ -102,7 +102,7 @@ def main():
             for metric in analyzers[0].metrics:
                 plt.figure()
                 for ind, analyser in enumerate(analyzers):
-                    metric.plot(plt, analyser.results['version'], analyser.results[metric.getMetricName()],label=str(ind))
+                    metric.plot(plt, analyser.results['Version'], analyser.results[metric.getMetricName()],label=str(ind))
                 plt.legend(loc='upper left')
                 plt.savefig(sim['dir'] + 'img/' + metric.getMetricName() + '.png')
 

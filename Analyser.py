@@ -96,6 +96,16 @@ class MetricNumberOfClusters(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Number', label)
 
+class HelperMetricVersion(Metric):
+    def calculate(self, graph):
+        return Graph.getVersion(graph)
+
+    def getMetricName(self):
+        return 'Version'
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Version', label)
+
 defaultConfig = {
     'stepSize' : 10
 }
@@ -111,13 +121,11 @@ availableMetrics = [
 
 class Analyser:
     def initAnalysis(self, graph, metrics = availableMetrics, config = defaultConfig):
-        self.metrics = metrics
+        self.metrics = [HelperMetricVersion()] + metrics
         self.config = config
-        self.results = {metric.getMetricName():[] for metric in metrics}
-        self.results['version'] = []
+        self.results = {metric.getMetricName():[] for metric in self.metrics}
 
     def _calcMetrics(self, graph):
-        self.results['version'].append(Graph.getVersion(graph))
         for metric in self.metrics:
             self.results[metric.getMetricName()].append(metric.calculate(graph))
 
@@ -126,7 +134,7 @@ class Analyser:
             self._calcMetrics(graph)
 
     def finishAnalysis(self, graph):
-        if self.results['version'][-1] != Graph.getVersion(graph):
+        if self.results[HelperMetricVersion().getMetricName()][-1] != Graph.getVersion(graph):
             self._calcMetrics(graph)
 
     def write(self, filename):
