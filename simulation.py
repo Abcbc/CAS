@@ -4,6 +4,8 @@ import networkx as nx
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
+import csv
+import numpy as np
 
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
@@ -12,6 +14,7 @@ import Updater
 import GraphLog as gl
 import Rules
 
+import matplotlib.pyplot as plt
 def run_repetition(ruleset, graph, logDir, repetition, iterations):
     updater = Updater.Updater(ruleset)
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
@@ -105,6 +108,26 @@ def main():
                     metric.plot(plt, analyser.results['Version'], analyser.results[metric.getMetricName()],label=str(ind))
                 plt.legend(loc='upper left')
                 plt.savefig(sim['dir'] + 'img/' + metric.getMetricName() + '.png')
+
+            for ind, analyser in enumerate(analyzers):
+                analyser.write(step['stepDir']+'graph_'+str(ind)+'.csv')
+
+            # build mean and std over all analyzers
+            metrics_mean = []
+            metrics_std = []
+            for metric in analyzers[0].metrics:
+                metric_combined = np.array([analyser.results[metric.getMetricName()] for analyser in analyzers]) # a row is an analyzer
+                metrics_mean.append(np.mean(metric_combined, axis=0))
+                metrics_std.append(np.std(metric_combined, axis=0))
+
+            combinedCsv = csv.writer(open(step['stepDir']+'metrics.csv','w'))
+            combinedCsv.writerow([metric.getMetricName()+suffix for metric in analyzers[0].metrics for suffix in ['_mean','_std']])
+            for i in range(len(analyzers[0].results['Version'])):
+                row = []
+                for metric_mean, metric_std in zip(metrics_mean,metrics_std):
+                    row.append(metric_mean[i])
+                    row.append(metric_std[i])
+                combinedCsv.writerow(row)
 
 def run_from_log():
     logfile = '.log'
