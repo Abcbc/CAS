@@ -152,9 +152,13 @@ class AdaptationRule(Rule):
     """
     def _createInternals(self, graph):
         self.internals = {'opinionPair': self._findOperands(graph),
-                          'nodePosToAdapt': random.choice([0,1])
                           }
         if self.internals['opinionPair'] is not None:
+            nodeA = graph.nodes[self.internals['opinionPair']['edgeId'][0]]
+            nodeB = graph.nodes[self.internals['opinionPair']['edgeId'][1]]
+            self.internals['nodePosToAdapt'] = 0 if nodeA[Graph.KEY_V] < nodeB[Graph.KEY_V] else 1
+            if nodeA[Graph.KEY_V] == nodeB[Graph.KEY_V]:
+                self.internals['nodePosToAdapt'] = random.choice([0,1])
             self.internals['adaptionDecision'] = random.random() < self._calcAdaptionProbability(graph)
         return self.internals
 
