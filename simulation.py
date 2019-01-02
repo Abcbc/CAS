@@ -106,13 +106,6 @@ def main():
                 plt.legend(loc='upper left')
                 plt.savefig(sim['dir'] + 'img/' + metric.getMetricName() + '.png')
 
-            changedGraphsCnt = 0
-            for analyser in analyzers:
-                if analyser.results['GraphSize'][0] != analyser.results['GraphSize'][-1]:
-                    changedGraphsCnt += 1
-            print('percentage abweichler: '+str(step['settings']['tmp_percentage']))
-            print('percentage changed graphs: '+str(changedGraphsCnt/simulation_setting['sim_repetitions']))
-
 def run_from_log():
     logfile = '.log'
     import GraphLog as gl
