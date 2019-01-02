@@ -17,7 +17,7 @@ class GraphFactory:
     """
 
     def __init__(self, sim_settings):
-        self.graph_type = sim_settings["graph_type"]
+        self.graph_type = sim_settings['graph_type']
         self.branch_probability = sim_settings["graph_branch_probability"]
         self.num_of_nodes = sim_settings["graph_num_of_node"]
         self.num_of_cluster = sim_settings["graph_cluster"]

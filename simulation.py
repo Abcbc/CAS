@@ -4,6 +4,7 @@ import networkx as nx
 import multiprocessing as mp
 import time
 import matplotlib.pyplot as plt
+from ConvergensChecker import ConvergensChecker
 
 from utils.Logger import *
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
@@ -12,12 +13,18 @@ import Updater
 import GraphLog as gl
 import Rules
 
-def run_repetition(ruleset, graph, logDir, repetition, iterations):
+def run_repetition(checker, ruleset, graph, logDir, repetition, iterations):
     updater = Updater.Updater(ruleset)
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
 
     for iteration in range(iterations):
         updater.update()
+        updater.getAnalyzer().onNewVersion(graph)
+        mem = updater.getAnalyzer().results
+        if checker.converges(mem):
+            updater.getAnalyzer().finishAnalysis(graph)
+            break
+
 
     updater.close()
 
@@ -29,6 +36,7 @@ def run_repetition(ruleset, graph, logDir, repetition, iterations):
 def run_simulation(simulation_setting, logDir, pool):
     log.debug(simulation_setting)
     gf = GraphFactory(simulation_setting)
+    checker = ConvergensChecker(simulation_setting)
     repetitions = []
 
     for repetition in range(simulation_setting["sim_repetitions"]):
@@ -40,7 +48,7 @@ def run_simulation(simulation_setting, logDir, pool):
 
 
 
-        repetitions.append(pool.apply_async(run_repetition, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
+        repetitions.append(pool.apply_async(run_repetition, args=(checker, ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
     return repetitions
 
 def main():
@@ -107,11 +115,11 @@ def main():
                 plt.savefig(sim['dir'] + 'img/' + metric.getMetricName() + '.png')
 
             changedGraphsCnt = 0
-            for analyser in analyzers:
-                if analyser.results['GraphSize'][0] != analyser.results['GraphSize'][-1]:
-                    changedGraphsCnt += 1
-            print('percentage abweichler: '+str(step['settings']['tmp_percentage']))
-            print('percentage changed graphs: '+str(changedGraphsCnt/simulation_setting['sim_repetitions']))
+#            for analyser in analyzers:
+#                if analyser.results['GraphSize'][0] != analyser.results['GraphSize'][-1]:
+#                    changedGraphsCnt += 1
+#            print('percentage abweichler: '+str(step['settings']['tmp_percentage']))
+#            print('percentage changed graphs: '+str(changedGraphsCnt/simulation_setting['sim_repetitions']))
 
 def run_from_log():
     logfile = '.log'
