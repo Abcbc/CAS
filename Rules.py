@@ -412,9 +412,10 @@ class TakeoverRule(Rule):
             commonNeighbours = [candidate for candidate in nx.neighbors(graph,self.internals['edgeId'][0]) if candidate in nx.neighbors(graph,self.internals['edgeId'][1])]
             weakerNodeId = self.internals['edgeId'][0 if graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V] < graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V] else 1]
 
-            for commonNeighbour in commonNeighbours:
-                if self._calcVDiffMetrik(graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V],graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V]) >= self.parameters['minDifference'] and random.random() < self.parameters['removalProbability']:
-                    self.internals['edgesToRemove'].append((weakerNodeId, commonNeighbour))
+            if self._calcVDiffMetrik(graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V],graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V]) >= self.parameters['minDifference']:
+                for commonNeighbour in commonNeighbours:
+                    if random.random() < self.parameters['removalProbability']:
+                        self.internals['edgesToRemove'].append((weakerNodeId, commonNeighbour))
 
         return self.internals
 
