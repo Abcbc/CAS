@@ -22,3 +22,9 @@ def printGraph(graph):
         printNode(graph.nodes[nodeId])
         for neighborId in graph.neighbors(nodeId):
             print('NeighId ' + str(neighborId) + ': orientation ' + str(graph.edges[nodeId,neighborId][KEY_ORIENTATION]))
+
+def isDivisor(number, divisorCandidate):
+    return isNull(number % divisorCandidate)
+
+def isNull(float):
+    return float < 1e-5

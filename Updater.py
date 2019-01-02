@@ -6,15 +6,17 @@ from utils.Logger import get_graph_logger
 import Analyser
 
 class Updater:
-    def __init__(self):
-        self.rules = getRuleset()
+    def __init__(self, ruleset=None):
+        if ruleset is None:
+            ruleset = getRuleset()
+        self.rules = ruleset
         self.analyzer = Analyser.Analyser()
 
-    def setGraph(self, graph):
+    def setGraph(self, graph, logger):
         self.graph = graph
         self.graph = Graph.calculateAttributes(self.graph)
 
-        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(get_graph_logger('GraphLogger', 'graph.log')))
+        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(logger))
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
         self.analyzer.initAnalysis(self.graph, config={'stepSize':1})
@@ -47,3 +49,6 @@ class Updater:
     def close(self):
         self.graphLogger.close()
         self.analyzer.finishAnalysis(self.graph)
+
+    def getAnalyzer(self):
+        return self.analyzer

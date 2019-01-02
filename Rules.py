@@ -1,12 +1,17 @@
 import random
 from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
 import Graph
+import utils.Logger as Logger
 from utils.Logger import get_logger
 import community
 import networkx as nx
 import numpy as np
+import logging
 
+Logger.cmd_level = logging.ERROR
+Logger.file_level = logging.DEBUG
 log = get_logger("Rule")
+
 
 class Rule:
     """
@@ -168,7 +173,7 @@ class AdaptationRule(Rule):
         nodeToAdaptFrom = [nodeB, nodeA][self.internals['nodePosToAdapt']]
 
         vSum = (nodeToAdapt[Graph.KEY_V]+nodeToAdaptFrom[Graph.KEY_V])
-        return 0 if vSum == 0 else nodeToAdaptFrom[Graph.KEY_V] / vSum
+        return 0 if vSum == 0 else float(nodeToAdaptFrom[Graph.KEY_V] / vSum)
 
     def _adaptNodeToNode(self, toAdapt, toAdaptFrom):
         opInd = self.internals['opinionPair']['opinionIndex']
@@ -427,10 +432,8 @@ class TakeoverRule(Rule):
     def getName():
         return 'TakeoverRule'
 
-"""
-Global ruleset. Created once, configured globally, accessed via getRuleset()
-"""
-ruleset = {
+def getNewRuleset():
+    return {
         OrientationConfirmationRule.getName():OrientationConfirmationRule(),
         AdaptationRule.getName():AdaptationRule(),
         NewNodeRule.getName():NewNodeRule(),
@@ -438,6 +441,11 @@ ruleset = {
         RemoveEdgeRule.getName():RemoveEdgeRule(),
         TakeoverRule.getName():TakeoverRule(),
         }
+
+"""
+Global ruleset. Created once, configured globally, accessed via getRuleset()
+"""
+ruleset = getNewRuleset()
 
 def getRuleset():
     return ruleset

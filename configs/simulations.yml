@@ -19,6 +19,7 @@ simulation_settings:
 
         defaults:
             sim_iterations: 20
+            sim_repetitions: 1
             sim_breaks: 2
             actor_complexity: 4
             actor_method: random
@@ -57,6 +58,7 @@ simulation_settings:
 
         defaults:
             sim_iterations: 20
+            sim_repetitions: 1
             sim_breaks: 20
             actor_complexity: 4
             actor_method: random
@@ -86,6 +88,17 @@ simulation_settings:
                 Metrics:
                     GraphSize: 40
                     AverageClustering: 3
+
+
+    iterationtest:
+        range:
+            key: "range(0:0.5:5)"
+            sim_name: "RangeTest"
+        list:
+            key: "list(0:1:1.5:20)"
+            sim_name: "ListTest"
+
+        defaults:
 
 
       
