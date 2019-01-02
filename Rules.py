@@ -330,8 +330,9 @@ class NewEdgesRule(Rule):
                               }
 
         if self.internals['edgeId'] is not None:
-            nodeToConnect = self.internals['edgeId'][0]
-            fixedNode = self.internals['edgeId'][1]
+            nodePosFixed = random.choice([0,1])
+            nodeToConnect = self.internals['edgeId'][1-nodePosFixed]
+            fixedNode = self.internals['edgeId'][nodePosFixed]
             edgeCandidates = self._addUnconnected(graph, nodeToConnect, [fixedNode])
             edgesToAdd = set()
             for edgeCandidate in edgeCandidates:
