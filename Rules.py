@@ -320,7 +320,7 @@ class NewEdgesRule(Rule):
         edgesToAdd.update([(nodeToConnect, neighbour) for neighbour in nodesToCheck if not (graph.has_edge(neighbour,nodeToConnect) or neighbour==nodeToConnect)])
 
         if len(edgesToAdd) == 0:
-            self._addUnconnected(graph, nodeToConnect, nextToCheck)
+            edgesToAdd = self._addUnconnected(graph, nodeToConnect, nextToCheck) # edgesToAdd = self._add ...?
 
         return list(edgesToAdd)
 
