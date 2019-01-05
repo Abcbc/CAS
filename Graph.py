@@ -130,3 +130,8 @@ def setVersion(graph, version):
 def incrementVersion(graph):
     graph.graph[KEY_VERSION] += 1
     return getVersion(graph)
+
+def findPaths(g, len, v):
+    if len==0:
+        return [[v]]
+    return [[v] + p for u in nx.neighbors(g, v) for p in findPaths(g,len-1, u) if not v in p]
