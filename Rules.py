@@ -312,7 +312,7 @@ class NewEdgesRule(Rule):
     # Return empty list if no such edge can be added
     def _addUnconnected(self, graph, nodeToConnect, nodesToCheck):
         nextToCheck = set()
-        nextToCheck.update([nx.neighbors(graph, n) for n in nodesToCheck])
+        [nextToCheck.update(list(nx.neighbors(graph, n)) )for n in nodesToCheck]
         if len(nodesToCheck) == len(nextToCheck):
             return []
 
