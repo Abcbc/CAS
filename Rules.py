@@ -1,5 +1,5 @@
 import random
-from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph
+from SelectionRules import selectEdgeFromGraph, selectOpinionPairFromGraph, selectPathFromGraph
 import Graph
 import utils.Logger as Logger
 from utils.Logger import get_logger
@@ -394,27 +394,15 @@ class RemoveEdgeRule(Rule):
 
 class TakeoverRule(Rule):
     """
-    removalProbability: probability that a suitable edge is removed. Range: 0 to 1. Default: 0.5
     minDifference: minimum difference in V of the two nodes that this rule can be applied to them.
     """
 
-    defaultParameters = {'removalProbability': 0.5,
-                         'minDifference': 1,
+    defaultParameters = {'minDifference': 1,
                          }
 
     def _createInternals(self, graph):
-        self.internals = {'edgeId': self._findOperands(graph),
-                          'edgesToRemove': [],
+        self.internals = {'path': self._findOperands(graph),
                           }
-
-        if self.internals['edgeId'] is not None:
-            commonNeighbours = [candidate for candidate in nx.neighbors(graph,self.internals['edgeId'][0]) if candidate in nx.neighbors(graph,self.internals['edgeId'][1])]
-            weakerNodeId = self.internals['edgeId'][0 if graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V] < graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V] else 1]
-
-            if self._calcVDiffMetrik(graph.nodes[self.internals['edgeId'][0]][Graph.KEY_V],graph.nodes[self.internals['edgeId'][1]][Graph.KEY_V]) >= self.parameters['minDifference']:
-                for commonNeighbour in commonNeighbours:
-                    if random.random() < self.parameters['removalProbability']:
-                        self.internals['edgesToRemove'].append((weakerNodeId, commonNeighbour))
 
         return self.internals
 
@@ -422,14 +410,18 @@ class TakeoverRule(Rule):
         return abs(v1-v2)
 
     def _findOperands(self, graph):
-        return selectEdgeFromGraph(graph, weight_getter=lambda edgeId:self._calcVDiffMetrik(graph.nodes[edgeId[0]][Graph.KEY_V],graph.nodes[edgeId[1]][Graph.KEY_V]))
+        def pathMetric(path):
+            return self._calcVDiffMetrik(graph.nodes[path[0]][Graph.KEY_V],graph.nodes[path[2]][Graph.KEY_V])
+        return selectPathFromGraph(graph, 2, weight_getter=pathMetric, predicate=lambda path:pathMetric(path) >= self.parameters['minDifference'])
 
     def apply(self, graph, _parameters=None, _internals=None):
         self._prepareApply(graph,_parameters, _internals)
 
-        if self.internals['edgeId'] is not None:
-            log.debug('Removing edges ' + str(self.internals['edgesToRemove']) + ' because one node of ' + str(self.internals['edgeId']) + ' is stronger')
-            graph.remove_edges_from(self.internals['edgesToRemove'])
+        path = self.internals['path']
+        if path is not None:
+            edgeToRemove = (path[1], path[0] if graph.nodes[path[0]][Graph.KEY_V] < graph.nodes[path[2]][Graph.KEY_V] else path[2])
+            log.debug('Removing edge ' + str(edgeToRemove) + ' because is is the weak one in ' + str(path))
+            graph.remove_edges_from([edgeToRemove])
 
         return graph
 
