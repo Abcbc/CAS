@@ -88,7 +88,7 @@ class MetricOpinionConsensus(Metric):
 
 class MetricNumberOfClusters(Metric):
     def calculate(self, graph):
-        return max(community.best_partition(graph).values())
+        return max(community.best_partition(graph).values())+1
 
     def getMetricName(self):
         return 'NumberOfClusters'

@@ -27,12 +27,12 @@ simulation_settings:
             sim_repetitions: 1
             sim_breaks: 2
             actor_complexity: 4
-            actor_method: deviation
+            actor_method: random
             graph_type: complete
             graph_num_of_node: 40
             graph_init_connects: 10
             graph_branch_probability: 0.6
-            graph_cluster: 2
+            graph_cluster: 1
             graph_cluster_methods: default
             graph_cluster_distribution: even
             OrientationConfirmationRule:
