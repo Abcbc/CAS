@@ -73,15 +73,15 @@ class OpinionFactory:
         :return: an Actor with a defined deviation to its orgin
         """
         origin = actor[self.KEY_OPINIONS]
-        complexity = len(range(origin))
-        alter_steps = int(complexity / deviation)
+        complexity = len(origin)
+        alter_steps = int(complexity * deviation)
         result = [None for x in range(complexity)]
-        indices = [x for x in range(complexity)]
-
+        indices =[x for x in range(complexity)]
+        r.shuffle(indices)
         while indices:
-            idx = indices.pop(r.choice(indices))
-            if alter_steps >= 0:
-                result[idx] = r.choice([x for x in range(-1, 1) if x != origin[idx]])
+            idx = indices.pop()
+            if alter_steps > 0:
+                result[idx] = r.choice([x for x in range(-1, 2) if x != origin[idx]])
                 alter_steps -= 1
             else:
                 result[idx] = origin[idx]

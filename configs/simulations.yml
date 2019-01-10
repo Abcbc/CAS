@@ -1,33 +1,33 @@
 simulation_settings:
     group1:
-        sim1:
-            sim_name: "Group 1/2 CLuster Same opinion 20"
-            sim_iterations: 20
-        sim2:
-            sim_name: "Group 1/2 CLuster Same opinion 40"
-            sim_iterations: 40
-        sim3:
-            sim_name: "Group 1/2 CLuster Same opinion 60"
-            sim_iterations: 60
-        sim4:
-            sim_name: "Group 1/2 CLuster Same opinion 80"
-            sim_iterations: 80
-        sim5:
-            sim_name: "Group 1/2 CLuster Same opinion 100"
-            sim_iterations: 100
-        sim6:
-            sim_name: "Group 1/2 CLuster Same opinion 1000"
-            sim_iterations: 1000
+ #       sim1:
+ #           sim_name: "Group 1/2 CLuster Same opinion 20"
+ #           sim_iterations: 20
+ #       sim2:
+ #           sim_name: "Group 1/2 CLuster Same opinion 40"
+ #           sim_iterations: 40
+ #       sim3:
+ #           sim_name: "Group 1/2 CLuster Same opinion 60"
+ #           sim_iterations: 60
+ #       sim4:
+ #           sim_name: "Group 1/2 CLuster Same opinion 80"
+ #           sim_iterations: 80
+ #       sim5:
+ #           sim_name: "Group 1/2 CLuster Same opinion 100"
+ #           sim_iterations: 100
+ #       sim6:
+ #           sim_name: "Group 1/2 CLuster Same opinion 1000"
+ #           sim_iterations: 1000
         sim7:
             sim_name: "Group 1/2 CLuster Same opinion 10000"
-            sim_iterations: 10000
+            sim_iterations: 2000
 
         defaults:
             sim_iterations: 20
             sim_repetitions: 1
             sim_breaks: 2
             actor_complexity: 4
-            actor_method: random
+            actor_method: deviation
             graph_type: complete
             graph_num_of_node: 40
             graph_init_connects: 10
@@ -57,27 +57,28 @@ simulation_settings:
                 drift: 0.10
 
     group2:
-        sim1:
-            sim_name: "Group 2/2 CLuster Same opinion 20"
-            sim_iterations: 20
-        sim2:
-            sim_name: "Group 2/2 CLuster Same opinion 40"
-            sim_iterations: 40
-        sim3:
-            sim_name: "Group 2/2 CLuster Same opinion 60"
-            sim_iterations: 60
-        sim4:
-            sim_name: "Group 2/2 CLuster Same opinion 80"
-            sim_iterations: 80
-        sim5:
-            sim_name: "Group 2/2 CLuster Same opinion 100"
-            sim_iterations: 100
-        sim6:
-            sim_name: "Group 2/2 CLuster Same opinion 1000"
-            sim_iterations: 1000
+#        sim1:
+#            sim_name: "Group 2/2 CLuster Same opinion 20"
+#            sim_iterations: 20
+#        sim2:
+#            sim_name: "Group 2/2 CLuster Same opinion 40"
+#            sim_iterations: 40
+#        sim3:
+#            sim_name: "Group 2/2 CLuster Same opinion 60"
+#            sim_iterations: 60
+#        sim4:
+#            sim_name: "Group 2/2 CLuster Same opinion 80"
+#            sim_iterations: 80
+#        sim5:
+#            sim_name: "Group 2/2 CLuster Same opinion 100"
+#            sim_iterations: 100
+#        sim6:
+#            sim_name: "Group 2/2 CLuster Same opinion 1000"
+#            sim_iterations: 1000
         sim7:
             sim_name: "Group 2/2 CLuster Same opinion 10000"
-            sim_iterations: 10000
+            sim_iterations: 100
+            actor_method: deviation
 
         defaults:
             sim_iterations: 20
@@ -114,27 +115,27 @@ simulation_settings:
                 drift: 0.10
 
     group3:
-        sim1:
-            sim_name: "Group 3/2 CLuster Same opinion 20"
-            sim_iterations: 20
-        sim2:
-            sim_name: "Group 3/2 CLuster Same opinion 40"
-            sim_iterations: 40
-        sim3:
-            sim_name: "Group 3/2 CLuster Same opinion 60"
-            sim_iterations: 60
-        sim4:
-            sim_name: "Group 3/2 CLuster Same opinion 80"
-            sim_iterations: 80
-        sim5:
-            sim_name: "Group 3/2 CLuster Same opinion 100"
-            sim_iterations: 100
+#        sim1:
+#            sim_name: "Group 3/2 CLuster Same opinion 20"
+#            sim_iterations: 20
+#        sim2:
+#            sim_name: "Group 3/2 CLuster Same opinion 40"
+#            sim_iterations: 40
+#        sim3:
+#            sim_name: "Group 3/2 CLuster Same opinion 60"
+#            sim_iterations: 60
+#        sim4:
+#            sim_name: "Group 3/2 CLuster Same opinion 80"
+#            sim_iterations: 80
+#        sim5:
+#            sim_name: "Group 3/2 CLuster Same opinion 100"
+#            sim_iterations: 100
         sim6:
             sim_name: "Group 3/2 CLuster Same opinion 1000"
-            sim_iterations: 1000
+            sim_iterations: 10
         sim7:
             sim_name: "Group 3/2 CLuster Same opinion 10000"
-            sim_iterations: 10000
+            sim_iterations: 100
 
         defaults:
             sim_iterations: 20

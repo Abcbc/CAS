@@ -64,8 +64,16 @@ class GraphFactory:
         return cluster
 
     def _deviation(self, cluster):
-        for node in cluster.node:
-            cluster[node][KEY_OPINIONS] = self.opinion_factory.random_create()[KEY_OPINIONS]
+        base_opinion = self.opinion_factory.random_create()
+        core_groups = self._core_groups(cluster)
+
+        for key in core_groups:
+            for i in core_groups[key]:
+                cluster.node[i][KEY_OPINIONS] = base_opinion[KEY_OPINIONS]
+            base_opinion = self.opinion_factory.clone_with_deviation(base_opinion, 0.25)
+
+       # for node in cluster.node:
+       #     cluster[node][KEY_OPINIONS] = self.opinion_factory.random_create()[KEY_OPINIONS]
         return cluster
 
     def actor_method_mapper(self, method):
@@ -103,18 +111,19 @@ class GraphFactory:
 
     def create(self):
 
-        node_distrebution = self.node_distribution_method(self.num_of_cluster)
+        #node_distrebution = self.node_distribution_method(self.num_of_cluster)
         clusters = []
 
-        for nodes in node_distrebution:
+        for i in range(self.num_of_cluster):
 
             cluster = self._create_cluster(type=self.graph_type, num_of_nodes=self.num_of_nodes, initial_connections=self.initial_connections,
                                                    probability=self.branch_probability)
 
             clusters.append(cluster)
 
-        g = self._connected(clusters,self.initial_connections)
-        setVersion(g,0)
+        g = self._connected(clusters, self.initial_connections)
+        setVersion(g, 0)
+
         return addConvenienceAttributes(calculateAttributes(g))
 
 
