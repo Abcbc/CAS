@@ -1,21 +1,26 @@
 simulation_settings:
     group1:
         sim1:
-            sim_name: "2 CLuster Same opinion 20"
+            sim_name: "Group 1/2 CLuster Same opinion 20"
             sim_iterations: 20
         sim2:
-            sim_name: "2 CLuster Same opinion 40"
+            sim_name: "Group 1/2 CLuster Same opinion 40"
             sim_iterations: 40
         sim3:
-            sim_name: "2 CLuster Same opinion 60"
+            sim_name: "Group 1/2 CLuster Same opinion 60"
             sim_iterations: 60
         sim4:
-            sim_name: "2 CLuster Same opinion 80"
+            sim_name: "Group 1/2 CLuster Same opinion 80"
             sim_iterations: 80
         sim5:
-            sim_name: "2 CLuster Same opinion 100"
+            sim_name: "Group 1/2 CLuster Same opinion 100"
             sim_iterations: 100
-
+        sim6:
+            sim_name: "Group 1/2 CLuster Same opinion 1000"
+            sim_iterations: 1000
+        sim7:
+            sim_name: "Group 1/2 CLuster Same opinion 10000"
+            sim_iterations: 10000
 
         defaults:
             sim_iterations: 20
@@ -23,9 +28,9 @@ simulation_settings:
             sim_breaks: 2
             actor_complexity: 4
             actor_method: random
-            graph_type: default
-            graph_num_of_node: 10
-            graph_init_connects: 2
+            graph_type: complete
+            graph_num_of_node: 40
+            graph_init_connects: 10
             graph_branch_probability: 0.6
             graph_cluster: 2
             graph_cluster_methods: default
@@ -34,7 +39,7 @@ simulation_settings:
                 fallbackProbability: 0.5
             AdaptationRule:
             NewNodeRule:
-                densityThreshold: 0.8
+                densityThreshold: 0.5
                 meanOrientationThreshold: 0.8
                 opMeanThreshold: 0.8
             NewEdgesRule:
@@ -52,20 +57,37 @@ simulation_settings:
                 drift: 0.10
 
     group2:
+        sim1:
+            sim_name: "Group 2/2 CLuster Same opinion 20"
+            sim_iterations: 20
+        sim2:
+            sim_name: "Group 2/2 CLuster Same opinion 40"
+            sim_iterations: 40
         sim3:
-            sim_name: "some Simulationname3"
+            sim_name: "Group 2/2 CLuster Same opinion 60"
+            sim_iterations: 60
         sim4:
-            sim_name: "some Simulationname4"
+            sim_name: "Group 2/2 CLuster Same opinion 80"
+            sim_iterations: 80
+        sim5:
+            sim_name: "Group 2/2 CLuster Same opinion 100"
+            sim_iterations: 100
+        sim6:
+            sim_name: "Group 2/2 CLuster Same opinion 1000"
+            sim_iterations: 1000
+        sim7:
+            sim_name: "Group 2/2 CLuster Same opinion 10000"
+            sim_iterations: 10000
 
         defaults:
-            sim_iterations: 50
+            sim_iterations: 20
             sim_repetitions: 1
-            sim_breaks: 20
+            sim_breaks: 2
             actor_complexity: 4
             actor_method: random
-            graph_type: default
-            graph_num_of_node: 10
-            graph_init_connects: 2
+            graph_type: complete
+            graph_num_of_node: 40
+            graph_init_connects: 10
             graph_branch_probability: 0.6
             graph_cluster: 2
             graph_cluster_methods: default
@@ -74,8 +96,8 @@ simulation_settings:
                 fallbackProbability: 0.5
             AdaptationRule:
             NewNodeRule:
-                densityThreshold: 0.8
-                meanOrientationThreshold: 0.8
+                densityThreshold: 0.5
+                meanOrientationThreshold: 0.5
                 opMeanThreshold: 0.8
             NewEdgesRule:
                 createEdgeProbability: 0.1
@@ -91,6 +113,59 @@ simulation_settings:
                     AverageClustering: 0.346
                 drift: 0.10
 
+    group3:
+        sim1:
+            sim_name: "Group 3/2 CLuster Same opinion 20"
+            sim_iterations: 20
+        sim2:
+            sim_name: "Group 3/2 CLuster Same opinion 40"
+            sim_iterations: 40
+        sim3:
+            sim_name: "Group 3/2 CLuster Same opinion 60"
+            sim_iterations: 60
+        sim4:
+            sim_name: "Group 3/2 CLuster Same opinion 80"
+            sim_iterations: 80
+        sim5:
+            sim_name: "Group 3/2 CLuster Same opinion 100"
+            sim_iterations: 100
+        sim6:
+            sim_name: "Group 3/2 CLuster Same opinion 1000"
+            sim_iterations: 1000
+        sim7:
+            sim_name: "Group 3/2 CLuster Same opinion 10000"
+            sim_iterations: 10000
 
-
-      
+        defaults:
+            sim_iterations: 20
+            sim_repetitions: 1
+            sim_breaks: 2
+            actor_complexity: 4
+            actor_method: random
+            graph_type: complete
+            graph_num_of_node: 40
+            graph_init_connects: 10
+            graph_branch_probability: 0.6
+            graph_cluster: 2
+            graph_cluster_methods: default
+            graph_cluster_distribution: even
+            OrientationConfirmationRule:
+                fallbackProbability: 0.5
+            AdaptationRule:
+            NewNodeRule:
+                densityThreshold: 0.5
+                meanOrientationThreshold: 0.2
+                opMeanThreshold: 0.8
+            NewEdgesRule:
+                createEdgeProbability: 0.1
+            RemoveEdgeRule:
+                absOrientationThreshold: 0.1
+            TakeoverRule:
+                removalProbability: 0.5
+                minDifference: 1
+            Convergens_Checker:
+                numberOfIterations: 10
+                Metrics:
+                    GraphSize: 10
+                    AverageClustering: 0.346
+                drift: 0.10

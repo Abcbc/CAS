@@ -79,7 +79,18 @@ class GraphFactory:
     def _create_cluster(self, type, num_of_nodes, initial_connections, probability):
         #TODO: Return 1 cluster
 
-        subgraph = nx.generators.barabasi_albert_graph(self.num_of_nodes, self.initial_connections, seed=None)
+        if type == 'default':
+            subgraph = nx.generators.barabasi_albert_graph(num_of_nodes, initial_connections, seed=None)
+        elif type == 'Barabasi-Albert':
+            subgraph = nx.generators.barabasi_albert_graph(num_of_nodes, initial_connections, seed=None)
+        elif type == 'Watts-Strogatz':
+            subgraph = nx.generators.connected_watts_strogatz_graph(num_of_nodes, initial_connections, probability, seed = None)
+        elif type == "Powerlaw-Cluster":
+                subgraph = nx.powerlaw_cluster_graph(num_of_nodes, initial_connections, probability, seed = None)
+        elif type == 'complete':
+            subgraph = nx.generators.complete_graph(num_of_nodes)
+
+
         subgraph = self.actor_init_method(subgraph)
 
         return subgraph
@@ -87,7 +98,8 @@ class GraphFactory:
 
     def _connected(self, clusters, connection=1):
 
-        return clusters[0]
+        result = self.connect_clusters_n_times(clusters, connection)
+        return result
 
     def create(self):
 
@@ -96,12 +108,12 @@ class GraphFactory:
 
         for nodes in node_distrebution:
 
-            cluster = self._create_cluster(type=self.graph_type, num_of_nodes=nodes, initial_connections=self.initial_connections,
+            cluster = self._create_cluster(type=self.graph_type, num_of_nodes=self.num_of_nodes, initial_connections=self.initial_connections,
                                                    probability=self.branch_probability)
 
             clusters.append(cluster)
 
-        g = self._connected(clusters)
+        g = self._connected(clusters,self.initial_connections)
         setVersion(g,0)
         return addConvenienceAttributes(calculateAttributes(g))
 
@@ -249,14 +261,17 @@ class GraphFactory:
             result_graph = nx.disjoint_union(result_graph, subgraph)
             #connect by random edge connected to graph
 
-            used_edges = []
+            used_edges = [[-1, -1]]
             current_edge = [-1, -1]
+            node_idx_1 = -1
+            node_idx_2 = -1
             for i in range(number_of_times):
                 while current_edge in used_edges:
                     node_idx_1 = random.randint(0, offset_to_new_nodes - 1)
-                    node_idx_2 = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1)
+                    node_idx_2 = offset_to_new_nodes + random.randint(0, subgraph_number_of_nodes - 1) -1
+                    current_edge = [node_idx_1,node_idx_2]
                 result_graph.add_edge(node_idx_1, node_idx_2)
-                used_edges.add([node_idx_1, node_idx_2])
+                used_edges.append([node_idx_1, node_idx_2])
 
         return result_graph
 
