@@ -56,14 +56,14 @@ def finish_simulation(simulation_setting, repetitions, logDir):
         metrics_mean.append(np.mean(metric_combined, axis=0))
         metrics_std.append(np.std(metric_combined, axis=0))
 
-    combinedCsv = csv.writer(open(logDir+'metrics.csv','w'))
-    combinedCsv.writerow([metric.getMetricName()+suffix for metric in analyzers[0].metrics for suffix in ['_mean','_std']])
-    for i in range(len(analyzers[0].results['Version'])):
-        row = []
-        for metric_mean, metric_std in zip(metrics_mean,metrics_std):
-            row.append(metric_mean[i])
-            row.append(metric_std[i])
-        combinedCsv.writerow(row)
+    for suffix, contents in zip(['mean','std'], [metrics_mean, metrics_std]):
+        combinedCsv = csv.writer(open(logDir+'metrics_'+suffix+'.csv','w'))
+        combinedCsv.writerow([metric.getMetricName() for metric in analyzers[0].metrics])
+        for i in range(len(analyzers[0].results['Version'])):
+            row = []
+            for row_contents in contents:
+                row.append(row_contents[i])
+            combinedCsv.writerow(row)
 
     mean = {metric.getMetricName():metrics_mean[i] for i, metric in enumerate(analyzers[0].metrics)}
     std = {metric.getMetricName():metrics_std[i] for i, metric in enumerate(analyzers[0].metrics)}
