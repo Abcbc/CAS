@@ -40,6 +40,7 @@ import matplotlib.pyplot as plt
 
 def run_repetition(ruleset, graph, logDir, repetition, iterations):
     updater = Updater.Updater(ruleset)
+    updater.disableLogging()
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
 
     for iteration in range(iterations):

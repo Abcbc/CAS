@@ -11,13 +11,15 @@ class Updater:
             ruleset = getRuleset()
         self.rules = ruleset
         self.analyzer = Analyser.Analyser()
+        self.writeLog = True
 
     def setGraph(self, graph, logger):
         self.graph = graph
         self.graph = Graph.calculateAttributes(self.graph)
 
-        self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(logger))
-        self.graphLogger.setGraphGetter(lambda : self.graph)
+        if self.writeLog:
+            self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(logger))
+            self.graphLogger.setGraphGetter(lambda : self.graph)
 
         self.analyzer.initAnalysis(self.graph, config={'stepSize':10})
         self.analyzer.onNewVersion(self.graph)
@@ -41,15 +43,23 @@ class Updater:
 
             Graph.incrementVersion(self.graph)
 
-            self.graphLogger.logRule(self.rules[ruleName])
+            if self.writeLog:
+                self.graphLogger.logRule(self.rules[ruleName])
 
             self.analyzer.onNewVersion(self.graph)
         except TimeoutError:
             pass
 
     def close(self):
-        self.graphLogger.close()
+        if self.writeLog:
+            self.graphLogger.close()
         self.analyzer.finishAnalysis(self.graph)
 
     def getAnalyzer(self):
         return self.analyzer
+
+    def enableLogging(self):
+        self.writeLog = True
+
+    def disableLogging(self):
+        self.writeLog = False
