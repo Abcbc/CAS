@@ -19,7 +19,8 @@ class Updater:
         self.graphLogger = gl.GraphLogger(self.graph, gl.GraphLogWriter(logger))
         self.graphLogger.setGraphGetter(lambda : self.graph)
 
-        self.analyzer.initAnalysis(self.graph, config={'stepSize':1})
+        self.analyzer.initAnalysis(self.graph, config={'stepSize':10})
+        self.analyzer.onNewVersion(self.graph)
 
     def addRule(self, rule):
         self.rules[rule.getName()] = rule
