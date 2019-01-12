@@ -15,6 +15,17 @@ import GraphLog as gl
 import Rules
 
 import matplotlib.pyplot as plt
+# Note on concurrent simulation: repetition-level concurrency would be the solution that offers
+# speedup in all cases (provided with more than one core, of course). But I do not know if the
+# jobs are executed in the same order as they are given to apply_async. If they are not, with
+# bad execution orders (when all the last repetition of every step are the last jobs to get
+# executed), all results have to be kept im memory before the mean and std of all repetitions of
+# one step can be computed. In the extreme case,
+# <number_of_steps>*<repetitions>*<number_of_metrics>*<number_of_iterations> = a lot
+# of datapoints have to be stored in memory.
+# So I implemented concurrency in step level, which yields no speedup if many repetitions of
+# only few steps are needed.
+
 def run_repetition(ruleset, graph, logDir, repetition, iterations):
     updater = Updater.Updater(ruleset)
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
@@ -29,7 +40,39 @@ def run_repetition(ruleset, graph, logDir, repetition, iterations):
         'analyzer': updater.getAnalyzer(),
     }
 
-def run_simulation(simulation_setting, logDir, pool):
+def finish_simulation(simulation_setting, repetitions, logDir):
+    analyzers = [rep['analyzer'] for rep in repetitions]
+
+    cnf.save_config(simulation_setting,  logDir+'settings.yaml')
+
+    for ind, analyser in enumerate(analyzers):
+        analyser.write(logDir+'graph_'+str(ind)+'.csv')
+
+    # build mean and std over all analyzers
+    metrics_mean = []
+    metrics_std = []
+    for metric in analyzers[0].metrics:
+        metric_combined = np.array([analyser.results[metric.getMetricName()] for analyser in analyzers]) # a row is an analyzer
+        metrics_mean.append(np.mean(metric_combined, axis=0))
+        metrics_std.append(np.std(metric_combined, axis=0))
+
+    combinedCsv = csv.writer(open(logDir+'metrics.csv','w'))
+    combinedCsv.writerow([metric.getMetricName()+suffix for metric in analyzers[0].metrics for suffix in ['_mean','_std']])
+    for i in range(len(analyzers[0].results['Version'])):
+        row = []
+        for metric_mean, metric_std in zip(metrics_mean,metrics_std):
+            row.append(metric_mean[i])
+            row.append(metric_std[i])
+        combinedCsv.writerow(row)
+
+    mean = {metric.getMetricName():metrics_mean[i] for i, metric in enumerate(analyzers[0].metrics)}
+    std = {metric.getMetricName():metrics_std[i] for i, metric in enumerate(analyzers[0].metrics)}
+
+    return {'mean':mean,
+            'std':std,
+            }
+
+def run_simulation(simulation_setting, logDir):
     log.debug(simulation_setting)
     gf = GraphFactory(simulation_setting)
     repetitions = []
@@ -41,10 +84,9 @@ def run_simulation(simulation_setting, logDir, pool):
         for rule in ruleset.values():
             rule.setParameters(simulation_setting)
 
+        repetitions.append(run_repetition(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"]))
 
-
-        repetitions.append(pool.apply_async(run_repetition, args=(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"])))
-    return repetitions
+    return finish_simulation(simulation_setting, repetitions, logDir)
 
 def main():
     pool = mp.Pool()
@@ -71,12 +113,12 @@ def main():
                 os.mkdir(stepDir)
             except(FileExistsError):
                 pass
-            cnf.save_config(stepConfig,  stepDir+'settings.yaml')
-            repetitions = run_simulation(stepConfig.copy(), stepDir, pool)
+
+            stepResult = pool.apply_async(run_simulation, args=(stepConfig.copy(), stepDir))
 
             results[simulation_setting['sim_name']]['steps'].append({
                 'settings':stepConfig,
-                'repetitions': repetitions,
+                'result': stepResult,
                 'stepDir': stepDir,
             })
 
@@ -84,43 +126,20 @@ def main():
     # monitor progress
     ready = False
     while not ready:
-        all = sum([1 for sim in results.values() for step in sim['steps'] for rep in step['repetitions']])
-        finished = sum([1 for sim in results.values() for step in sim['steps'] for rep in step['repetitions'] if rep.ready()])
+        all = sum([step['settings']['sim_repetitions'] for sim in results.values() for step in sim['steps']])
+        finished = sum([step['settings']['sim_repetitions'] for sim in results.values() for step in sim['steps'] if step['result'].ready()])
         print(str(finished) + ' of ' + str(all) + ' jobs finished')
         ready = (all <= finished)
-        time.sleep(1)
+        try:
+            time.sleep(1)
+        except:
+            pass
+
+    if  sum([not step['result'].successful() for sim in results.values() for step in sim['steps']]) > 0:
+        log.error('an exception occurrent in a simulation')
 
     pool.join()
 
-    for name, sim in results.items():
-        try:
-            os.mkdir(sim['dir'] + 'img/')
-        except FileExistsError:
-            pass
-        for step in sim['steps']:
-            if  sum([not rep.successful() for rep in step['repetitions']]) > 0:
-                log.error('an exception occurrent in a simulation')
-            analyzers = [rep.get()['analyzer'] for rep in step['repetitions']]
-
-            for ind, analyser in enumerate(analyzers):
-                analyser.write(step['stepDir']+'graph_'+str(ind)+'.csv')
-
-            # build mean and std over all analyzers
-            metrics_mean = []
-            metrics_std = []
-            for metric in analyzers[0].metrics:
-                metric_combined = np.array([analyser.results[metric.getMetricName()] for analyser in analyzers]) # a row is an analyzer
-                metrics_mean.append(np.mean(metric_combined, axis=0))
-                metrics_std.append(np.std(metric_combined, axis=0))
-
-            combinedCsv = csv.writer(open(step['stepDir']+'metrics.csv','w'))
-            combinedCsv.writerow([metric.getMetricName()+suffix for metric in analyzers[0].metrics for suffix in ['_mean','_std']])
-            for i in range(len(analyzers[0].results['Version'])):
-                row = []
-                for metric_mean, metric_std in zip(metrics_mean,metrics_std):
-                    row.append(metric_mean[i])
-                    row.append(metric_std[i])
-                combinedCsv.writerow(row)
 
 def run_from_log():
     logfile = '.log'
