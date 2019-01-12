@@ -30,20 +30,15 @@ simulation_settings:
             graph_cluster: 2
             graph_cluster_methods: default
             graph_cluster_distribution: even
-            OrientationConfirmationRule:
-                fallbackProbability: 0.5
+            OrientationConfirmationRule_fallbackProbability: 0.5
             AdaptationRule:
-            NewNodeRule:
-                densityThreshold: 0.8
-                meanOrientationThreshold: 0.8
-                opMeanThreshold: 0.8
-            NewEdgesRule:
-                createEdgeProbability: 0.1
-            RemoveEdgeRule:
-                absOrientationThreshold: 0.1
-            TakeoverRule:
-                removalProbability: 0.5
-                minDifference: 1
+            NewNodeRule_densityThreshold: 0.8
+            NewNodeRule_meanOrientationThreshold: 0.8
+            NewNodeRule_opMeanThreshold: 0.8
+            NewEdgesRule_createEdgeProbability: 0.1
+            RemoveEdgeRule_absOrientationThreshold: 0.1
+            TakeoverRule_removalProbability: 0.5
+            TakeoverRule_minDifference: 1
 
     group2:
         sim3:
@@ -64,31 +59,12 @@ simulation_settings:
             graph_cluster: 2
             graph_cluster_methods: default
             graph_cluster_distribution: even
-            OrientationConfirmationRule:
-                fallbackProbability: 0.5
+            OrientationConfirmationRule_fallbackProbability: range(0.2:0.1:0.8)
             AdaptationRule:
-            NewNodeRule:
-                densityThreshold: 0.8
-                meanOrientationThreshold: 0.8
-                opMeanThreshold: 0.8
-            NewEdgesRule:
-                createEdgeProbability: 0.1
-            RemoveEdgeRule:
-                absOrientationThreshold: 0.1
-            TakeoverRule:
-                removalProbability: 0.5
-                minDifference: 1
-
-
-    iterationtest:
-        range:
-            key: "range(0:0.5:5)"
-            sim_name: "RangeTest"
-        list:
-            key: "list(0:1:1.5:20)"
-            sim_name: "ListTest"
-
-        defaults:
-
-
-      
+            NewNodeRule_densityThreshold: 0.8
+            NewNodeRule_meanOrientationThreshold: 0.8
+            NewNodeRule_opMeanThreshold: 0.8
+            NewEdgesRule_createEdgeProbability: 0.1
+            RemoveEdgeRule_absOrientationThreshold: 0.1
+            TakeoverRule_removalProbability: 0.5
+            TakeoverRule_minDifference: 1

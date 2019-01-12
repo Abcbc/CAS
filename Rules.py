@@ -51,7 +51,7 @@ class Rule:
         Sets parameters from the dictionary (can be retrieved with getParameters)
         """
         for paramKey in self.defaultParameters:
-            self.defaultParameters[paramKey] = parameters[paramKey]
+            self.defaultParameters[paramKey] = parameters[self.getName()+'_'+paramKey]
 
     def getInternals(self):
         """

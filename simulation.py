@@ -38,8 +38,8 @@ def run_simulation(simulation_setting, logDir, pool):
         g = gf.create()
 
         ruleset = Rules.getNewRuleset()
-        for rulename, rule in ruleset.items():
-            rule.setParameters(simulation_setting[rulename])
+        for rule in ruleset.values():
+            rule.setParameters(simulation_setting)
 
 
 
