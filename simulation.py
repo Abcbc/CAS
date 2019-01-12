@@ -102,13 +102,6 @@ def main():
                 log.error('an exception occurrent in a simulation')
             analyzers = [rep.get()['analyzer'] for rep in step['repetitions']]
 
-            for metric in analyzers[0].metrics:
-                plt.figure()
-                for ind, analyser in enumerate(analyzers):
-                    metric.plot(plt, analyser.results['Version'], analyser.results[metric.getMetricName()],label=str(ind))
-                plt.legend(loc='upper left')
-                plt.savefig(sim['dir'] + 'img/' + metric.getMetricName() + '.png')
-
             for ind, analyser in enumerate(analyzers):
                 analyser.write(step['stepDir']+'graph_'+str(ind)+'.csv')
 
