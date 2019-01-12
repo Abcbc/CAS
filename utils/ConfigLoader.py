@@ -3,6 +3,7 @@ import os
 import re
 import itertools
 import copy
+import math
 config_path = "/".join([os.getcwd(), "configs", "simulations.yml"])
 
 
@@ -95,8 +96,9 @@ def _build_iterable(it_str):
         return list
 
 def range_it(first, last, step):
+        is_integer = math.remainder(first,1) < 1e-10 and math.remainder(last,1) < 1e-10 and math.remainder(step,1) < 1e-10
         n = 0
         while first + n*step <= last:
-            yield first + n*step
+            yield first + n*step if not is_integer else int(first + n*step)
             n += 1
         return
