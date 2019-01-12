@@ -49,21 +49,22 @@ regex_range = re.compile('^range\((?P<first>'+regex_float_lit_str+'):(?P<step>'+
 regex_list_identifier = re.compile('^list.*')
 regex_list = re.compile('^list\((?P<items>(.+,?)*)\)$')
 
-def get_iteration_steps(config):
-    step_configs = []
+def config_generator(config, iterator_keys, combinations):
+    while True:
+        try:
+            inst = next(combinations)
+            for pos, key in enumerate(iterator_keys):
+                config[key] = inst[pos]
+            yield config
+        except StopIteration:
+            return
 
+def get_iteration_steps(config):
     # 1. find all iterator commands
     iterator_keys, iterator_strings = _findIterators(config)
     iterables = [_build_iterable(it_str) for it_str in iterator_strings]
 
-    # 2. iterate through  all iterator commands
-    for combination in itertools.product(*iterables):
-        _config = copy.deepcopy(config)
-        for pos, key in enumerate(iterator_keys):
-            _config[key] = combination[pos]
-        step_configs.append(_config)
-
-    return step_configs
+    return config_generator(config, iterator_keys, itertools.product(*iterables))
 
 def _findIterators(configDict):
     iterator_keys = []

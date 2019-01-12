@@ -72,7 +72,7 @@ def main():
             except(FileExistsError):
                 pass
             cnf.save_config(stepConfig,  stepDir+'settings.yaml')
-            repetitions = run_simulation(stepConfig, stepDir, pool)
+            repetitions = run_simulation(stepConfig.copy(), stepDir, pool)
 
             results[simulation_setting['sim_name']]['steps'].append({
                 'settings':stepConfig,
