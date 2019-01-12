@@ -24,8 +24,11 @@ def set_defaults(group):
     return result
 
 
-def load_config():
-    config = yml.load(open(config_path, "r")).get("simulation_settings")
+def load_config(cfg_file = None):
+    if cfg_file is not None:
+        config = yml.load(open(cfg_file, "r")).get("simulation_settings")
+    else:
+        config = yml.load(open(config_path, "r")).get("simulation_settings")
     result = []
 
     for group in get_groups(config):
