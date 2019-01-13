@@ -26,6 +26,18 @@ import matplotlib.pyplot as plt
 # So I implemented concurrency in step level, which yields no speedup if many repetitions of
 # only few steps are needed.
 
+# The results are stored in  structures/files as follows:
+# results[<sim_name>]: -'dir': string, directory for files for this simulation
+#                      - 'steps': list of - 'settings': dict
+#                                         - 'result': result object of dict - 'mean': dict metric_name->data
+#                                                                           - 'std': dict metric_name->data
+#                                         - 'stepDir': string, directory for this simulation step
+# The full simulation data can be written to disk in the following directory structure:
+# experiment/<sim_name>/<step_number>/ contains graph_<repetition>.log, graph_<repetition>.csv, settings.yaml,
+# metrics_mean.csv, metrics_std.csv
+# Especially the graph logs may grow large and numerous, so graph logging can be disabled  in de updater.
+# The graph csv files can be turned off by commenting out the respective lines in finish_simulation.
+
 def run_repetition(ruleset, graph, logDir, repetition, iterations):
     updater = Updater.Updater(ruleset)
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
@@ -45,6 +57,7 @@ def finish_simulation(simulation_setting, repetitions, logDir):
 
     cnf.save_config(simulation_setting,  logDir+'settings.yaml')
 
+    # write graph metrics to csv
     for ind, analyser in enumerate(analyzers):
         analyser.write(logDir+'graph_'+str(ind)+'.csv')
 
