@@ -68,3 +68,6 @@ simulation_settings:
             RemoveEdgeRule_absOrientationThreshold: 0.1
             TakeoverRule_removalProbability: 0.5
             TakeoverRule_minDifference: 1
+
+            active_rules:
+                - AdaptationRule

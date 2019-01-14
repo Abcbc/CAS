@@ -94,7 +94,7 @@ def run_simulation(simulation_setting, logDir):
     for repetition in range(simulation_setting["sim_repetitions"]):
         g = gf.create()
 
-        ruleset = Rules.getNewRuleset()
+        ruleset = {name:rule for name, rule in Rules.getNewRuleset().items() if name in simulation_setting['active_rules']}
         for rule in ruleset.values():
             rule.setParameters(simulation_setting)
 
