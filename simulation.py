@@ -65,10 +65,13 @@ def finish_simulation(simulation_setting, repetitions, logDir):
     # build mean and std over all analyzers
     metrics_mean = []
     metrics_std = []
+    metrics_mean.append(analyzers[0].results['Version'])
+    metrics_std.append(analyzers[0].results['Version'])
     for metric in analyzers[0].metrics:
-        metric_combined = np.array([analyser.results[metric.getMetricName()] for analyser in analyzers]) # a row is an analyzer
-        metrics_mean.append(np.mean(metric_combined, axis=0))
-        metrics_std.append(np.std(metric_combined, axis=0))
+        if metric.getMetricName() is not 'Version':
+            metric_combined = np.array([analyser.results[metric.getMetricName()] for analyser in analyzers]) # a row is an analyzer
+            metrics_mean.append(np.mean(metric_combined, axis=0))
+            metrics_std.append(np.std(metric_combined, axis=0))
 
     for suffix, contents in zip(['mean','std'], [metrics_mean, metrics_std]):
         combinedCsv = csv.writer(open(logDir+'metrics_'+suffix+'.csv','w'))
