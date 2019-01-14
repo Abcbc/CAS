@@ -102,7 +102,7 @@ class OrientationConfirmationRule(Rule):
         if self.internals['edgeId'] is not None:
             nodeA = graph.nodes[self.internals['edgeId'][0]]
             for i in range(len(nodeA[Graph.KEY_OPINIONS])):
-                self.internals['fallbackDecision'].append( random.random() > self._calcProbability() )
+                self.internals['fallbackDecision'].append( random.random() < self._calcProbability() )
                 self.internals['fallbackSelection'].append( random.choice([0,1]) )
 
         return self.internals
