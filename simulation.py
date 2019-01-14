@@ -15,6 +15,9 @@ import GraphLog as gl
 import Rules
 
 import matplotlib.pyplot as plt
+import MyGraphFactory
+import copy
+
 # Note on concurrent simulation: repetition-level concurrency would be the solution that offers
 # speedup in all cases (provided with more than one core, of course). But I do not know if the
 # jobs are executed in the same order as they are given to apply_async. If they are not, with
@@ -130,7 +133,8 @@ def main():
             except(FileExistsError):
                 pass
 
-            stepResult = pool.apply_async(run_simulation, args=(stepConfig.copy(), stepDir))
+            stepResult = pool.apply_async(run_simulation, args=(copy.deepcopy(stepConfig), stepDir))
+            # stepResult = run_simulation(stepConfig, stepDir)
 
             results[simulation_setting['sim_name']]['steps'].append({
                 'settings':stepConfig,
