@@ -86,6 +86,30 @@ class MetricOpinionConsensus(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Consensus', label)
 
+class MetricOpinionStrength(Metric):
+    def __init__(self, topicIndex=None):
+        self.topicIndex = topicIndex if topicIndex is not None else 'All'
+
+    def _calcForTopic(self, graph, ind):
+        opinions = np.array([graph.nodes[nid][Graph.KEY_OPINIONS][ind] for nid in graph.nodes])
+        numberNeutral = np.sum(opinions == 0)
+        return numberNeutral/opinions.size
+
+    def calculate(self, graph):
+        strength = []
+        topicIndex = self.topicIndex if self.topicIndex is not 'All' else list(range(len(graph.nodes[0][Graph.KEY_OPINIONS])))
+
+        for i in topicIndex:
+            strength.append(self._calcForTopic(graph, i))
+
+        return np.mean(strength)
+
+    def getMetricName(self):
+        return 'OpinionStrength' + str(self.topicIndex)
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Strength', label)
+
 class MetricNumberOfClusters(Metric):
     def calculate(self, graph):
         return max(community.best_partition(graph).values())
@@ -125,6 +149,7 @@ availableMetrics = [
     MetricAvgClustering(),
     MetricDensity(),
     MetricOpinionConsensus(),
+    MetricOpinionStrength(),
     MetricTransitivity(),
     MetricNumberOfClusters(),
     MetricMeanOrientation(),
