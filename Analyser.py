@@ -96,6 +96,16 @@ class MetricNumberOfClusters(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Number', label)
 
+class MetricMeanOrientation(Metric):
+    def calculate(self, graph):
+        return np.mean([graph.edges[eid][Graph.KEY_ORIENTATION] for eid in graph.edges])
+
+    def getMetricName(self):
+        return 'MeanOrientation'
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Mean orientation', label)
+
 class HelperMetricVersion(Metric):
     def calculate(self, graph):
         return Graph.getVersion(graph)
@@ -117,6 +127,7 @@ availableMetrics = [
     MetricOpinionConsensus(),
     MetricTransitivity(),
     MetricNumberOfClusters(),
+    MetricMeanOrientation(),
 ]
 
 class Analyser:
