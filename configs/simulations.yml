@@ -75,3 +75,5 @@ simulation_settings:
             NewEdgesRule_weight: 1
             RemoveEdgeRule_weight: 1
             TakeoverRule_weight: 1
+
+            logging_enabled: False
