@@ -69,5 +69,9 @@ simulation_settings:
             TakeoverRule_removalProbability: 0.5
             TakeoverRule_minDifference: 1
 
-            active_rules:
-                - AdaptationRule
+            OrientationConfirmationRule_weight: 1
+            AdaptationRule_weight: 1
+            NewNodeRule_weight: 1
+            NewEdgesRule_weight: 1
+            RemoveEdgeRule_weight: 1
+            TakeoverRule_weight: 1
