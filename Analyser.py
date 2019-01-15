@@ -93,7 +93,7 @@ class MetricOpinionStrength(Metric):
     def _calcForTopic(self, graph, ind):
         opinions = np.array([graph.nodes[nid][Graph.KEY_OPINIONS][ind] for nid in graph.nodes])
         numberNeutral = np.sum(opinions == 0)
-        return numberNeutral/opinions.size
+        return 1-numberNeutral/opinions.size
 
     def calculate(self, graph):
         strength = []
