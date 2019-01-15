@@ -97,12 +97,32 @@ def _build_iterable(it_str):
         return range_it(first, last, step)
     elif list_match is not None:
         list = list_match.group('items').split(':')
-        return list
+        return list_it(list)
+
+# form the list to list of integers or floats if possible
+def list_it(_list):
+    isNumber = False
+    try:
+        f = float(_list[0]) # if no exception => is float => expect all members to be numbers
+        isNumber = True
+    except ValueError:
+        pass
+    list = None
+    if isNumber:
+        try:
+            list = [int(v) for v in _list] # try to read integers
+        except ValueError:
+            list = [float(v) for v in _list] # else expect floats, raise error if something is not a number
+    else:
+        list = _list
+    for v in list:
+        yield v
+    return
 
 def range_it(first, last, step):
-        is_integer = math.remainder(first,1) < 1e-10 and math.remainder(last,1) < 1e-10 and math.remainder(step,1) < 1e-10
-        n = 0
-        while first + n*step <= last:
-            yield first + n*step if not is_integer else int(first + n*step)
-            n += 1
-        return
+    is_integer = math.remainder(first,1) < 1e-10 and math.remainder(last,1) < 1e-10 and math.remainder(step,1) < 1e-10
+    n = 0
+    while first + n*step <= last:
+        yield first + n*step if not is_integer else int(first + n*step)
+        n += 1
+    return
