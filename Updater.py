@@ -6,12 +6,16 @@ from utils.Logger import get_graph_logger
 import Analyser
 
 class Updater:
-    def __init__(self, ruleset=None):
+    default_config = {
+        'logging_enabled': False,
+    }
+
+    def __init__(self, ruleset=None, config=default_config):
         if ruleset is None:
             ruleset = getRuleset()
         self.rules = ruleset
         self.analyzer = Analyser.Analyser()
-        self.writeLog = True
+        self.writeLog = config['logging_enabled']
 
     def setGraph(self, graph, logger):
         self.graph = graph
@@ -57,9 +61,3 @@ class Updater:
 
     def getAnalyzer(self):
         return self.analyzer
-
-    def enableLogging(self):
-        self.writeLog = True
-
-    def disableLogging(self):
-        self.writeLog = False

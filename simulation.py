@@ -38,12 +38,11 @@ import matplotlib.pyplot as plt
 # Especially the graph logs may grow large and numerous, so graph logging can be disabled  in de updater.
 # The graph csv files can be turned off by commenting out the respective lines in finish_simulation.
 
-def run_repetition(ruleset, graph, logDir, repetition, iterations):
-    updater = Updater.Updater(ruleset)
-    updater.disableLogging()
+def run_repetition(ruleset, config, graph, logDir, repetition):
+    updater = Updater.Updater(ruleset, config)
     updater.setGraph(graph, get_graph_logger('GraphLogger_'+logDir+'graph_'+str(repetition), logDir+'graph_'+str(repetition)+'.log'))
 
-    for iteration in range(iterations):
+    for iteration in range(config["sim_iterations"]):
         updater.update()
 
     updater.close()
@@ -97,11 +96,11 @@ def run_simulation(simulation_setting, logDir):
     for repetition in range(simulation_setting["sim_repetitions"]):
         g = gf.create()
 
-        ruleset = {name:rule for name, rule in Rules.getNewRuleset().items() if name in simulation_setting['active_rules']}
+        ruleset = {name:rule for name, rule in Rules.getNewRuleset().items()}
         for rule in ruleset.values():
             rule.setParameters(simulation_setting)
 
-        repetitions.append(run_repetition(ruleset, g, logDir, repetition, simulation_setting["sim_iterations"]))
+        repetitions.append(run_repetition(ruleset, simulation_setting, g, logDir, repetition))
 
     return finish_simulation(simulation_setting, repetitions, logDir)
 
