@@ -1,38 +1,69 @@
 simulation_settings:
     group1:
- #       sim1:
- #           sim_name: "Group 1/2 CLuster Same opinion 20"
- #           sim_iterations: 20
- #       sim2:
- #           sim_name: "Group 1/2 CLuster Same opinion 40"
- #           sim_iterations: 40
- #       sim3:
- #           sim_name: "Group 1/2 CLuster Same opinion 60"
- #           sim_iterations: 60
- #       sim4:
- #           sim_name: "Group 1/2 CLuster Same opinion 80"
- #           sim_iterations: 80
- #       sim5:
- #           sim_name: "Group 1/2 CLuster Same opinion 100"
- #           sim_iterations: 100
- #       sim6:
- #           sim_name: "Group 1/2 CLuster Same opinion 1000"
- #           sim_iterations: 1000
+        sim1:
+            sim_name: "Random 4"
+            actor_method: random
+            actor_complexity: 4
+        sim2:
+            sim_name: "Random 10"
+            actor_method: random
+            actor_complexity: 10
+        sim3:
+            sim_name: "1000 Iterations"
+            sim_iterations: 1000
+            sim_repetitions: 1
+        sim4:
+            sim_name: "5000 Iterations"
+            sim_iterations: 5000
+            sim_repetitions: 1
+        sim5:
+            sim_name: "30000 Iterations"
+            sim_iterations: 30000
+            sim_repetitions: 1
+        sim6:
+            sim_name: "5000 Iterations 5 repetitions"
+            sim_iterations: 5000
         sim7:
-            sim_name: "Group 1/2 CLuster Same opinion 10000"
-            sim_iterations: 2000
+            sim_name: "30000 Iterations 5 repetitions"
+            sim_iterations: 30000
+        sim8:
+            sim_name: "10000 Iterations 5 repetitions 10 Meinungen 10 Verbindungen"
+            sim_iterations: 10000
+            actor_complexity: 10
+            graph_init_connects: 10
+        sim9:
+            sim_name: "10000 Iterations 5 repetitions 10 Meinungen 100 Verbindungen"
+            sim_iterations: 10000
+            actor_complexity: 100
+            graph_init_connects: 10
+        sim10:
+            sim_name: "10000 Iterations 5 repetitions 10 Meinungen 400 Verbindungen"
+            sim_iterations: 10000
+            actor_complexity: 400
+            graph_init_connects: 10
+        sim11:
+            sim_name: "10000 Iterations 5 repetitions 10 Meinungen 800 Verbindungen"
+            sim_iterations: 10000
+            actor_complexity: 800
+            graph_init_connects: 10
+        sim11:
+            sim_name: "10000 Iterations 5 repetitions 10 Meinungen 1600 Verbindungen"
+            sim_iterations: 10000
+            actor_complexity: 1600
+            graph_init_connects: 10
+
 
         defaults:
-            sim_iterations: 20
-            sim_repetitions: 1
+            sim_iterations: 30000
+            sim_repetitions: 5
             sim_breaks: 2
             actor_complexity: 4
             actor_method: random
             graph_type: complete
             graph_num_of_node: 40
-            graph_init_connects: 10
+            graph_init_connects: 5
             graph_branch_probability: 0.6
-            graph_cluster: 1
+            graph_cluster: 2
             graph_cluster_methods: default
             graph_cluster_distribution: even
             OrientationConfirmationRule:
@@ -43,130 +74,16 @@ simulation_settings:
                 meanOrientationThreshold: 0.8
                 opMeanThreshold: 0.8
             NewEdgesRule:
-                createEdgeProbability: 0.1
+                createEdgeProbability: 0.5
             RemoveEdgeRule:
-                absOrientationThreshold: 0.1
+                absOrientationThreshold: 0.5
             TakeoverRule:
                 removalProbability: 0.5
                 minDifference: 1
             Convergens_Checker:
                 numberOfIterations: 10
                 Metrics:
-                    GraphSize: 10
-                    AverageClustering: 0.346
+                    GraphSize: 80
+                    OpinionConsensusAll: 0.5
                 drift: 0.10
 
-    group2:
-#        sim1:
-#            sim_name: "Group 2/2 CLuster Same opinion 20"
-#            sim_iterations: 20
-#        sim2:
-#            sim_name: "Group 2/2 CLuster Same opinion 40"
-#            sim_iterations: 40
-#        sim3:
-#            sim_name: "Group 2/2 CLuster Same opinion 60"
-#            sim_iterations: 60
-#        sim4:
-#            sim_name: "Group 2/2 CLuster Same opinion 80"
-#            sim_iterations: 80
-#        sim5:
-#            sim_name: "Group 2/2 CLuster Same opinion 100"
-#            sim_iterations: 100
-#        sim6:
-#            sim_name: "Group 2/2 CLuster Same opinion 1000"
-#            sim_iterations: 1000
-        sim7:
-            sim_name: "Group 2/2 CLuster Same opinion 10000"
-            sim_iterations: 100
-            actor_method: deviation
-
-        defaults:
-            sim_iterations: 20
-            sim_repetitions: 1
-            sim_breaks: 2
-            actor_complexity: 4
-            actor_method: random
-            graph_type: complete
-            graph_num_of_node: 40
-            graph_init_connects: 10
-            graph_branch_probability: 0.6
-            graph_cluster: 2
-            graph_cluster_methods: default
-            graph_cluster_distribution: even
-            OrientationConfirmationRule:
-                fallbackProbability: 0.5
-            AdaptationRule:
-            NewNodeRule:
-                densityThreshold: 0.5
-                meanOrientationThreshold: 0.5
-                opMeanThreshold: 0.8
-            NewEdgesRule:
-                createEdgeProbability: 0.1
-            RemoveEdgeRule:
-                absOrientationThreshold: 0.1
-            TakeoverRule:
-                removalProbability: 0.5
-                minDifference: 1
-            Convergens_Checker:
-                numberOfIterations: 10
-                Metrics:
-                    GraphSize: 10
-                    AverageClustering: 0.346
-                drift: 0.10
-
-    group3:
-#        sim1:
-#            sim_name: "Group 3/2 CLuster Same opinion 20"
-#            sim_iterations: 20
-#        sim2:
-#            sim_name: "Group 3/2 CLuster Same opinion 40"
-#            sim_iterations: 40
-#        sim3:
-#            sim_name: "Group 3/2 CLuster Same opinion 60"
-#            sim_iterations: 60
-#        sim4:
-#            sim_name: "Group 3/2 CLuster Same opinion 80"
-#            sim_iterations: 80
-#        sim5:
-#            sim_name: "Group 3/2 CLuster Same opinion 100"
-#            sim_iterations: 100
-        sim6:
-            sim_name: "Group 3/2 CLuster Same opinion 1000"
-            sim_iterations: 10
-        sim7:
-            sim_name: "Group 3/2 CLuster Same opinion 10000"
-            sim_iterations: 100
-
-        defaults:
-            sim_iterations: 20
-            sim_repetitions: 1
-            sim_breaks: 2
-            actor_complexity: 4
-            actor_method: random
-            graph_type: complete
-            graph_num_of_node: 40
-            graph_init_connects: 10
-            graph_branch_probability: 0.6
-            graph_cluster: 2
-            graph_cluster_methods: default
-            graph_cluster_distribution: even
-            OrientationConfirmationRule:
-                fallbackProbability: 0.5
-            AdaptationRule:
-            NewNodeRule:
-                densityThreshold: 0.5
-                meanOrientationThreshold: 0.2
-                opMeanThreshold: 0.8
-            NewEdgesRule:
-                createEdgeProbability: 0.1
-            RemoveEdgeRule:
-                absOrientationThreshold: 0.1
-            TakeoverRule:
-                removalProbability: 0.5
-                minDifference: 1
-            Convergens_Checker:
-                numberOfIterations: 10
-                Metrics:
-                    GraphSize: 10
-                    AverageClustering: 0.346
-                drift: 0.10

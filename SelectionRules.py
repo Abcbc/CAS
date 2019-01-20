@@ -1,5 +1,5 @@
 import random
-from Graph import KEY_OPINIONS, KEY_EDGE_ID
+from Graph import KEY_OPINIONS, KEY_EDGE_ID, findPaths
 
 def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
     filtered_set = [item for item in set if predicate(item)]
@@ -74,3 +74,21 @@ def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_g
 
     pairWithEdgeObjects = selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate, maxChoiceTries=maxChoiceTries)
     return {'edgeId':pairWithEdgeObjects['edge'][KEY_EDGE_ID], 'opinionIndex':pairWithEdgeObjects['opinionIndex']} if pairWithEdgeObjects is not None else None
+
+def selectPathFromGraph(graph, len, weight_getter=lambda path:1, predicate=lambda path:True, maxChoiceTries=100):
+    """
+    Selects one path with 'len' edges from the graph. The first and the last node in the path will not be the same.
+    The choice can be influenced by specifying a weight_getter function and/or a predicate.
+    The weight_getter function takes a list of nodes (the path) as arguments and calculates
+    the weight for this path (scalar value). When no function is specified, all paths have the same weight.
+    The predicate can be specified to ensure the chosen path fulfills some requirements. When no
+    function is specified, all paths can be chosen.
+    Returns the path as a list of edges.
+    If no suitable path could be found after maxChoiceTries, the function raises an error.
+    """
+    paths = []
+    for n in graph.nodes:
+        paths.extend(findPaths(graph, len, n))
+
+
+    return selectItemFromSet(paths, weight_getter, predicate, maxChoiceTries)
