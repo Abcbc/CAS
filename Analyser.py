@@ -31,6 +31,16 @@ class MetricGraphSize(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Number of nodes', label)
 
+class MetricNumberOfEdges(Metric):
+    def calculate(self, graph):
+        return len(graph.edges)
+
+    def getMetricName(self):
+        return 'NumberOfEdges'
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, 'Number of edges', label)
+
 class MetricAvgClustering(Metric):
     def calculate(self, graph):
         return nx.average_clustering(graph)
@@ -146,6 +156,7 @@ defaultConfig = {
 
 availableMetrics = [
     MetricGraphSize(),
+    MetricNumberOfEdges(),
     MetricAvgClustering(),
     MetricDensity(),
     MetricOpinionConsensus(),
