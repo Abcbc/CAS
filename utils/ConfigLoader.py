@@ -64,11 +64,12 @@ def config_generator(config, iterator_keys, combinations):
 
 def get_iteration_steps(config):
     # 1. find all iterator commands
-    iterator_keys, iterator_strings = _findIterators(config)
-    iterables = [_build_iterable(it_str) for it_str in iterator_strings]
+    iterator_params = _findIterators(config)
+    iterables = [_build_iterable(it_param[1]) for it_param in iterator_params]
 
-    return config_generator(config, iterator_keys, itertools.product(*iterables))
+    return config_generator(config, [it_param[0] for it_param in iterator_params], itertools.product(*iterables))
 
+# interators are returned alphabetically ordered with respect to the key
 def _findIterators(configDict):
     iterator_keys = []
     iterator_strings = []
@@ -84,7 +85,7 @@ def _findIterators(configDict):
                 iterator_keys.append(key)
                 iterator_strings.append(value)
 
-    return iterator_keys, iterator_strings
+    return sorted(zip(iterator_keys, iterator_strings), key=itemgetter(0))
 
 def _build_iterable(it_str):
     range_match = regex_range.fullmatch(it_str)
