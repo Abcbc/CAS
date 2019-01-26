@@ -4,6 +4,7 @@ import re
 import itertools
 import copy
 import math
+from operator import itemgetter
 config_path = "/".join([os.getcwd(), "configs", "simulations.yml"])
 
 
@@ -62,10 +63,14 @@ def config_generator(config, iterator_keys, combinations):
         except StopIteration:
             return
 
+def get_iterators_info(config):
+    iterator_params = _findIterators(config)
+    return [_build_iterable(it_param[1])['meta'] for it_param in iterator_params]
+
 def get_iteration_steps(config):
     # 1. find all iterator commands
     iterator_params = _findIterators(config)
-    iterables = [_build_iterable(it_param[1]) for it_param in iterator_params]
+    iterables = [_build_iterable(it_param[1])['it'] for it_param in iterator_params]
 
     return config_generator(config, [it_param[0] for it_param in iterator_params], itertools.product(*iterables))
 
@@ -95,10 +100,10 @@ def _build_iterable(it_str):
         first = float(range_match.group('first'))
         step = float(range_match.group('step'))
         last = float(range_match.group('last'))
-        return range_it(first, last, step)
+        return {'it': range_it(first, last, step), 'meta':{'type':'range','first':first,'step':step,'last':last}}
     elif list_match is not None:
-        list = list_match.group('items').split(':')
-        return list_it(list)
+        list = list_match.group('items').split(',')
+        return {'it':list_it(list), 'meta':{'type':'list','length':len(list)}}
 
 # form the list to list of integers or floats if possible
 def list_it(_list):
