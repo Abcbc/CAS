@@ -71,6 +71,20 @@ class MetricDensity(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Density', label)
 
+class MetricGraphProperty(Metric):
+    def __init__(self, getter_lambda, name):
+        self.getter = getter_lambda
+        self.name = name
+
+    def calculate(self, graph):
+        return self.getter(graph)
+
+    def getMetricName(self):
+        return self.name
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        plotLinear(plt, x, y, self.getMetricName(), xlabel, self.getMetricName(), label)
+
 class MetricOpinionConsensus(Metric):
     def __init__(self, topicIndex=None):
         self.topicIndex = topicIndex if topicIndex is not None else 'All'
@@ -164,6 +178,7 @@ availableMetrics = [
     MetricTransitivity(),
     MetricNumberOfClusters(),
     MetricMeanOrientation(),
+    MetricGraphProperty(lambda graph: nx.is_connected(graph), 'Connectedness'),
 ]
 
 class Analyser:
