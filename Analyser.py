@@ -15,6 +15,12 @@ class Metric:
     def plot(self, plt, x,y, xlabel='version', label=''):
         raise NotImplementedError('plot method must be implemented by concrete metric class')
 
+    # ToDo works not for all, e.g. not for histogram
+    @staticmethod
+    def mean_std(runs):
+        runs_combined = np.array([run for run in runs]) # each row is a run
+        return (np.mean(runs_combined, axis=0), np.std(runs_combined, axis=0))
+
 def plotLinear(plt, x, y, title, xlabel, ylabel,label):
     plt.plot(x,y,label=label,marker='*',linestyle='dashed')
     plt.title(title)
