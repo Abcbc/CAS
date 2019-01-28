@@ -65,7 +65,7 @@ def config_generator(config, iterator_keys, combinations):
 
 def get_iterators_info(config):
     iterator_params = _findIterators(config)
-    return [_build_iterable(it_param[1])['meta'] for it_param in iterator_params]
+    return [(it_param[0], _build_iterable(it_param[1])['meta']) for it_param in iterator_params]
 
 def get_iteration_steps(config):
     # 1. find all iterator commands
@@ -100,10 +100,10 @@ def _build_iterable(it_str):
         first = float(range_match.group('first'))
         step = float(range_match.group('step'))
         last = float(range_match.group('last'))
-        return {'it': range_it(first, last, step), 'meta':{'type':'range','first':first,'step':step,'last':last}}
+        return {'it': range_it(first, last, step), 'meta':{'it_type':'range','first':first,'step':step,'last':last,'length':len(list(range_it(first,last,step)))}}
     elif list_match is not None:
-        list = list_match.group('items').split(',')
-        return {'it':list_it(list), 'meta':{'type':'list','length':len(list)}}
+        list_ = list_match.group('items').split(',')
+        return {'it':list_it(list_), 'meta':{'it_type':'list','length':len(list_)}}
 
 # form the list to list of integers or floats if possible
 def list_it(_list):
