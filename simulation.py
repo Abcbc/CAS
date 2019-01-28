@@ -81,7 +81,7 @@ def finish_simulation(simulation_setting, repetitions, logDir):
         for i in range(len(analyzers[0].results['Version'])):
             row = []
             for row_contents in contents:
-                row.append(row_contents[i])
+                row.append(repr(row_contents[i]))
             combinedCsv.writerow(row)
 
     mean = {metric.getMetricName():metrics_mean[i] for i, metric in enumerate(analyzers[0].metrics)}

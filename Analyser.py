@@ -160,6 +160,48 @@ class MetricMeanOrientation(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Mean orientation', label)
 
+class MetricHistogram(Metric):
+    class Getter:
+        def __init__(self, getter_lambda, name):
+            self.getter_lambda = getter_lambda
+            self.name = name
+        def get(self, graph, node_id):
+            return self.getter_lambda(graph, node_id)
+        def get_name(self):
+            return self.name
+    class Getter_attribute(Getter):
+        def __init__(self, attr_name):
+            self.getter_lambda = lambda graph, node_id: graph.nodes[node_id][attr_name]
+            self.name = attr_name
+
+    def __init__(self, getter, min, max, nbins):
+        self.getter = getter
+        self.min = min
+        self.max = max
+        self.nbins = nbins
+
+    def calculate(self, graph):
+        vals = np.array([self.getter.get(graph, nid) for nid in graph.nodes])
+        if np.any(vals > self.max):
+            print('value {} > max {} dropped in {}'.format(max(vals),self.max,self.getMetricName()))
+        return np.histogram(vals, bins=self.nbins, range=(self.min,self.max))
+
+    def getMetricName(self):
+        return 'Histogram'+self.getter.get_name()
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        raise NotImplementedError
+
+    # works only if min, max, nbins are the same
+    @staticmethod
+    def mean_std(runs):
+        combined_hists = np.array([[iteration for iteration in run] for run in runs]) # each row is one histogram
+        mean_hist = (np.mean(combined_hists, axis=0))
+        iterations = len(mean_hist[0][0])
+        fake_std = (np.zeros(iterations), np.zeros(iterations+1))
+        fake_std = np.array([fake_std for _ in range(len(mean_hist))])
+        return (mean_hist, fake_std) # no std
+
 class HelperMetricVersion(Metric):
     def calculate(self, graph):
         return Graph.getVersion(graph)
@@ -184,6 +226,8 @@ availableMetrics = [
     MetricTransitivity(),
     MetricNumberOfClusters(),
     MetricMeanOrientation(),
+    MetricHistogram(MetricHistogram.Getter_attribute(Graph.KEY_V), 0, 50,250),
+    MetricHistogram(MetricHistogram.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree'), 0, 50, 250),
     MetricGraphProperty(lambda graph: nx.is_connected(graph), 'Connectedness'),
 ]
 
