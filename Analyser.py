@@ -164,7 +164,7 @@ class MetricMeanOrientation(Metric):
     def plot(self, plt, x,y, xlabel='version', label=''):
         plotLinear(plt, x,y, self.getMetricName(), xlabel, 'Mean orientation', label)
 
-class MetricHistogram(Metric):
+class MetricAggregateValues(Metric):
     class Getter:
         def __init__(self, getter_lambda, name):
             self.getter_lambda = getter_lambda
@@ -178,33 +178,53 @@ class MetricHistogram(Metric):
             self.getter_lambda = lambda graph, node_id: graph.nodes[node_id][attr_name]
             self.name = attr_name
 
-    def __init__(self, getter, min, max, nbins):
+    def __init__(self, getter):
         self.getter = getter
-        self.min = min
-        self.max = max
-        self.nbins = nbins
+
+# min value is 0!
+class MetricHistogram(MetricAggregateValues):
+    def __init__(self, getter):
+        super().__init__(getter)
 
     def calculate(self, graph):
         vals = np.array([self.getter.get(graph, nid) for nid in graph.nodes])
-        if np.any(vals > self.max):
-            print('value {} > max {} dropped in {}'.format(max(vals),self.max,self.getMetricName()))
-        return np.histogram(vals, bins=self.nbins, range=(self.min,self.max))
+
+        max = np.max(vals)
+        nbins = int(np.ceil(max))
+        nbins = nbins+1 if nbins == 0 else nbins
+        return np.histogram(vals, bins=nbins, range=(0,max))
 
     def getMetricName(self):
         return 'Histogram'+self.getter.get_name()
 
-    def plot(self, plt, x,y, xlabel='version', label=''):
-        raise NotImplementedError
-
-    # works only if min, max, nbins are the same
     @staticmethod
     def mean_std(runs):
-        combined_hists = np.array([[iteration for iteration in run] for run in runs]) # each row is one histogram
-        mean_hist = (np.mean(combined_hists, axis=0))
+        runs = np.array(runs)
+        maxlen = [max([len(run[it][0]) for run in runs]) for it in range(len(runs[0]))]
+        bins = np.array([np.array(range(maxlen_+1)) for maxlen_ in maxlen])
+
+        combined_hists = np.array([[(np.pad(hist[0],[0,maxlen_-len(hist[0])],'constant',constant_values=0),bins_) for hist in runs[:,i,:]] for i,maxlen_,bins_ in zip(range(len(runs[0])),maxlen,bins)])
+
+        mean_hist = (np.mean(combined_hists, axis=1))
         iterations = len(mean_hist[0][0])
         fake_std = (np.zeros(iterations), np.zeros(iterations+1))
         fake_std = np.array([fake_std for _ in range(len(mean_hist))])
         return (mean_hist, fake_std) # no std
+
+class MetricMean(MetricAggregateValues):
+    def calculate(self, graph):
+        return np.mean([self.getter.get(graph, nid) for nid in graph.nodes])
+
+    def getMetricName(self):
+        return 'Mean'+self.getter.get_name()
+
+class MetricStd(MetricAggregateValues):
+    def calculate(self, graph):
+        return np.std([self.getter.get(graph, nid) for nid in graph.nodes])
+
+    def getMetricName(self):
+        return 'Std'+self.getter.get_name()
+
 
 class HelperMetricVersion(Metric):
     def calculate(self, graph):
@@ -230,8 +250,10 @@ availableMetrics = [
     MetricTransitivity(),
     MetricNumberOfClusters(),
     MetricMeanOrientation(),
-    MetricHistogram(MetricHistogram.Getter_attribute(Graph.KEY_V), 0, 50,250),
-    MetricHistogram(MetricHistogram.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree'), 0, 50, 250),
+    # MetricHistogram(MetricHistogram.Getter_attribute(Graph.KEY_V), 0, 50,250),
+    MetricHistogram(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
+    MetricMean(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
+    MetricStd(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
     MetricGraphProperty(lambda graph: nx.is_connected(graph), 'Connectedness'),
 ]
 
