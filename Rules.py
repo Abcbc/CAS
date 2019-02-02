@@ -257,7 +257,8 @@ class NewNodeRule(Rule):
         for comm in communities:
             commGraph = graph.subgraph(comm)
             isDense = nx.density(commGraph) >= self.parameters['densityThreshold']
-            hasHighOrientation = np.mean([graph.edges[eid][Graph.KEY_ORIENTATION] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold']
+            hasHighOrientation = np.mean([graph.edges[eid][Graph.KEY_ORIENTATION] for eid in commGraph.edges]) >= self.parameters['meanOrientationThreshold'] if len(commGraph.edges) > 0 \
+                else False
             if isDense and hasHighOrientation:
                 connectedCommunities.append(comm)
             else:
