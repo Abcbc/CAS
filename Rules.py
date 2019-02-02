@@ -215,18 +215,20 @@ class NewNodeRule(Rule):
 
     defaultParameters = { 'densityThreshold' : 0.8,
                           'meanOrientationThreshold' : 0.8,
-                          'opMeanThreshold' : 0.8 }
+                          'opMeanThreshold' : 0.8,
+                          'modularityThreshold': 0.2}
 
     def _createInternals(self, graph):
         log.debug('NewNodeRule create internals')
         communities = self._findOperands(graph)
         self.internals = { 'nodesToAdd' : [] }
-        for comm in communities:
-            opinions = self._calcOpinions(graph, comm)
-            neighbors = comm
-            self.internals['nodesToAdd'].append((opinions,neighbors))
-            log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
-                      + ' to community ' + str(comm))
+        if community.modularity(community.best_partition(graph),graph) > self.parameters['modularityThreshold']:
+            for comm in communities:
+                opinions = self._calcOpinions(graph, comm)
+                neighbors = comm
+                self.internals['nodesToAdd'].append((opinions,neighbors))
+                log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
+                          + ' to community ' + str(comm))
 
         return self.internals
 
