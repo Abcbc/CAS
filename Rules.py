@@ -281,7 +281,7 @@ class NewNodeRule(Rule):
             graph.add_nodes_from([(node[Graph.KEY_NODE_ID],node)])
             log.debug('Added node ' + str(graph.nodes[node[Graph.KEY_NODE_ID]]))
             for neighbour in nodeToAdd[1]:
-                edge = Graph.createNewEdgeSkeleton(graph, node, graph.nodes[neighbour])
+                edge = Graph.createNewEdgeSkeleton(graph, graph.nodes[node[Graph.KEY_NODE_ID]], graph.nodes[neighbour])
                 graph.add_edges_from([(node[Graph.KEY_NODE_ID], neighbour,edge)])
                 log.debug('Added edge ' + str(graph.edges[edge[Graph.KEY_EDGE_ID]]))
 
