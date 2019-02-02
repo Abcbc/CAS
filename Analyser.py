@@ -226,6 +226,24 @@ class MetricStd(MetricAggregateValues):
         return 'Std'+self.getter.get_name()
 
 
+class MetricCommunities(Metric):
+    def calculate(self, graph):
+        bp = community.best_partition(graph)
+        comms = [[nid for nid in community.best_partition(graph) if bp[nid]==i] for i in range(20)]
+        comms = [comm for comm in comms if len(comm)>0]
+        return sorted([len(comm) for comm in comms]),community.modularity(bp, graph)
+
+    def getMetricName(self):
+        return 'Communities'
+
+    def plot(self, plt, x,y, xlabel='version', label=''):
+        raise NotImplementedError
+
+    @staticmethod
+    def mean_std(runs):
+        # just return the first run. How to average?
+        return (runs[0],np.zeros(len(runs[0])))
+
 class HelperMetricVersion(Metric):
     def calculate(self, graph):
         return Graph.getVersion(graph)
@@ -255,6 +273,8 @@ availableMetrics = [
     MetricMean(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
     MetricStd(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
     MetricGraphProperty(lambda graph: nx.is_connected(graph), 'Connectedness'),
+    MetricCommunities(),
+
 ]
 
 class Analyser:
