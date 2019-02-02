@@ -99,6 +99,8 @@ class MetricOpinionConsensus(Metric):
         opinions = [graph.nodes[nid][Graph.KEY_OPINIONS][ind] for nid in graph.nodes]
         numberPositive = np.sum(np.array(opinions) > 0)
         numberNegative = np.sum(np.array(opinions) < 0)
+        if numberPositive == 0 and numberNegative == 0:
+            return 0 # no opinion is not really consensus
         return 1 - min(numberPositive,numberNegative)/max(numberPositive,numberNegative)
 
     def calculate(self, graph):
@@ -152,6 +154,8 @@ class MetricNumberOfClusters(Metric):
 
 class MetricMeanOrientation(Metric):
     def calculate(self, graph):
+        if len(graph.edges) == 0:
+            return 0
         return np.mean([graph.edges[eid][Graph.KEY_ORIENTATION] for eid in graph.edges])
 
     def getMetricName(self):
