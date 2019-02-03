@@ -222,13 +222,16 @@ class NewNodeRule(Rule):
         log.debug('NewNodeRule create internals')
         communities = self._findOperands(graph)
         self.internals = { 'nodesToAdd' : [] }
-        if community.modularity(community.best_partition(graph),graph) > self.parameters['modularityThreshold']:
-            for comm in communities:
-                opinions = self._calcOpinions(graph, comm)
-                neighbors = comm
-                self.internals['nodesToAdd'].append((opinions,neighbors))
-                log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
-                          + ' to community ' + str(comm))
+        try:
+            if community.modularity(community.best_partition(graph),graph) > self.parameters['modularityThreshold']:
+                for comm in communities:
+                    opinions = self._calcOpinions(graph, comm)
+                    neighbors = comm
+                    self.internals['nodesToAdd'].append((opinions,neighbors))
+                    log.debug('NewNodeRule decided to add new node with opinions ' + str(opinions)
+                              + ' to community ' + str(comm))
+        except ValueError:
+            pass
 
         return self.internals
 
