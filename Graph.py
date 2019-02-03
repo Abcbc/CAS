@@ -1,4 +1,5 @@
 import networkx as nx
+import community
 import json
 
 KEY_NODE_ID = 'id'
@@ -135,3 +136,8 @@ def findPaths(g, len, v):
     if len==0:
         return [[v]]
     return [[v] + p for u in nx.neighbors(g, v) for p in findPaths(g,len-1, u) if not v in p]
+
+def getCommunities(graph):
+    bp = community.best_partition(graph)
+    comms = [[nid for nid in bp if bp[nid]==i] for i in range(20)]
+    return [comm for comm in comms if len(comm)>0], community.modularity(bp,graph)
