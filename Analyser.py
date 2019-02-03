@@ -231,7 +231,10 @@ class MetricCommunities(Metric):
         bp = community.best_partition(graph)
         comms = [[nid for nid in community.best_partition(graph) if bp[nid]==i] for i in range(20)]
         comms = [comm for comm in comms if len(comm)>0]
-        return sorted([len(comm) for comm in comms]),community.modularity(bp, graph)
+        try:
+            return sorted([len(comm) for comm in comms]),community.modularity(bp, graph)
+        except ValueError:
+            return [0],0
 
     def getMetricName(self):
         return 'Communities'
