@@ -273,10 +273,11 @@ availableMetrics = [
     MetricMeanOrientation(),
     # MetricHistogram(MetricHistogram.Getter_attribute(Graph.KEY_V), 0, 50,250),
     MetricHistogram(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
-    MetricMean(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
-    MetricStd(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')),
+    # MetricMean(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')), # disabled to save computations, most information is in histogram
+    # MetricStd(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')), # disabled to save computations, most information is in histogram
     MetricGraphProperty(lambda graph: nx.is_connected(graph), 'Connectedness'),
-    MetricCommunities(),
+    MetricGraphProperty(lambda graph: community.modularity(community.best_partition(graph),graph), 'Modularity'),
+    # MetricCommunities(), # disabled, not much to get from this metric, just modularity is measured above
 
 ]
 
