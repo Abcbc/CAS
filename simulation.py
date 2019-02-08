@@ -1,21 +1,17 @@
 import utils.ConfigLoader as cnf
-from GraphFactory import GraphFactory
 import networkx as nx
 import multiprocessing as mp
 import time
-import matplotlib.pyplot as plt
 import csv
-import numpy as np
 
 from utils.Logger import *
+file_level = ERROR
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
-import Builder
 import Updater
-import GraphLog as gl
 import Rules
 
 import matplotlib.pyplot as plt
-import MyGraphFactory
+import GraphFactory2
 import copy
 
 # Note on concurrent simulation: repetition-level concurrency would be the solution that offers
@@ -60,9 +56,10 @@ def finish_simulation(simulation_setting, repetitions, logDir):
 
     cnf.save_config(simulation_setting,  logDir+'settings.yaml')
 
+    # comment out to save space
     # write graph metrics to csv
-    for ind, analyser in enumerate(analyzers):
-        analyser.write(logDir+'graph_'+str(ind)+'.csv')
+    # for ind, analyser in enumerate(analyzers):
+    #     analyser.write(logDir+'graph_'+str(ind)+'.csv')
 
     # build mean and std over all analyzers
     metrics_mean = []
@@ -92,20 +89,23 @@ def finish_simulation(simulation_setting, repetitions, logDir):
             }
 
 def run_simulation(simulation_setting, logDir):
-    log.debug(simulation_setting)
-    gf = GraphFactory(simulation_setting)
-    repetitions = []
+    try:
+        repetitions = []
 
-    for repetition in range(simulation_setting["sim_repetitions"]):
-        g = gf.create()
+        for repetition in range(simulation_setting["sim_repetitions"]):
+            g = GraphFactory2.get_graph(simulation_setting,simulation_setting)
 
-        ruleset = {name:rule for name, rule in Rules.getNewRuleset().items()}
-        for rule in ruleset.values():
-            rule.setParameters(simulation_setting)
+            ruleset = {name:rule for name, rule in Rules.getNewRuleset().items()}
+            for rule in ruleset.values():
+                rule.setParameters(simulation_setting)
 
-        repetitions.append(run_repetition(ruleset, simulation_setting, g, logDir, repetition))
+            repetitions.append(run_repetition(ruleset, simulation_setting, g, logDir, repetition))
 
-    return finish_simulation(simulation_setting, repetitions, logDir)
+        return finish_simulation(simulation_setting, repetitions, logDir)
+    except Exception as e:
+        import sys,traceback
+        print('Exception during simulation ' + logDir)
+        traceback.print_exc(file=sys.stdout)
 
 def main():
     pool = mp.Pool()
@@ -128,13 +128,15 @@ def main():
         }
         for ind, stepConfig in enumerate(stepConfigs):
             stepDir = simulation_dir + str(ind) + '/'
+            # print(stepDir + ": " + str(stepConfig))
             try:
                 os.mkdir(stepDir)
             except(FileExistsError):
                 pass
 
+            # use the pool line for production; use the direct call for debugging.
             stepResult = pool.apply_async(run_simulation, args=(copy.deepcopy(stepConfig), stepDir))
-            # stepResult = run_simulation(stepConfig, stepDir)
+            # stepResult = run_simulation(stepConfig, stepDir) # note: Program will crash after all simulations are done when the result is no multiprocessing result object and has no method ready()
 
             results[simulation_setting['sim_name']]['steps'].append({
                 'settings':stepConfig,
@@ -160,7 +162,6 @@ def main():
 
     pool.join()
 
-
 def run_from_log():
     logfile = '.log'
     import GraphLog as gl
@@ -185,6 +186,8 @@ def run_from_log():
 
 if __name__ == "__main__":
     start = time.perf_counter()
+
     main()
+
     end = time.perf_counter()
     print("time consumed: " + str(end-start) + " s")
