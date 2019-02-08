@@ -1,79 +1,84 @@
 simulation_settings:
-    group1:
-        sim1:
-            sim_name: "2 CLuster Same opinion 20"
-            sim_iterations: 20
-        sim2:
-            sim_name: "2 CLuster Same opinion 20"
-            sim_iterations: 40
-        sim3:
-            sim_name: "2 CLuster Same opinion 20"
-            sim_iterations: 60
-        sim4:
-            sim_name: "2 CLuster Same opinion 20"
-            sim_iterations: 80
-        sim5:
-            sim_name: "2 CLuster Same opinion 20"
-            sim_iterations: 100
-
+    verification:
+        scenario1:
+            sim_name: random
+            opinions_distri: 'random'
+            graph_type: list(Barabasi-Albert,karate-club)
+        scenario2:
+            sim_name: oneCentre
+            opinions_distri: 'model'
+            opinions_number_of_centres: 1
+            opinions_center_choicemode: betweenness
+            graph_type: list(Barabasi-Albert,karate-club)
+        scenario3:
+            sim_name: twoCentres
+            opinions_distri: 'model'
+            opinions_number_of_centres: 2
+            opinions_center_choicemode: betweenness
+            graph_type: Barabasi-Albert
+            opinions_center_tendencies:
+              - pos
+              - neg
+        scenario4:
+            sim_name: twoCentresPeriph
+            opinions_distri: 'model'
+            opinions_number_of_centres: 2
+            opinions_center_choicemode: periph
+            graph_type: Barabasi-Albert
+            opinions_center_tendencies:
+              - pos
+              - neg
+        scenario5:
+            sim_name: twoBaTest
+            graph_type: 2BA
+            graph_part_num_of_nodes: 50
+            graph_inter_cluster_connections: range(10:20:50)
+            opinions_distri: model
+            opinions_center_choicemode: list(betweenness,periph)
+            opinions_number_of_centres: 1 #centers per comm
+            opinions_center_tendencies:
+              - pos
+              - neg
+        scenario6:
+            sim_name: twoBaTestRnd
+            graph_type: 2BA
+            graph_part_num_of_nodes: 50
+            graph_inter_cluster_connections: range(10:20:50)
+            opinions_distri: random
+            opinions_number_of_centres: 1 #centers per comm
+            opinions_center_tendencies:
+              - pos
+              - neg
 
         defaults:
-            sim_iterations: 20
-            sim_repetitions: 1
-            sim_breaks: 2
-            actor_complexity: 4
-            actor_method: random
-            graph_type: default
-            graph_num_of_node: 10
-            graph_init_connects: 2
-            graph_branch_probability: 0.6
-            graph_cluster: 2
-            graph_cluster_methods: default
-            graph_cluster_distribution: even
-            OrientationConfirmationRule_fallbackProbability: 0.5
+            graph_barabasi_albert_n-conn: list(5,10)
+
+            sim_iterations: 2000
+            sim_repetitions: 20
+
+            graph_num_of_nodes: 50
+
+            opinions_number_of_topics: 50
+            opinions_center_tendencies: random
+
+            func: log
+            tendency_strength: 1000
+
+            OrientationConfirmationRule_fallbackProbability: 0.3
             AdaptationRule:
-            NewNodeRule_densityThreshold: 0.8
-            NewNodeRule_meanOrientationThreshold: 0.8
-            NewNodeRule_opMeanThreshold: 0.8
-            NewEdgesRule_createEdgeProbability: 0.1
-            RemoveEdgeRule_absOrientationThreshold: 0.1
-            TakeoverRule_removalProbability: 0.5
-            TakeoverRule_minDifference: 1
+            NewNodeRule_densityThreshold: 0.5
+            NewNodeRule_meanOrientationThreshold: 0.4
+            NewNodeRule_opMeanThreshold: 0.7
+            NewNodeRule_modularityThreshold: 0.2
+            NewEdgesRule_createEdgeProbability: 0.5
+            RemoveEdgeRule_absOrientationThreshold: 0.6
+            TakeoverRule_minDifference: 0.2
 
-    group2:
-        sim3:
-            sim_name: "some Simulationname3"
-        sim4:
-            sim_name: "some Simulationname4"
-
-        defaults:
-            sim_iterations: 20
-            sim_repetitions: 1
-            sim_breaks: 20
-            actor_complexity: 4
-            actor_method: random
-            graph_type: default
-            graph_num_of_node: 10
-            graph_init_connects: 2
-            graph_branch_probability: 0.6
-            graph_cluster: 2
-            graph_cluster_methods: default
-            graph_cluster_distribution: even
-            OrientationConfirmationRule_fallbackProbability: range(0.2:0.1:0.8)
-            AdaptationRule:
-            NewNodeRule_densityThreshold: 0.8
-            NewNodeRule_meanOrientationThreshold: 0.8
-            NewNodeRule_opMeanThreshold: 0.8
-            NewEdgesRule_createEdgeProbability: 0.1
-            RemoveEdgeRule_absOrientationThreshold: 0.1
-            TakeoverRule_removalProbability: 0.5
-            TakeoverRule_minDifference: 1
-
-            OrientationConfirmationRule_weight: 1
-            AdaptationRule_weight: 1
+            OrientationConfirmationRule_weight: 0.5
+            AdaptationRule_weight: 10
             NewNodeRule_weight: 1
             NewEdgesRule_weight: 1
-            RemoveEdgeRule_weight: 1
-            TakeoverRule_weight: 1
+            RemoveEdgeRule_weight: 2
+            TakeoverRule_weight: 5
 
             logging_enabled: False
