@@ -9,6 +9,8 @@ file_level = ERROR
 log = get_logger(__name__, __file__) # For Main, call before any include with also calls get_logger
 import Updater
 import Rules
+import examples_plots
+import visualization
 
 import matplotlib.pyplot as plt
 import GraphFactory2
