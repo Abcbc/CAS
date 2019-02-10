@@ -276,7 +276,7 @@ availableMetrics = [
     # MetricMean(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')), # disabled to save computations, most information is in histogram
     # MetricStd(MetricAggregateValues.Getter(lambda graph, nid: nx.degree(graph, nid), 'Degree')), # disabled to save computations, most information is in histogram
     MetricGraphProperty(lambda graph: nx.is_connected(graph), 'Connectedness'),
-    MetricGraphProperty(lambda graph: community.modularity(community.best_partition(graph),graph), 'Modularity'),
+    MetricGraphProperty(lambda graph: 0 if len(graph.edges)==0 else community.modularity(community.best_partition(graph),graph), 'Modularity'),
     # MetricCommunities(), # disabled, not much to get from this metric, just modularity is measured above
 
 ]
