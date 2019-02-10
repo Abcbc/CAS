@@ -1,7 +1,7 @@
 import random
 from Graph import KEY_OPINIONS, KEY_EDGE_ID, findPaths
 
-def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
+def selectItemFromSet(set, weight_getter, predicate):
     filtered_set = [item for item in set if predicate(item)]
     if len(filtered_set) == 0:
         return None
@@ -17,7 +17,7 @@ def selectItemFromSet(set, weight_getter, predicate, maxChoiceTries):
 
     return chosenItem
     
-def selectNodeFromGraph(graph, weight_getter=lambda node:1, predicate=lambda node: True, maxChoiceTries=100):
+def selectNodeFromGraph(graph, weight_getter=lambda node:1, predicate=lambda node: True):
     """
     Selects one random node from the graph.
 
@@ -29,9 +29,9 @@ def selectNodeFromGraph(graph, weight_getter=lambda node:1, predicate=lambda nod
     Returns the node id.
     If no suitable node could be found after maxChoiceTries, the function raises an error.
     """
-    return selectItemFromSet(list(graph.nodes()), weight_getter, predicate, maxChoiceTries)
+    return selectItemFromSet(list(graph.nodes()), weight_getter, predicate)
 
-def selectEdgeFromGraph(graph, weight_getter=lambda edge:1, predicate=lambda edge: True, maxChoiceTries=100):
+def selectEdgeFromGraph(graph, weight_getter=lambda edge:1, predicate=lambda edge: True):
     """
     Selects one random edge from the graph.
 
@@ -43,10 +43,10 @@ def selectEdgeFromGraph(graph, weight_getter=lambda edge:1, predicate=lambda edg
     Returns the edge id.
     If no suitable edge could be found after maxChoiceTries, the function raises an error.
     """
-    return selectItemFromSet(list(graph.edges()), weight_getter, predicate, maxChoiceTries)
+    return selectItemFromSet(list(graph.edges()), weight_getter, predicate)
 
 #def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=lambda opA,opB:1, predicate=lambda edge,opA,opB:True, maxChoiceTries=100):
-def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=None, predicate=lambda pair:True, maxChoiceTries=100):
+def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_getter_opinion=None, predicate=lambda pair:True):
     """
     Selects one pair of opinions (opinions of two connected nodes about the same "subject" from the
     graph.
@@ -72,10 +72,10 @@ def selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge:1, weight_g
         for idx in range(len(graph.nodes[edgeId[0]][KEY_OPINIONS])):
             pairs.append({'edge':graph.edges[edgeId], 'opinionIndex':idx})
 
-    pairWithEdgeObjects = selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate, maxChoiceTries=maxChoiceTries)
+    pairWithEdgeObjects = selectItemFromSet(pairs, weight_getter=lambda pair:weight_getter_edge(pair['edge']), predicate=predicate)
     return {'edgeId':pairWithEdgeObjects['edge'][KEY_EDGE_ID], 'opinionIndex':pairWithEdgeObjects['opinionIndex']} if pairWithEdgeObjects is not None else None
 
-def selectPathFromGraph(graph, len, weight_getter=lambda path:1, predicate=lambda path:True, maxChoiceTries=100):
+def selectPathFromGraph(graph, len, weight_getter=lambda path:1, predicate=lambda path:True):
     """
     Selects one path with 'len' edges from the graph. The first and the last node in the path will not be the same.
 
@@ -92,4 +92,4 @@ def selectPathFromGraph(graph, len, weight_getter=lambda path:1, predicate=lambd
         paths.extend(findPaths(graph, len, n))
 
 
-    return selectItemFromSet(paths, weight_getter, predicate, maxChoiceTries)
+    return selectItemFromSet(paths, weight_getter, predicate)

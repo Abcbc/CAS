@@ -163,7 +163,7 @@ class AdaptationRule(Rule):
         return self.internals
 
     def _findOperands(self, graph):
-        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[Graph.KEY_ORIENTATION]), predicate=self._selectionPredicate, maxChoiceTries=1e6)
+        return selectOpinionPairFromGraph(graph, weight_getter_edge=lambda edge : abs(edge[Graph.KEY_ORIENTATION]), predicate=self._selectionPredicate)
 
     def _selectionPredicate(self, pair):
         opA = pair['edge']['nodeA'][Graph.KEY_OPINIONS][pair['opinionIndex']]
